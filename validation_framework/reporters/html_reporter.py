@@ -788,6 +788,31 @@ HTML_TEMPLATE = """
             </div>
         </div>
 
+        <!-- Status Legend -->
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 1rem;">📋 Status Definitions</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="padding: 0.75rem; background: var(--bg-primary); border-radius: 6px; border-left: 3px solid var(--error);">
+                    <strong style="color: var(--error);">FAILED</strong>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
+                        One or more ERROR-severity checks failed. Critical data quality issues detected that should prevent data load.
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: var(--bg-primary); border-radius: 6px; border-left: 3px solid var(--warning);">
+                    <strong style="color: var(--warning);">WARNING</strong>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
+                        All ERROR checks passed, but one or more WARNING-severity checks failed. Data may be loaded with caution.
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: var(--bg-primary); border-radius: 6px; border-left: 3px solid var(--success);">
+                    <strong style="color: var(--success);">PASSED</strong>
+                    <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.875rem;">
+                        All validation checks passed successfully. Data meets all quality standards and is ready for load.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Charts & Visualizations -->
         <div class="charts-section">
             <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">📊 Validation Insights</h2>
@@ -899,7 +924,7 @@ HTML_TEMPLATE = """
                                 <div>
                                     <div class="validation-name">{{ result.rule_name }}</div>
                                     <span class="severity-badge {% if result.passed %}severity-success{% else %}{% if result.severity.value == 'ERROR' %}severity-error{% else %}severity-warning{% endif %}{% endif %}">
-                                        {{ result.severity.value }}
+                                        {% if result.passed %}PASSED{% else %}{{ result.severity.value }}{% endif %}
                                     </span>
                                 </div>
                             </div>
