@@ -1,0 +1,274 @@
+"""
+Command-line interface for the Data Validation Framework.
+
+Provides commands for:
+- Running validations
+- Listing available validation types
+- Generating reports
+"""
+
+import click
+import sys
+from pathlib import Path
+
+from validation_framework.core.engine import ValidationEngine
+from validation_framework.core.registry import get_registry
+
+
+@click.group()
+@click.version_option(version="0.1.0")
+def cli():
+    """
+    Data Validation Framework - Robust pre-load data quality checks.
+
+    A comprehensive tool for validating data files before loading them
+    into systems. Supports CSV, Excel, Parquet and validates data quality,
+    completeness, schema conformance, and business rules.
+    """
+    pass
+
+
+@cli.command()
+@click.argument('config_file', type=click.Path(exists=True))
+@click.option('--html-output', '-o', help='Path for HTML report output')
+@click.option('--json-output', '-j', help='Path for JSON report output')
+@click.option('--verbose/--quiet', '-v/-q', default=True, help='Verbose output')
+@click.option('--fail-on-warning', is_flag=True, help='Fail if warnings are found')
+def validate(config_file, html_output, json_output, verbose, fail_on_warning):
+    """
+    Run data validation from a configuration file.
+
+    CONFIG_FILE: Path to YAML configuration file defining validations
+
+    Examples:
+
+    \b
+    # Basic validation
+    data-validate validate config.yaml
+
+    \b
+    # With custom output paths
+    data-validate validate config.yaml -o report.html -j results.json
+
+    \b
+    # Fail on warnings
+    data-validate validate config.yaml --fail-on-warning
+    """
+    try:
+        # Create and run validation engine
+        engine = ValidationEngine.from_config(config_file)
+        report = engine.run(verbose=verbose)
+
+        # Generate HTML report
+        if html_output:
+            engine.generate_html_report(report, html_output)
+        else:
+            # Use default from config or fallback
+            html_path = engine.config.html_report_path
+            engine.generate_html_report(report, html_path)
+
+        # Generate JSON report
+        if json_output:
+            engine.generate_json_report(report, json_output)
+        else:
+            # Check if config specifies JSON output
+            if engine.config.json_summary_path:
+                engine.generate_json_report(report, engine.config.json_summary_path)
+
+        # Determine exit code based on results
+        if report.has_errors():
+            if engine.config.fail_on_error:
+                click.echo("\n❌ Validation FAILED with errors", err=True)
+                sys.exit(1)
+
+        if report.has_warnings() and (fail_on_warning or engine.config.fail_on_warning):
+            click.echo("\n⚠️  Validation completed with warnings (treating as failure)", err=True)
+            sys.exit(2)
+
+        if report.has_errors() or report.has_warnings():
+            click.echo(f"\n✓ Validation completed with issues (warnings only)")
+            sys.exit(0)
+
+        click.echo("\n✅ Validation PASSED")
+        sys.exit(0)
+
+    except FileNotFoundError as e:
+        click.echo(f"❌ Error: {str(e)}", err=True)
+        sys.exit(1)
+
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        if verbose:
+            import traceback
+            traceback.print_exc()
+        sys.exit(1)
+
+
+@cli.command()
+@click.option('--category', '-c', type=click.Choice(['all', 'file', 'schema', 'field', 'record']),
+              default='all', help='Filter by validation category')
+def list_validations(category):
+    """
+    List all available validation types.
+
+    Use --category to filter by validation category:
+    - file: File-level checks (empty files, row counts, etc.)
+    - schema: Schema validation (columns, types, etc.)
+    - field: Field-level checks (mandatory, regex, ranges, etc.)
+    - record: Record-level checks (duplicates, blanks, etc.)
+
+    Examples:
+
+    \b
+    # List all validations
+    data-validate list-validations
+
+    \b
+    # List only field-level validations
+    data-validate list-validations --category field
+    """
+    registry = get_registry()
+    validations = sorted(registry.list_available())
+
+    # Category filtering (simple string matching)
+    if category != 'all':
+        category_keywords = {
+            'file': ['file', 'size', 'row'],
+            'schema': ['schema', 'column'],
+            'field': ['field', 'mandatory', 'regex', 'values', 'range', 'date', 'format'],
+            'record': ['duplicate', 'blank', 'unique', 'record'],
+        }
+        keywords = category_keywords.get(category, [])
+        validations = [v for v in validations if any(k.lower() in v.lower() for k in keywords)]
+
+    click.echo(f"\nAvailable Validations ({len(validations)}):\n")
+
+    for validation in validations:
+        try:
+            # Get validation class to show description
+            validation_class = registry.get(validation)
+            # Create temporary instance to get description
+            from validation_framework.core.results import Severity
+            instance = validation_class(name=validation, severity=Severity.ERROR, params={})
+            description = instance.get_description()
+            click.echo(f"  • {validation}")
+            click.echo(f"    {description}\n")
+        except Exception:
+            click.echo(f"  • {validation}\n")
+
+
+@cli.command()
+@click.argument('output_path', type=click.Path())
+def init_config(output_path):
+    """
+    Generate a sample configuration file.
+
+    OUTPUT_PATH: Path where sample config should be written
+
+    Example:
+
+    \b
+    data-validate init-config my_validation.yaml
+    """
+    sample_config = '''# Data Validation Configuration
+# Generated by Data Validation Framework
+
+validation_job:
+  name: "Sample Data Validation"
+  version: "1.0"
+
+  files:
+    # Example CSV file validation
+    - name: "customers"
+      path: "data/customers.csv"
+      format: "csv"
+      delimiter: ","
+      encoding: "utf-8"
+
+      validations:
+        # File-level checks
+        - type: "EmptyFileCheck"
+          severity: "ERROR"
+
+        - type: "RowCountRangeCheck"
+          severity: "WARNING"
+          params:
+            min_rows: 100
+            max_rows: 1000000
+
+        # Schema validation
+        - type: "SchemaMatchCheck"
+          severity: "ERROR"
+          params:
+            expected_schema:
+              customer_id: "integer"
+              name: "string"
+              email: "string"
+              balance: "float"
+              created_date: "date"
+
+        # Field-level validations
+        - type: "MandatoryFieldCheck"
+          severity: "ERROR"
+          params:
+            fields: ["customer_id", "name", "email"]
+
+        - type: "RegexCheck"
+          severity: "ERROR"
+          params:
+            field: "email"
+            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}$"
+            message: "Invalid email format"
+
+        - type: "RangeCheck"
+          severity: "WARNING"
+          params:
+            field: "balance"
+            min_value: 0
+            max_value: 1000000
+
+        # Record-level checks
+        - type: "DuplicateRowCheck"
+          severity: "ERROR"
+          params:
+            key_fields: ["customer_id"]
+
+  # Output configuration
+  output:
+    html_report: "validation_report.html"
+    json_summary: "validation_summary.json"
+    fail_on_error: true
+    fail_on_warning: false
+
+  # Processing options
+  processing:
+    chunk_size: 50000  # Rows per chunk (for large files)
+    parallel_files: false
+    max_sample_failures: 100
+'''
+
+    try:
+        output_file = Path(output_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(output_file, 'w') as f:
+            f.write(sample_config)
+
+        click.echo(f"✓ Sample configuration written to: {output_path}")
+        click.echo(f"\nEdit the file to customize for your data, then run:")
+        click.echo(f"  data-validate validate {output_path}")
+
+    except Exception as e:
+        click.echo(f"❌ Error creating config file: {str(e)}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+def version():
+    """Display version information."""
+    click.echo("Data Validation Framework v0.1.0")
+    click.echo("A robust tool for pre-load data quality validation")
+
+
+if __name__ == '__main__':
+    cli()

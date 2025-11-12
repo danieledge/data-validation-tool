@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Generated data files (keep structure, ignore content)
+examples/sample_data/*.csv
+examples/sample_data/*.xlsx
+examples/sample_data/*.parquet
+
+# Generated reports
+examples/validation_report.html
+examples/validation_summary.json
+validation_report.html
+validation_summary.json
+*.html
+*.json
+
+# But DO track example config
+!examples/sample_config.yaml
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Large files
+*.gz
+*.zip
+*.tar
+*.7z
+
+# OS
+Thumbs.db
