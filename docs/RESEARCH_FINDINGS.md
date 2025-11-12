@@ -315,7 +315,7 @@ Based on user value and complexity:
 
 **Advantages**:
 - ✅ Simpler YAML configuration
-- ✅ BA-friendly inline checks (no coding)
+- ✅ Bespoke inline checks (no coding)
 - ✅ Beautiful modern reports
 - ✅ Lightweight (fewer dependencies)
 - ✅ Focused on pre-load validation
@@ -326,7 +326,7 @@ Based on user value and complexity:
 - ❌ No data profiling
 - ❌ No built-in statistical checks
 
-**Strategy**: Focus on ease of use for Business Analysts while adding the most valuable validation types from Great Expectations.
+**Strategy**: Focus on ease of use for users while adding the most valuable validation types from Great Expectations.
 
 ---
 

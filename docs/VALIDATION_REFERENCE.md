@@ -1,6 +1,6 @@
 # Validation Reference Guide
 
-Complete reference for all 16 built-in validation types in the Data Validation Tool.
+Complete reference for all 22 built-in validation types in the Data Validation Tool.
 
 ---
 
@@ -10,7 +10,8 @@ Complete reference for all 16 built-in validation types in the Data Validation T
 2. [Schema Validations](#schema-validations)
 3. [Field-Level Validations](#field-level-validations)
 4. [Record-Level Validations](#record-level-validations)
-5. [BA-Friendly Custom Validations](#ba-friendly-custom-validations)
+5. [Bespoke Validation Checks](#bespoke-validation-checks)
+6. [Advanced Validation Checks](#advanced-validation-checks)
 
 ---
 
@@ -537,9 +538,9 @@ Row #567: Duplicate key 'CUST002' (also appears in row #400)
 
 ---
 
-## BA-Friendly Custom Validations
+## Bespoke Validation Checks
 
-These validations allow Business Analysts to define custom checks without writing Python code.
+These validations allow users to define custom checks without writing Python code.
 
 ### 14. InlineRegexCheck
 
@@ -1026,9 +1027,9 @@ Row #567: Has 5 decimals, maximum is 4
 | DuplicateRowCheck | Record | No | Find duplicates |
 | BlankRecordCheck | Record | No | Find blank rows |
 | UniqueKeyCheck | Record | No | Unique constraints |
-| InlineRegexCheck | Custom | **No (BA-Friendly)** | Custom patterns |
-| InlineBusinessRuleCheck | Custom | **No (BA-Friendly)** | Business rules |
-| InlineLookupCheck | Custom | **No (BA-Friendly)** | Reference data |
+| InlineRegexCheck | Bespoke | **No** | Custom patterns |
+| InlineBusinessRuleCheck | Bespoke | **No** | Business rules |
+| InlineLookupCheck | Bespoke | **No** | Reference data |
 | **StatisticalOutlierCheck** | **Advanced** | **No** | **Detect outliers** |
 | **CrossFieldComparisonCheck** | **Advanced** | **No** | **Field relationships** |
 | **FreshnessCheck** | **Advanced** | **No** | **Data currency** |
@@ -1040,7 +1041,7 @@ Row #567: Has 5 decimals, maximum is 4
 
 ## Need More Help?
 
-- **BA Guide**: [BA_GUIDE.md](BA_GUIDE.md) - Non-technical guide for Business Analysts
+- **BA Guide**: [BA_GUIDE.md](BA_GUIDE.md) - Guide for defining custom validations without coding
 - **Examples**: Check `examples/` directory for sample configurations
 - **Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md) - Technical details
 

@@ -130,7 +130,7 @@ python3 -m validation_framework.cli validate my_validation.yaml
 - Blank record identification
 - Unique key constraints
 
-#### BA-Friendly Custom Checks (3 - No Coding!)
+#### Bespoke Validation Checks (3 - No Coding!)
 - Custom regex patterns
 - Business rule expressions
 - Reference data lookups
@@ -259,7 +259,7 @@ data-validate version
 ### For Business Analysts
 1. Read the **[Business Analyst Guide](BA_GUIDE.md)** to learn how to define custom validations without coding
 2. Check out **[Validation Reference](VALIDATION_REFERENCE.md)** for all available validation types
-3. Explore the **[BA-Friendly Example Config](../examples/ba_friendly_config.yaml)**
+3. Explore the **[Bespoke Validation Example Config](../examples/bespoke_validations_config.yaml)**
 
 ### For Developers
 1. Review the **[Architecture Overview](ARCHITECTURE.md)** to understand system design

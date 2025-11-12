@@ -12,7 +12,7 @@ A robust, production-grade CLI tool for validating data quality and completeness
   - Field-level checks (mandatory fields, regex patterns, valid values, ranges, date formats)
   - Record-level checks (duplicates, blank rows, uniqueness)
   - Advanced checks (statistical outliers, completeness, string length, precision)
-  - BA-friendly inline checks (custom regex, business rules, lookups)
+  - Bespoke inline checks (custom regex, business rules, lookups)
 - **Flexible Severity Levels**: ERROR vs WARNING with clear status reporting
 - **Modern HTML Reports**:
   - Interactive dark-themed reports with data visualizations

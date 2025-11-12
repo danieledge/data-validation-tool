@@ -364,7 +364,7 @@ validations/
 │   ├── schema_checks.py     # Schema validations
 │   ├── field_checks.py      # Field-level validations
 │   ├── record_checks.py     # Record-level validations
-│   ├── inline_checks.py     # BA-friendly custom checks
+│   ├── inline_checks.py     # Bespoke custom checks
 │   └── registry.py          # Auto-registration
 └── custom/                  # User custom validations
     └── (user-defined files)

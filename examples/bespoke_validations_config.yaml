@@ -1,9 +1,9 @@
-# BA-Friendly Data Validation Configuration
+# Bespoke Data Validation Configuration
 # This file shows how to define custom validations WITHOUT writing Python code!
 # Business Analysts can copy and modify these examples for their needs.
 
 validation_job:
-  name: "BA-Friendly Custom Validations Example"
+  name: "Bespoke Custom Validations Example"
   version: "1.0"
 
   files:

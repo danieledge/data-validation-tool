@@ -236,6 +236,6 @@ validation_job:
 # - 2 Schema checks
 # - 5 Field-level checks
 # - 3 Record-level checks
-# - 3 BA-friendly inline checks
+# - 3 Bespoke inline checks
 # - 6 Advanced checks (NEW!)
 # ============================================================================

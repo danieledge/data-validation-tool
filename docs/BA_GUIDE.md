@@ -9,11 +9,13 @@ This guide shows you how to define custom data validation rules without writing 
 ## Table of Contents
 
 1. [Quick Start](#quick-start)
-2. [Custom Regex Patterns](#custom-regex-patterns)
-3. [Business Rules](#business-rules)
-4. [Reference Data Lookups](#reference-data-lookups)
-5. [Common Examples](#common-examples)
-6. [Troubleshooting](#troubleshooting)
+2. [Standard Built-in Validations](#standard-built-in-validations)
+3. [Custom Regex Patterns](#custom-regex-patterns)
+4. [Business Rules](#business-rules)
+5. [Reference Data Lookups](#reference-data-lookups)
+6. [Working with Different File Formats](#working-with-different-file-formats)
+7. [Common Examples](#common-examples)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -36,6 +38,135 @@ python3 test_validation.py
 ### Step 4: Check the Report
 
 Open the generated HTML report to see results
+
+---
+
+## Standard Built-in Validations
+
+Before creating custom validations, check if a built-in validation already does what you need! Here are the most commonly used standard checks:
+
+### File-Level Checks
+
+#### Check File is Not Empty
+
+```yaml
+- type: "EmptyFileCheck"
+  severity: "ERROR"
+```
+
+**What it does**: Ensures the file contains data (not 0 bytes). Perfect for catching upstream pipeline failures.
+
+#### Check Row Count
+
+```yaml
+- type: "RowCountRangeCheck"
+  severity: "WARNING"
+  params:
+    min_rows: 100
+    max_rows: 1000000
+```
+
+**What it does**: Ensures the file has the expected number of rows. Useful for detecting incomplete data loads or unexpected data volumes.
+
+### Field-Level Checks
+
+#### Ensure Required Fields Have Values
+
+```yaml
+- type: "MandatoryFieldCheck"
+  severity: "ERROR"
+  params:
+    fields:
+      - "customer_id"
+      - "email"
+      - "first_name"
+```
+
+**What it does**: Checks that critical fields are not empty or null. Essential for primary keys and required fields.
+
+#### Validate Email Addresses
+
+```yaml
+- type: "RegexCheck"
+  severity: "ERROR"
+  params:
+    field: "email"
+    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+```
+
+**What it does**: Validates email format using a standard pattern.
+
+#### Check Numeric Ranges
+
+```yaml
+- type: "RangeCheck"
+  severity: "WARNING"
+  params:
+    field: "age"
+    min_value: 18
+    max_value: 120
+```
+
+**What it does**: Ensures numeric values fall within acceptable ranges.
+
+#### Validate Date Formats
+
+```yaml
+- type: "DateFormatCheck"
+  severity: "ERROR"
+  params:
+    field: "signup_date"
+    date_format: "%Y-%m-%d"  # YYYY-MM-DD
+```
+
+**What it does**: Ensures dates match the expected format.
+
+**Common formats**:
+- `%Y-%m-%d` = 2024-12-25
+- `%d/%m/%Y` = 25/12/2024
+- `%m/%d/%Y` = 12/25/2024
+
+#### Check Values from Allowed List
+
+```yaml
+- type: "ValidValuesCheck"
+  severity: "ERROR"
+  params:
+    field: "status"
+    valid_values:
+      - "ACTIVE"
+      - "INACTIVE"
+      - "PENDING"
+      - "SUSPENDED"
+```
+
+**What it does**: Ensures values are from a specific allowed list. Great for status codes, country codes, etc.
+
+### Record-Level Checks
+
+#### Find Duplicate Records
+
+```yaml
+- type: "DuplicateRowCheck"
+  severity: "ERROR"
+  params:
+    key_fields:
+      - "customer_id"
+```
+
+**What it does**: Detects duplicate rows based on key fields.
+
+#### Ensure Unique Keys
+
+```yaml
+- type: "UniqueKeyCheck"
+  severity: "ERROR"
+  params:
+    fields:
+      - "transaction_id"
+```
+
+**What it does**: Validates that key fields contain unique values (no duplicates).
 
 ---
 
@@ -361,6 +492,185 @@ Use **InlineLookupCheck** to validate against allowed/blocked lists!
 
 ---
 
+## Working with Different File Formats
+
+The validation tool supports multiple file formats. Here's how to configure each one:
+
+### CSV Files
+
+**Most common format** - Text files with comma-separated values.
+
+```yaml
+validation_job:
+  name: "Customer Data Validation"
+  files:
+    - name: "customers"
+      path: "data/customers.csv"
+      format: "csv"
+
+      validations:
+        - type: "EmptyFileCheck"
+          severity: "ERROR"
+        - type: "MandatoryFieldCheck"
+          severity: "ERROR"
+          params:
+            fields: ["customer_id", "email"]
+```
+
+**Custom delimiters** (for pipe-delimited, tab-delimited, etc.):
+
+```yaml
+files:
+  - name: "pipe_delimited_file"
+    path: "data/data.txt"
+    format: "csv"
+    delimiter: "|"  # Pipe-delimited
+
+  - name: "tab_delimited_file"
+    path: "data/data.tsv"
+    format: "csv"
+    delimiter: "\t"  # Tab-delimited
+```
+
+### Excel Files
+
+**For .xlsx and .xls files** - Supports multiple sheets.
+
+```yaml
+files:
+  - name: "sales_data"
+    path: "data/Q4_Sales.xlsx"
+    format: "excel"
+    sheet_name: "Sheet1"  # Optional: specify sheet name
+
+    validations:
+      - type: "RowCountRangeCheck"
+        severity: "WARNING"
+        params:
+          min_rows: 1000
+          max_rows: 100000
+```
+
+**Multiple sheets from same file**:
+
+```yaml
+files:
+  - name: "customers_sheet"
+    path: "data/MasterData.xlsx"
+    format: "excel"
+    sheet_name: "Customers"
+    validations:
+      - type: "MandatoryFieldCheck"
+        severity: "ERROR"
+        params:
+          fields: ["customer_id"]
+
+  - name: "products_sheet"
+    path: "data/MasterData.xlsx"
+    format: "excel"
+    sheet_name: "Products"
+    validations:
+      - type: "MandatoryFieldCheck"
+        severity: "ERROR"
+        params:
+          fields: ["product_id"]
+```
+
+### Parquet Files
+
+**For large data files** - Best performance for files over 50GB.
+
+```yaml
+files:
+  - name: "transaction_history"
+    path: "data/transactions.parquet"
+    format: "parquet"
+
+    validations:
+      - type: "EmptyFileCheck"
+        severity: "ERROR"
+      - type: "RangeCheck"
+        severity: "ERROR"
+        params:
+          field: "amount"
+          min_value: 0
+```
+
+**When to use Parquet**:
+- Files larger than 50GB
+- Better compression than CSV
+- Faster processing for columnar data
+- Recommended for data warehouse extracts
+
+### JSON Files (Future Support)
+
+JSON file support is planned for future releases. Currently supported: CSV, Excel, Parquet.
+
+### Complete Multi-Format Example
+
+```yaml
+validation_job:
+  name: "Multi-Source Data Validation"
+  version: "1.0"
+
+  files:
+    # CSV file
+    - name: "daily_transactions"
+      path: "/data/transactions/2024-01-15.csv"
+      format: "csv"
+      validations:
+        - type: "EmptyFileCheck"
+          severity: "ERROR"
+        - type: "MandatoryFieldCheck"
+          severity: "ERROR"
+          params:
+            fields: ["transaction_id", "amount", "customer_id"]
+
+    # Excel file
+    - name: "customer_master"
+      path: "/data/master/customers.xlsx"
+      format: "excel"
+      sheet_name: "Active_Customers"
+      validations:
+        - type: "UniqueKeyCheck"
+          severity: "ERROR"
+          params:
+            fields: ["customer_id"]
+        - type: "RegexCheck"
+          severity: "ERROR"
+          params:
+            field: "email"
+            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+
+    # Parquet file (large dataset)
+    - name: "historical_sales"
+      path: "/data/warehouse/sales_2023.parquet"
+      format: "parquet"
+      validations:
+        - type: "RowCountRangeCheck"
+          severity: "WARNING"
+          params:
+            min_rows: 1000000
+            max_rows: 50000000
+        - type: "DateFormatCheck"
+          severity: "ERROR"
+          params:
+            field: "sale_date"
+            date_format: "%Y-%m-%d"
+
+  output:
+    html_report: "validation_report.html"
+    json_summary: "validation_summary.json"
+```
+
+**Tips for different file formats**:
+- **CSV**: Use for text files, exports from databases, simple data feeds
+- **Excel**: Use for business user-generated files, reports with multiple sheets
+- **Parquet**: Use for large data warehouse extracts, analytics datasets over 50GB
+- **Delimiter**: Always specify custom delimiters (pipe, tab) for non-comma CSV files
+
+---
+
 ## Common Examples
 
 ### Financial Data
@@ -506,13 +816,13 @@ Use **InlineLookupCheck** to validate against allowed/blocked lists!
 
 ## Need Help?
 
-1. Check the `examples/ba_friendly_config.yaml` file for more examples
+1. Check the `examples/bespoke_validations_config.yaml` file for more examples
 2. Look at the generated HTML report for detailed error messages
 3. Start with simple validations and build up complexity
 4. Test on a small sample of data first
 
 ---
 
-**Remember**: You don't need to be a programmer! These validations are designed for Business Analysts to define and maintain.
+**Remember**: You don't need to be a programmer! These validations are designed to be defined and maintained without coding.
 
 Happy Validating! 🎯

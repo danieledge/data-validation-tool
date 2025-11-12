@@ -1,7 +1,7 @@
 """
-Inline custom validation checks - BA-friendly validations defined in YAML.
+Inline custom validation checks - Bespoke validations defined in YAML.
 
-These validations allow Business Analysts to define custom checks without
+These validations allow users to define custom checks without
 writing Python code. All configuration is done in the YAML file.
 
 Author: daniel edge
@@ -17,7 +17,7 @@ class InlineRegexCheck(DataValidationRule):
     """
     Define custom regex validation directly in YAML config.
 
-    Perfect for BAs who need to validate custom patterns without coding.
+    Perfect for defining custom patterns without coding.
 
     Configuration:
         params:
@@ -148,7 +148,7 @@ class InlineBusinessRuleCheck(DataValidationRule):
     """
     Define custom business rules using simple expressions in YAML.
 
-    BAs can define rules using SQL-like WHERE clause syntax.
+    Users can define rules using SQL-like WHERE clause syntax.
 
     Configuration:
         params:
@@ -296,7 +296,7 @@ class InlineLookupCheck(DataValidationRule):
     """
     Validate against a reference data list defined in YAML.
 
-    BAs can define allowed/disallowed values directly in config.
+    Users can define allowed/disallowed values directly in config.
 
     Configuration:
         params:

@@ -76,7 +76,7 @@ def register_all_builtin_validations():
     register_validation("BlankRecordCheck", BlankRecordCheck)
     register_validation("UniqueKeyCheck", UniqueKeyCheck)
 
-    # Inline/Custom checks (BA-friendly)
+    # Inline/Custom checks (Bespoke validations)
     register_validation("InlineRegexCheck", InlineRegexCheck)
     register_validation("InlineBusinessRuleCheck", InlineBusinessRuleCheck)
     register_validation("InlineLookupCheck", InlineLookupCheck)
