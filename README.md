@@ -4,7 +4,7 @@ A robust, production-grade CLI tool for validating data quality and completeness
 
 ## Features
 
-- **Multiple Format Support**: CSV, Excel (.xlsx), Parquet
+- **Multiple Format Support**: CSV, Excel (.xlsx), Parquet, JSON (including JSON Lines/JSONL)
 - **Large File Handling**: Optimized for 200GB+ datasets with chunked processing
 - **22 Built-in Validation Types**:
   - File-level checks (empty files, row counts, file size)
@@ -20,7 +20,7 @@ A robust, production-grade CLI tool for validating data quality and completeness
   - Collapsible sections and sample failures
   - Mobile-responsive design
 - **Structured Logging**: Configurable log levels and file output for debugging
-- **Comprehensive Test Suite**: 74 tests with 89% pass rate ensuring reliability
+- **Comprehensive Test Suite**: 88 tests with 100% pass rate ensuring reliability
 - **Extensible**: Easy to add custom validations via plugin architecture
 - **CLI Interface**: Simple command-line usage with multiple options
 

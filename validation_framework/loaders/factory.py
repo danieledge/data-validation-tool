@@ -11,6 +11,7 @@ from validation_framework.loaders.base import DataLoader
 from validation_framework.loaders.csv_loader import CSVLoader
 from validation_framework.loaders.excel_loader import ExcelLoader
 from validation_framework.loaders.parquet_loader import ParquetLoader
+from validation_framework.loaders.json_loader import JSONLoader
 
 
 class LoaderFactory:
@@ -24,6 +25,7 @@ class LoaderFactory:
         - CSV and delimited text files (csv, tsv, txt)
         - Excel files (xls, xlsx)
         - Parquet files (parquet)
+        - JSON files (json, jsonl)
     """
 
     # Mapping of format names to loader classes
@@ -31,6 +33,7 @@ class LoaderFactory:
         "csv": CSVLoader,
         "excel": ExcelLoader,
         "parquet": ParquetLoader,
+        "json": JSONLoader,
     }
 
     @classmethod
@@ -56,6 +59,8 @@ class LoaderFactory:
                 - encoding: File encoding for CSV files (default: 'utf-8')
                 - header: Row number to use as column names (default: 0)
                 - sheet_name: Sheet name or index for Excel files (default: 0)
+                - lines: For JSON files, True for JSON Lines format (default: auto-detect)
+                - flatten: For JSON files, flatten nested structures (default: True)
 
         Returns:
             DataLoader: An instance of the appropriate loader class
@@ -137,6 +142,8 @@ class LoaderFactory:
             ".xls": "excel",
             ".xlsx": "excel",
             ".parquet": "parquet",
+            ".json": "json",
+            ".jsonl": "json",
         }
 
         inferred_format = extension_map.get(suffix)

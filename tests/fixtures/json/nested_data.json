@@ -1,0 +1,33 @@
+[
+  {
+    "order_id": "ORD001",
+    "customer": {
+      "id": 1,
+      "name": "John Smith",
+      "contact": {
+        "email": "john@example.com",
+        "phone": "+44 20 1234 5678"
+      }
+    },
+    "items": [
+      {"product_id": "P001", "quantity": 2},
+      {"product_id": "P002", "quantity": 1}
+    ],
+    "total": 250.00
+  },
+  {
+    "order_id": "ORD002",
+    "customer": {
+      "id": 2,
+      "name": "Jane Doe",
+      "contact": {
+        "email": "jane@example.com",
+        "phone": "+1 555 123 4567"
+      }
+    },
+    "items": [
+      {"product_id": "P003", "quantity": 5}
+    ],
+    "total": 175.50
+  }
+]

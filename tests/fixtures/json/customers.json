@@ -1,0 +1,47 @@
+[
+  {
+    "customer_id": 1,
+    "first_name": "John",
+    "last_name": "Smith",
+    "email": "john.smith@example.com",
+    "age": 35,
+    "country": "UK",
+    "account_balance": 1250.50
+  },
+  {
+    "customer_id": 2,
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "email": "jane.doe@example.com",
+    "age": 28,
+    "country": "US",
+    "account_balance": 2500.00
+  },
+  {
+    "customer_id": 3,
+    "first_name": "Bob",
+    "last_name": "Wilson",
+    "email": "bob.wilson@example.com",
+    "age": 42,
+    "country": "CA",
+    "account_balance": 750.25
+  },
+  {
+    "customer_id": 4,
+    "first_name": "Alice",
+    "last_name": "Brown",
+    "email": "alice.brown@example.com",
+    "age": 31,
+    "country": "AU",
+    "account_balance": 3200.75
+  },
+  {
+    "customer_id": 5,
+    "first_name": "Charlie",
+    "last_name": "Davis",
+    "email": "charlie.davis@example.com",
+    "age": 55,
+    "country": "UK",
+    "account_balance": 890.00
+  }
+]

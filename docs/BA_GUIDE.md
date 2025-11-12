@@ -602,9 +602,65 @@ files:
 - Faster processing for columnar data
 - Recommended for data warehouse extracts
 
-### JSON Files (Future Support)
+### JSON Files
 
-JSON file support is planned for future releases. Currently supported: CSV, Excel, Parquet.
+**For standard JSON arrays and JSON Lines (JSONL/NDJSON)** - Auto-detects format.
+
+```yaml
+files:
+  # Standard JSON array format
+  - name: "customer_data"
+    path: "data/customers.json"
+    format: "json"
+
+    validations:
+      - type: "MandatoryFieldCheck"
+        severity: "ERROR"
+        params:
+          fields: ["customer_id", "email"]
+```
+
+**JSON Lines (JSONL) format**:
+
+```yaml
+files:
+  - name: "transaction_log"
+    path: "data/transactions.jsonl"
+    format: "json"
+    lines: true  # Optional: explicitly specify JSON Lines format
+
+    validations:
+      - type: "RangeCheck"
+        severity: "ERROR"
+        params:
+          field: "amount"
+          min_value: 0
+```
+
+**Nested JSON with flattening**:
+
+```yaml
+files:
+  - name: "api_response"
+    path: "data/orders.json"
+    format: "json"
+    flatten: true  # Automatically flatten nested structures (default: true)
+
+    validations:
+      - type: "MandatoryFieldCheck"
+        severity: "ERROR"
+        params:
+          # Nested fields are flattened with underscore separator
+          # customer.contact.email becomes customer_contact_email
+          fields: ["order_id", "customer_id", "customer_contact_email"]
+```
+
+**When to use JSON**:
+- REST API responses
+- NoSQL database exports
+- Log files in JSON Lines format
+- Configuration files
+- Modern data interchange format
 
 ### Complete Multi-Format Example
 
@@ -667,6 +723,7 @@ validation_job:
 - **CSV**: Use for text files, exports from databases, simple data feeds
 - **Excel**: Use for business user-generated files, reports with multiple sheets
 - **Parquet**: Use for large data warehouse extracts, analytics datasets over 50GB
+- **JSON**: Use for API responses, NoSQL exports, log files, modern data interchange
 - **Delimiter**: Always specify custom delimiters (pipe, tab) for non-comma CSV files
 
 ---

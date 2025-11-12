@@ -159,7 +159,7 @@ python3 -m validation_framework.cli validate my_validation.yaml
 - CSV (any delimiter)
 - Excel (XLS, XLSX)
 - Parquet
-- JSON
+- JSON (standard arrays and JSON Lines/JSONL/NDJSON)
 - Custom formats
 
 ---
