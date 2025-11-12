@@ -107,34 +107,41 @@ python3 -m validation_framework.cli validate my_validation.yaml
 - Memory-efficient streaming
 - Configurable chunk sizes
 
-### 2. **16 Built-in Validation Types**
+### 2. **22 Built-in Validation Types**
 
-#### File-Level Checks
+#### File-Level Checks (3)
 - Empty file detection
 - Row count validation
 - File size limits
 
-#### Schema Checks
+#### Schema Checks (2)
 - Column presence
-- Data type validation
 - Schema matching
 
-#### Field-Level Checks
+#### Field-Level Checks (5)
 - Mandatory field validation
 - Regex pattern matching
 - Value range checks
 - Date format validation
 - Allowed/blocked value lists
 
-#### Record-Level Checks
+#### Record-Level Checks (3)
 - Duplicate detection
 - Blank record identification
 - Unique key constraints
 
-#### BA-Friendly Custom Checks (No Coding!)
+#### BA-Friendly Custom Checks (3 - No Coding!)
 - Custom regex patterns
 - Business rule expressions
 - Reference data lookups
+
+#### Advanced Quality Checks (6 - NEW!)
+- Statistical outlier detection (Z-score, IQR)
+- Cross-field comparison
+- Data freshness validation
+- Completeness percentage
+- String length constraints
+- Numeric precision validation
 
 ### 3. **Modern, Mobile-Friendly Reports**
 - Dark theme (Tokyo Night color scheme)

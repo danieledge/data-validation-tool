@@ -740,6 +740,275 @@ Row #567: 'YY' not in approved list [US, UK, CA, AU, DE, FR]
 
 ---
 
+## Advanced Validation Checks
+
+These validations were added based on research into leading data quality frameworks like Great Expectations.
+
+### 17. StatisticalOutlierCheck
+
+**Purpose**: Detects statistical outliers using Z-score or IQR methods.
+
+**Use Cases**:
+- Detect fraudulent transactions
+- Identify sensor errors
+- Find data quality issues
+- Validate measurement accuracy
+
+**Configuration**:
+```yaml
+# Z-Score method
+- type: "StatisticalOutlierCheck"
+  severity: "WARNING"
+  params:
+    field: "transaction_amount"
+    method: "zscore"
+    threshold: 3.0  # >3 standard deviations
+
+# IQR method
+- type: "StatisticalOutlierCheck"
+  severity: "WARNING"
+  params:
+    field: "temperature"
+    method: "iqr"
+    threshold: 1.5  # 1.5 * IQR from quartiles
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `field` | string | Yes | Numeric field to check |
+| `method` | string | No | 'zscore' or 'iqr' (default: 'zscore') |
+| `threshold` | float | No | Threshold value (default: 3.0 for zscore, 1.5 for iqr) |
+
+**Methods**:
+- **zscore**: Flags values beyond N standard deviations from mean
+- **iqr**: Uses Interquartile Range (Q3-Q1) to detect outliers
+
+**Example Output**:
+- **Pass**: "No outliers detected in 5,000 values (zscore method)"
+- **Fail**: "Found 12 outliers using zscore method. Mean: 100.5, StdDev: 15.2"
+
+---
+
+### 18. CrossFieldComparisonCheck
+
+**Purpose**: Validates logical relationships between two fields.
+
+**Use Cases**:
+- Verify end_date > start_date
+- Ensure discount <= price
+- Check actual <= budget
+- Validate min <= max
+
+**Configuration**:
+```yaml
+# Date comparison
+- type: "CrossFieldComparisonCheck"
+  severity: "ERROR"
+  params:
+    field_a: "end_date"
+    operator: ">"
+    field_b: "start_date"
+
+# Numeric comparison
+- type: "CrossFieldComparisonCheck"
+  severity: "ERROR"
+  params:
+    field_a: "discount_amount"
+    operator: "<="
+    field_b: "product_price"
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `field_a` | string | Yes | First field name |
+| `operator` | string | Yes | Comparison: >, <, >=, <=, ==, != |
+| `field_b` | string | Yes | Second field name |
+
+**Example Output**:
+- **Pass**: "All 5,000 rows pass: end_date > start_date"
+- **Fail**: "Found 15 rows where discount_amount not <= product_price"
+
+---
+
+### 19. FreshnessCheck
+
+**Purpose**: Validates file or data is fresh (recently updated).
+
+**Use Cases**:
+- Ensure daily data loads completed
+- Verify SLA compliance
+- Check data currency
+- Monitor pipeline health
+
+**Configuration**:
+```yaml
+# File age check
+- type: "FreshnessCheck"
+  severity: "WARNING"
+  params:
+    check_type: "file"
+    max_age_hours: 24  # File modified within 24 hours
+
+# Data age check (future enhancement)
+- type: "FreshnessCheck"
+  severity: "ERROR"
+  params:
+    check_type: "data"
+    max_age_hours: 48
+    date_field: "transaction_timestamp"
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `check_type` | string | No | 'file' or 'data' (default: 'file') |
+| `max_age_hours` | int | Yes | Maximum age in hours |
+| `date_field` | string | Conditional | Required if check_type='data' |
+
+**Example Output**:
+- **Pass**: "File is fresh (2.5 hours old, max: 24)"
+- **Fail**: "File is 36.2 hours old (max: 24)"
+
+---
+
+### 20. CompletenessCheck
+
+**Purpose**: Validates field completeness (percentage of non-null values).
+
+**Use Cases**:
+- Ensure critical fields are populated
+- Measure data quality
+- Monitor data collection
+- SLA compliance
+
+**Configuration**:
+```yaml
+# 95% completeness required
+- type: "CompletenessCheck"
+  severity: "WARNING"
+  params:
+    field: "email"
+    min_completeness: 0.95  # 95%
+
+# 100% completeness required
+- type: "CompletenessCheck"
+  severity: "ERROR"
+  params:
+    field: "customer_id"
+    min_completeness: 1.0  # 100%
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `field` | string | Yes | Field to check |
+| `min_completeness` | float | Yes | Min completeness (0.0-1.0 or 0-100) |
+
+**Example Output**:
+- **Pass**: "Completeness 98.5% meets minimum 95%"
+- **Fail**: "Completeness 92.3% is below minimum 95%. Missing 38 of 500 values"
+
+---
+
+### 21. StringLengthCheck
+
+**Purpose**: Validates string field length is within acceptable range.
+
+**Use Cases**:
+- Prevent database truncation
+- Validate ID formats
+- Check description quality
+- Ensure proper data entry
+
+**Configuration**:
+```yaml
+# Min and max length
+- type: "StringLengthCheck"
+  severity: "ERROR"
+  params:
+    field: "product_code"
+    min_length: 5
+    max_length: 20
+
+# Minimum only
+- type: "StringLengthCheck"
+  severity: "WARNING"
+  params:
+    field: "description"
+    min_length: 10  # At least 10 characters
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `field` | string | Yes | String field to check |
+| `min_length` | int | No | Minimum length |
+| `max_length` | int | No | Maximum length |
+
+**Note**: At least one of min_length or max_length is required.
+
+**Example Output**:
+- **Pass**: "All 5,000 values have valid length"
+- **Fail**: "Found 25 values with invalid length"
+
+**Sample Failures**:
+```
+Row #234: Length 3 < minimum 5
+Row #567: Length 25 > maximum 20
+```
+
+---
+
+### 22. NumericPrecisionCheck
+
+**Purpose**: Validates numeric precision (decimal places).
+
+**Use Cases**:
+- Validate currency fields (2 decimals)
+- Check measurement precision
+- Ensure database compatibility
+- Prevent rounding errors
+
+**Configuration**:
+```yaml
+# Exact precision (currency)
+- type: "NumericPrecisionCheck"
+  severity: "ERROR"
+  params:
+    field: "price"
+    exact_decimal_places: 2
+
+# Maximum precision
+- type: "NumericPrecisionCheck"
+  severity: "WARNING"
+  params:
+    field: "measurement"
+    max_decimal_places: 4
+```
+
+**Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `field` | string | Yes | Numeric field to check |
+| `max_decimal_places` | int | No | Maximum allowed decimals |
+| `exact_decimal_places` | int | No | Required exact decimals |
+
+**Note**: Either max_decimal_places or exact_decimal_places is required.
+
+**Example Output**:
+- **Pass**: "All 5,000 values have valid precision"
+- **Fail**: "Found 40 values with invalid precision"
+
+**Sample Failures**:
+```
+Row #234: Has 4 decimals, requires exactly 2
+Row #567: Has 5 decimals, maximum is 4
+```
+
+---
+
 ## Summary Table
 
 | Validation Type | Category | Coding Required | Use Case |
@@ -760,6 +1029,12 @@ Row #567: 'YY' not in approved list [US, UK, CA, AU, DE, FR]
 | InlineRegexCheck | Custom | **No (BA-Friendly)** | Custom patterns |
 | InlineBusinessRuleCheck | Custom | **No (BA-Friendly)** | Business rules |
 | InlineLookupCheck | Custom | **No (BA-Friendly)** | Reference data |
+| **StatisticalOutlierCheck** | **Advanced** | **No** | **Detect outliers** |
+| **CrossFieldComparisonCheck** | **Advanced** | **No** | **Field relationships** |
+| **FreshnessCheck** | **Advanced** | **No** | **Data currency** |
+| **CompletenessCheck** | **Advanced** | **No** | **Missing values** |
+| **StringLengthCheck** | **Advanced** | **No** | **String length** |
+| **NumericPrecisionCheck** | **Advanced** | **No** | **Decimal precision** |
 
 ---
 

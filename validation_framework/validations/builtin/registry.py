@@ -39,6 +39,15 @@ from validation_framework.validations.builtin.inline_checks import (
     InlineLookupCheck,
 )
 
+from validation_framework.validations.builtin.advanced_checks import (
+    StatisticalOutlierCheck,
+    CrossFieldComparisonCheck,
+    FreshnessCheck,
+    CompletenessCheck,
+    StringLengthCheck,
+    NumericPrecisionCheck,
+)
+
 
 def register_all_builtin_validations():
     """
@@ -71,6 +80,14 @@ def register_all_builtin_validations():
     register_validation("InlineRegexCheck", InlineRegexCheck)
     register_validation("InlineBusinessRuleCheck", InlineBusinessRuleCheck)
     register_validation("InlineLookupCheck", InlineLookupCheck)
+
+    # Advanced checks (statistical, cross-field, freshness)
+    register_validation("StatisticalOutlierCheck", StatisticalOutlierCheck)
+    register_validation("CrossFieldComparisonCheck", CrossFieldComparisonCheck)
+    register_validation("FreshnessCheck", FreshnessCheck)
+    register_validation("CompletenessCheck", CompletenessCheck)
+    register_validation("StringLengthCheck", StringLengthCheck)
+    register_validation("NumericPrecisionCheck", NumericPrecisionCheck)
 
 
 # Auto-register on import
