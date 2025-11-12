@@ -341,7 +341,7 @@ class FreshnessCheck(FileValidationRule):
         max_age = self.params.get("max_age_hours", "?")
         return f"Freshness check ({check_type}): max age {max_age} hours"
 
-    def validate(self, file_path: str, context: Dict[str, Any]) -> ValidationResult:
+    def validate_file(self, context: Dict[str, Any]) -> ValidationResult:
         """Validate file/data freshness."""
         check_type = self.params.get("check_type", "file").lower()
         max_age_hours = self.params.get("max_age_hours")
@@ -359,6 +359,14 @@ class FreshnessCheck(FileValidationRule):
         if check_type == "file":
             # Check file modification time
             try:
+                file_path = context.get("file_path")
+                if not file_path:
+                    return self._create_result(
+                        passed=False,
+                        message="File path not found in context",
+                        failed_count=1
+                    )
+
                 file_mtime = datetime.fromtimestamp(os.path.getmtime(file_path))
                 age = now - file_mtime
 

@@ -13,6 +13,9 @@ from pathlib import Path
 
 from validation_framework.core.engine import ValidationEngine
 from validation_framework.core.registry import get_registry
+from validation_framework.core.logging_config import setup_logging, get_logger
+
+logger = get_logger(__name__)
 
 
 @click.group()
@@ -34,7 +37,10 @@ def cli():
 @click.option('--json-output', '-j', help='Path for JSON report output')
 @click.option('--verbose/--quiet', '-v/-q', default=True, help='Verbose output')
 @click.option('--fail-on-warning', is_flag=True, help='Fail if warnings are found')
-def validate(config_file, html_output, json_output, verbose, fail_on_warning):
+@click.option('--log-level', type=click.Choice(['DEBUG', 'INFO', 'WARNING', 'ERROR'], case_sensitive=False),
+              default='INFO', help='Logging level')
+@click.option('--log-file', type=click.Path(), help='Optional log file path')
+def validate(config_file, html_output, json_output, verbose, fail_on_warning, log_level, log_file):
     """
     Run data validation from a configuration file.
 
@@ -53,10 +59,22 @@ def validate(config_file, html_output, json_output, verbose, fail_on_warning):
     \b
     # Fail on warnings
     data-validate validate config.yaml --fail-on-warning
+
+    \b
+    # With custom log level and file
+    data-validate validate config.yaml --log-level DEBUG --log-file validation.log
     """
+    # Setup logging
+    setup_logging(level=log_level, log_file=log_file)
+    logger.info(f"Starting validation: {config_file}")
+    logger.info(f"Log level: {log_level}")
+
     try:
         # Create and run validation engine
+        logger.debug(f"Loading configuration from {config_file}")
         engine = ValidationEngine.from_config(config_file)
+        logger.info(f"Configuration loaded: {engine.config.job_name}")
+
         report = engine.run(verbose=verbose)
 
         # Generate HTML report

@@ -13,6 +13,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+import logging
 
 from validation_framework.core.config import ValidationConfig
 from validation_framework.core.registry import get_registry
@@ -22,9 +23,12 @@ from validation_framework.core.results import (
     Status,
 )
 from validation_framework.loaders.factory import LoaderFactory
+from validation_framework.core.logging_config import get_logger
 
 # Import to trigger registration of built-in validations
 import validation_framework.validations.builtin.registry  # noqa
+
+logger = get_logger(__name__)
 
 # Optional imports for colored output
 try:
@@ -98,6 +102,9 @@ class ValidationEngine:
         Returns:
             ValidationReport with complete validation results
         """
+        logger.info(f"Starting validation job: {self.config.job_name}")
+        logger.debug(f"Number of files to validate: {len(self.config.files)}")
+
         if verbose:
             print(f"\n{Fore.CYAN}{'='*80}")
             print(f"{Fore.CYAN}Data Validation Framework")
@@ -116,9 +123,13 @@ class ValidationEngine:
             config=self.config.to_dict(),
             description=self.config.description,
         )
+        logger.debug("Validation report initialized")
 
         # Process each file
         for file_idx, file_config in enumerate(self.config.files, 1):
+            logger.info(f"Processing file {file_idx}/{len(self.config.files)}: {file_config['name']}")
+            logger.debug(f"File path: {file_config['path']}, Format: {file_config['format']}")
+
             if verbose:
                 print(f"\n{Fore.YELLOW}[{file_idx}/{len(self.config.files)}] Processing: {file_config['name']}{Style.RESET_ALL}")
                 print(f"  Path: {file_config['path']}")
@@ -127,6 +138,7 @@ class ValidationEngine:
 
             # Validate the file
             file_report = self._validate_file(file_config, verbose)
+            logger.info(f"File validation completed: {file_config['name']} - Status: {file_report.status.value}")
 
             # Add to overall report
             report.add_file_report(file_report)
@@ -142,6 +154,9 @@ class ValidationEngine:
         # Update overall status and duration
         report.update_overall_status()
         report.duration_seconds = time.time() - start_time
+
+        logger.info(f"Validation job completed in {report.duration_seconds:.2f}s")
+        logger.info(f"Overall status: {report.overall_status.value} (Errors: {report.total_errors}, Warnings: {report.total_warnings})")
 
         # Print final summary
         if verbose:
