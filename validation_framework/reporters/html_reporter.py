@@ -94,16 +94,32 @@ class HTMLReporter(Reporter):
         return template.render(**template_data)
 
 
-# Embedded HTML template
-# This is self-contained with inline CSS and JavaScript
+# Embedded HTML template with modern dark theme
+# Self-contained with inline CSS and JavaScript - mobile responsive
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Validation Report - {{ report.job_name }}</title>
+    <title>{{ report.job_name }} - Validation Report</title>
     <style>
+        /* Modern Dark Theme - Mobile Responsive */
+        :root {
+            --bg-primary: #1a1b26;
+            --bg-secondary: #24283b;
+            --bg-tertiary: #2f3549;
+            --text-primary: #c0caf5;
+            --text-secondary: #9aa5ce;
+            --text-muted: #565f89;
+            --success: #9ece6a;
+            --error: #f7768e;
+            --warning: #e0af68;
+            --info: #7aa2f7;
+            --border: #3b4261;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -111,190 +127,356 @@ HTML_TEMPLATE = """
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 1rem;
         }
 
+        @media (min-width: 768px) {
+            .container {
+                padding: 2rem;
+            }
+        }
+
+        /* Header */
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%);
             color: white;
-            padding: 30px 0;
-            margin-bottom: 30px;
-            border-radius: 8px;
+            padding: 2rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px var(--shadow);
         }
 
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
 
         header .subtitle {
-            opacity: 0.9;
-            font-size: 1.1em;
+            opacity: 0.95;
+            font-size: clamp(0.875rem, 2vw, 1.125rem);
         }
 
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            gap: 0.5rem;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .status-passed {
+            background: rgba(158, 206, 106, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-passed::before {
+            background: var(--success);
+        }
+
+        .status-failed {
+            background: rgba(247, 118, 142, 0.15);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .status-failed::before {
+            background: var(--error);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-warning {
+            background: rgba(224, 175, 104, 0.15);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-warning::before {
+            background: var(--warning);
+        }
+
+        /* Summary Grid */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .summary-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow);
         }
 
         .summary-card h3 {
-            font-size: 0.9em;
-            color: #666;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
         }
 
         .summary-card .value {
-            font-size: 2.5em;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
         }
 
-        .status-passed { color: #10b981; }
-        .status-failed { color: #ef4444; }
-        .status-warning { color: #f59e0b; }
+        .summary-card.highlight-passed .value {
+            color: var(--success);
+        }
 
-        .bg-passed { background-color: #d1fae5; }
-        .bg-failed { background-color: #fee2e2; }
-        .bg-warning { background-color: #fef3c7; }
+        .summary-card.highlight-failed .value {
+            color: var(--error);
+        }
 
+        .summary-card.highlight-warning .value {
+            color: var(--warning);
+        }
+
+        /* File Section */
         .file-section {
-            background: white;
-            margin-bottom: 30px;
-            border-radius: 8px;
+            background: var(--bg-secondary);
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 16px var(--shadow);
         }
 
         .file-header {
-            padding: 20px;
-            background: #f9fafb;
-            border-bottom: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
         }
 
         .file-header:hover {
-            background: #f3f4f6;
+            background: #363b52;
         }
 
         .file-header h2 {
-            font-size: 1.5em;
+            font-size: clamp(1.125rem, 3vw, 1.5rem);
             display: flex;
             align-items: center;
-            gap: 15px;
-        }
-
-        .file-header .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
         }
 
         .file-stats {
             display: flex;
-            gap: 20px;
-            font-size: 0.9em;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            flex-wrap: wrap;
         }
 
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .stat-value.error {
+            color: var(--error);
+        }
+
+        .stat-value.warning {
+            color: var(--warning);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* File Content */
         .file-content {
-            padding: 20px;
+            padding: 1.5rem;
         }
 
         .file-meta {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 6px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
-        .file-meta-item {
+        .meta-item {
             display: flex;
             flex-direction: column;
+            gap: 0.25rem;
         }
 
-        .file-meta-item label {
-            font-size: 0.8em;
-            color: #666;
+        .meta-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            letter-spacing: 0.05em;
         }
 
-        .file-meta-item value {
+        .meta-value {
             font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
         }
 
+        /* Validation Item */
         .validation-list {
-            margin-top: 20px;
+            margin-top: 1.5rem;
+        }
+
+        .validation-list > h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
         }
 
         .validation-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
             overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .validation-item.failed {
+            border-color: var(--error);
         }
 
         .validation-header {
-            padding: 15px;
-            background: #fafafa;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
+            gap: 1rem;
+            flex-wrap: wrap;
+            transition: background 0.2s;
         }
 
         .validation-header:hover {
-            background: #f5f5f5;
+            background: #363b52;
         }
 
-        .validation-header h4 {
+        .validation-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.1em;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 200px;
         }
 
         .validation-icon {
-            font-size: 1.2em;
+            font-size: 1.5rem;
+        }
+
+        .validation-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-error {
+            background: rgba(247, 118, 142, 0.15);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .severity-warning {
+            background: rgba(224, 175, 104, 0.15);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .severity-success {
+            background: rgba(158, 206, 106, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
         }
 
         .validation-stats {
             display: flex;
-            gap: 15px;
-            font-size: 0.9em;
+            gap: 1rem;
+            font-size: 0.875rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .validation-details {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
             display: none;
         }
 
@@ -302,98 +484,171 @@ HTML_TEMPLATE = """
             display: block;
         }
 
+        .validation-message {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-left: 3px solid var(--info);
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-size: 0.938rem;
+        }
+
+        .validation-message strong {
+            color: var(--info);
+        }
+
+        /* Failures Table */
+        .failures-section {
+            margin-top: 1.5rem;
+        }
+
+        .failures-section h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--error);
+        }
+
+        .failures-table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
         .failures-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            font-size: 0.875rem;
         }
 
         .failures-table th {
-            background: #f3f4f6;
-            padding: 12px;
+            background: var(--bg-tertiary);
+            padding: 0.75rem;
             text-align: left;
             font-weight: 600;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-primary);
+            white-space: nowrap;
         }
 
         .failures-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
         }
 
         .failures-table tr:hover {
-            background: #f9fafb;
+            background: var(--bg-primary);
+        }
+
+        .failures-table tr:last-child td {
+            border-bottom: none;
         }
 
         .code {
-            background: #f3f4f6;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.875em;
+            color: var(--info);
+            border: 1px solid var(--border);
         }
 
-        .toggle-icon {
-            transition: transform 0.3s;
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
         }
 
-        .toggle-icon.rotated {
-            transform: rotate(180deg);
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .file-header,
+            .validation-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .file-stats,
+            .validation-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .file-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .failures-table {
+                font-size: 0.75rem;
+            }
+
+            .failures-table th,
+            .failures-table td {
+                padding: 0.5rem;
+            }
         }
 
+        /* Print Styles */
         @media print {
             body {
                 background: white;
+                color: black;
             }
-            .file-header {
+
+            .file-header,
+            .validation-header {
                 cursor: default;
             }
+
             .validation-details {
                 display: block !important;
             }
+
+            .toggle-icon {
+                display: none;
+            }
         }
 
-        .metric-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-left: 5px;
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .badge-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
+        .file-section,
+        .summary-card {
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <header>
-            <h1>{{ report.job_name }}</h1>
+            <h1>📊 {{ report.job_name }}</h1>
             <div class="subtitle">
-                Executed: {{ report.execution_time.strftime('%Y-%m-%d %H:%M:%S') }} |
-                Duration: {{ "%.2f"|format(report.duration_seconds) }}s
+                🕐 {{ report.execution_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                | ⏱️ Duration: {{ "%.2f"|format(report.duration_seconds) }}s
             </div>
         </header>
 
         <!-- Summary Section -->
         <div class="summary-grid">
-            <div class="summary-card {% if report.overall_status == Status.PASSED %}bg-passed{% elif report.overall_status == Status.FAILED %}bg-failed{% else %}bg-warning{% endif %}">
+            <div class="summary-card {% if report.overall_status == Status.PASSED %}highlight-passed{% elif report.overall_status == Status.FAILED %}highlight-failed{% else %}highlight-warning{% endif %}">
                 <h3>Overall Status</h3>
-                <div class="value {% if report.overall_status == Status.PASSED %}status-passed{% elif report.overall_status == Status.FAILED %}status-failed{% else %}status-warning{% endif %}">
-                    {{ report.overall_status.value }}
+                <div class="value">
+                    <span class="status-badge {% if report.overall_status == Status.PASSED %}status-passed{% elif report.overall_status == Status.FAILED %}status-failed{% else %}status-warning{% endif %}">
+                        {{ report.overall_status.value }}
+                    </span>
                 </div>
             </div>
 
@@ -402,23 +657,23 @@ HTML_TEMPLATE = """
                 <div class="value">{{ total_validations }}</div>
             </div>
 
-            <div class="summary-card">
-                <h3>Errors</h3>
-                <div class="value status-failed">{{ report.total_errors }}</div>
+            <div class="summary-card highlight-failed">
+                <h3>❌ Errors</h3>
+                <div class="value">{{ report.total_errors }}</div>
+            </div>
+
+            <div class="summary-card highlight-warning">
+                <h3>⚠️ Warnings</h3>
+                <div class="value">{{ report.total_warnings }}</div>
+            </div>
+
+            <div class="summary-card highlight-passed">
+                <h3>✅ Passed</h3>
+                <div class="value">{{ passed_validations }}</div>
             </div>
 
             <div class="summary-card">
-                <h3>Warnings</h3>
-                <div class="value status-warning">{{ report.total_warnings }}</div>
-            </div>
-
-            <div class="summary-card">
-                <h3>Passed</h3>
-                <div class="value status-passed">{{ passed_validations }}</div>
-            </div>
-
-            <div class="summary-card">
-                <h3>Files Processed</h3>
+                <h3>📁 Files</h3>
                 <div class="value">{{ report.file_reports|length }}</div>
             </div>
         </div>
@@ -426,17 +681,26 @@ HTML_TEMPLATE = """
         <!-- File Sections -->
         {% for file_report in report.file_reports %}
         <div class="file-section">
-            <div class="file-header" onclick="toggleFileContent('file-{{ loop.index }}')">
+            <div class="file-header" onclick="toggleFile('file-{{ loop.index }}')">
                 <h2>
-                    <span class="status-badge {% if file_report.status == Status.PASSED %}bg-passed status-passed{% elif file_report.status == Status.FAILED %}bg-failed status-failed{% else %}bg-warning status-warning{% endif %}">
+                    <span class="status-badge {% if file_report.status == Status.PASSED %}status-passed{% elif file_report.status == Status.FAILED %}status-failed{% else %}status-warning{% endif %}">
                         {{ file_report.status.value }}
                     </span>
                     {{ file_report.file_name }}
                 </h2>
                 <div class="file-stats">
-                    <span>{{ file_report.total_validations }} checks</span>
-                    <span class="status-failed">{{ file_report.error_count }} errors</span>
-                    <span class="status-warning">{{ file_report.warning_count }} warnings</span>
+                    <div class="stat-item">
+                        <span class="stat-label">Checks:</span>
+                        <span class="stat-value">{{ file_report.total_validations }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Errors:</span>
+                        <span class="stat-value error">{{ file_report.error_count }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Warnings:</span>
+                        <span class="stat-value warning">{{ file_report.warning_count }}</span>
+                    </div>
                     <span class="toggle-icon" id="toggle-file-{{ loop.index }}">▼</span>
                 </div>
             </div>
@@ -444,27 +708,27 @@ HTML_TEMPLATE = """
             <div class="file-content" id="file-{{ loop.index }}" style="display: block;">
                 <!-- File Metadata -->
                 <div class="file-meta">
-                    <div class="file-meta-item">
-                        <label>File Path</label>
-                        <value>{{ file_report.file_path }}</value>
+                    <div class="meta-item">
+                        <span class="meta-label">File Path</span>
+                        <span class="meta-value">{{ file_report.file_path }}</span>
                     </div>
-                    <div class="file-meta-item">
-                        <label>Format</label>
-                        <value>{{ file_report.file_format }}</value>
+                    <div class="meta-item">
+                        <span class="meta-label">Format</span>
+                        <span class="meta-value">{{ file_report.file_format|upper }}</span>
                     </div>
-                    <div class="file-meta-item">
-                        <label>File Size</label>
-                        <value>
+                    <div class="meta-item">
+                        <span class="meta-label">File Size</span>
+                        <span class="meta-value">
                             {% if file_report.metadata.file_size_mb %}
                                 {{ "%.2f"|format(file_report.metadata.file_size_mb) }} MB
                             {% else %}
                                 N/A
                             {% endif %}
-                        </value>
+                        </span>
                     </div>
-                    <div class="file-meta-item">
-                        <label>Rows</label>
-                        <value>
+                    <div class="meta-item">
+                        <span class="meta-label">Rows</span>
+                        <span class="meta-value">
                             {% if file_report.metadata.total_rows %}
                                 {{ "{:,}".format(file_report.metadata.total_rows) }}
                             {% elif file_report.metadata.estimated_rows %}
@@ -472,78 +736,85 @@ HTML_TEMPLATE = """
                             {% else %}
                                 N/A
                             {% endif %}
-                        </value>
+                        </span>
                     </div>
-                    <div class="file-meta-item">
-                        <label>Columns</label>
-                        <value>{{ file_report.metadata.column_count if file_report.metadata.column_count else 'N/A' }}</value>
+                    <div class="meta-item">
+                        <span class="meta-label">Columns</span>
+                        <span class="meta-value">{{ file_report.metadata.column_count if file_report.metadata.column_count else 'N/A' }}</span>
                     </div>
-                    <div class="file-meta-item">
-                        <label>Duration</label>
-                        <value>{{ "%.2f"|format(file_report.execution_time) }}s</value>
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">{{ "%.2f"|format(file_report.execution_time) }}s</span>
                     </div>
                 </div>
 
                 <!-- Validations -->
                 <div class="validation-list">
-                    <h3>Validation Results</h3>
+                    <h3>🔍 Validation Results</h3>
                     {% for result in file_report.validation_results %}
-                    {% set file_idx = loop.index0 %}
-                    <div class="validation-item">
+                    <div class="validation-item {% if not result.passed %}failed{% endif %}">
                         <div class="validation-header" onclick="toggleValidation('validation-{{ file_report.file_name }}-{{ loop.index }}')">
-                            <h4>
+                            <div class="validation-title">
                                 <span class="validation-icon">
                                     {% if result.passed %}✅{% else %}❌{% endif %}
                                 </span>
-                                <span>{{ result.rule_name }}</span>
-                                <span class="metric-badge {% if result.passed %}badge-success{% else %}{% if result.severity.value == 'ERROR' %}badge-error{% else %}badge-warning{% endif %}{% endif %}">
-                                    {{ result.severity.value }}
-                                </span>
-                            </h4>
+                                <div>
+                                    <div class="validation-name">{{ result.rule_name }}</div>
+                                    <span class="severity-badge {% if result.passed %}severity-success{% else %}{% if result.severity.value == 'ERROR' %}severity-error{% else %}severity-warning{% endif %}{% endif %}">
+                                        {{ result.severity.value }}
+                                    </span>
+                                </div>
+                            </div>
                             <div class="validation-stats">
                                 {% if not result.passed %}
-                                    <span>{{ result.failed_count }} failures</span>
+                                    <span style="color: var(--error);">{{ result.failed_count }} failures</span>
                                 {% endif %}
                                 {% if result.total_count > 0 %}
-                                    <span>{{ "%.1f"|format((result.total_count - result.failed_count) / result.total_count * 100) }}% success rate</span>
+                                    <span style="color: var(--text-muted);">{{ "%.1f"|format((result.total_count - result.failed_count) / result.total_count * 100) }}% pass rate</span>
                                 {% endif %}
                                 <span class="toggle-icon" id="toggle-validation-{{ file_report.file_name }}-{{ loop.index }}">▼</span>
                             </div>
                         </div>
 
                         <div class="validation-details" id="validation-{{ file_report.file_name }}-{{ loop.index }}">
-                            <p><strong>Message:</strong> {{ result.message }}</p>
+                            <div class="validation-message">
+                                <strong>Result:</strong> {{ result.message }}
+                            </div>
 
                             {% if not result.passed and result.sample_failures %}
-                                <h4 style="margin-top: 20px;">Sample Failures (showing {{ result.sample_failures|length }} of {{ result.failed_count }})</h4>
-                                <table class="failures-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Row</th>
-                                            {% if result.sample_failures[0].field %}
-                                                <th>Field</th>
-                                            {% endif %}
-                                            {% if result.sample_failures[0].value %}
-                                                <th>Value</th>
-                                            {% endif %}
-                                            <th>Message</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for failure in result.sample_failures %}
-                                        <tr>
-                                            <td><span class="code">{{ failure.row }}</span></td>
-                                            {% if failure.field %}
-                                                <td><span class="code">{{ failure.field }}</span></td>
-                                            {% endif %}
-                                            {% if failure.value %}
-                                                <td><span class="code">{{ failure.value }}</span></td>
-                                            {% endif %}
-                                            <td>{{ failure.message }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                                <div class="failures-section">
+                                    <h4>❌ Sample Failures (showing {{ result.sample_failures|length }} of {{ result.failed_count }})</h4>
+                                    <div class="failures-table-wrapper">
+                                        <table class="failures-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Row</th>
+                                                    {% if result.sample_failures[0].field %}
+                                                        <th>Field</th>
+                                                    {% endif %}
+                                                    {% if result.sample_failures[0].value %}
+                                                        <th>Value</th>
+                                                    {% endif %}
+                                                    <th>Issue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for failure in result.sample_failures %}
+                                                <tr>
+                                                    <td><span class="code">#{{ failure.row }}</span></td>
+                                                    {% if failure.field %}
+                                                        <td><span class="code">{{ failure.field }}</span></td>
+                                                    {% endif %}
+                                                    {% if failure.value %}
+                                                        <td><span class="code">{{ failure.value }}</span></td>
+                                                    {% endif %}
+                                                    <td><span class="error-message">{{ failure.message }}</span></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -555,7 +826,7 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        function toggleFileContent(fileId) {
+        function toggleFile(fileId) {
             const content = document.getElementById(fileId);
             const icon = document.getElementById('toggle-' + fileId);
 
@@ -578,14 +849,11 @@ HTML_TEMPLATE = """
 
         // Auto-expand failed validations
         document.addEventListener('DOMContentLoaded', function() {
-            const failedValidations = document.querySelectorAll('.validation-item');
+            const failedValidations = document.querySelectorAll('.validation-item.failed');
             failedValidations.forEach(function(item) {
-                const icon = item.querySelector('.validation-icon');
-                if (icon && icon.textContent.trim() === '❌') {
-                    const header = item.querySelector('.validation-header');
-                    if (header) {
-                        header.click();
-                    }
+                const header = item.querySelector('.validation-header');
+                if (header) {
+                    header.click();
                 }
             });
         });

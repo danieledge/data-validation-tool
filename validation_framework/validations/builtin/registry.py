@@ -33,6 +33,12 @@ from validation_framework.validations.builtin.record_checks import (
     UniqueKeyCheck,
 )
 
+from validation_framework.validations.builtin.inline_checks import (
+    InlineRegexCheck,
+    InlineBusinessRuleCheck,
+    InlineLookupCheck,
+)
+
 
 def register_all_builtin_validations():
     """
@@ -60,6 +66,11 @@ def register_all_builtin_validations():
     register_validation("DuplicateRowCheck", DuplicateRowCheck)
     register_validation("BlankRecordCheck", BlankRecordCheck)
     register_validation("UniqueKeyCheck", UniqueKeyCheck)
+
+    # Inline/Custom checks (BA-friendly)
+    register_validation("InlineRegexCheck", InlineRegexCheck)
+    register_validation("InlineBusinessRuleCheck", InlineBusinessRuleCheck)
+    register_validation("InlineLookupCheck", InlineLookupCheck)
 
 
 # Auto-register on import
