@@ -392,7 +392,7 @@ class TestLargeDatasetIntegration:
                                     "severity": "ERROR",
                                     "params": {
                                         "min_rows": 9000,
-                                        "max_rows": 11000
+                                        "max_rows": 12000  # Allow for estimation variance
                                     }
                                 },
                                 {

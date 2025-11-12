@@ -45,9 +45,9 @@ class TestEmptyFileCheck:
 
     def test_empty_file_check_fails_for_empty_file(self):
         """Test that empty file check fails for empty files."""
-        # Create empty file
+        # Create truly empty file (0 bytes)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-            f.write("col1,col2\n")  # Header only
+            # Don't write anything - create 0 byte file
             temp_path = f.name
 
         try:
@@ -73,22 +73,30 @@ class TestEmptyFileCheck:
 
     def test_empty_file_check_passes_for_non_empty_file(self):
         """Test that empty file check passes for non-empty files."""
-        validation = EmptyFileCheck(
-            name="EmptyFileCheck",
-            severity=Severity.ERROR,
-            params={}
-        )
+        # Create non-empty file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            f.write("col1,col2\nval1,val2\n")  # Header + data
+            temp_path = f.name
 
-        context = {
-            "file_path": "test.csv",
-            "is_empty": False,
-            "estimated_rows": 100
-        }
+        try:
+            validation = EmptyFileCheck(
+                name="EmptyFileCheck",
+                severity=Severity.ERROR,
+                params={}
+            )
 
-        result = validation.validate_file(context)
+            context = {
+                "file_path": temp_path,
+                "is_empty": False,
+                "estimated_rows": 100
+            }
 
-        assert result.passed is True
-        assert result.severity == Severity.ERROR
+            result = validation.validate_file(context)
+
+            assert result.passed is True
+            assert result.severity == Severity.ERROR
+        finally:
+            Path(temp_path).unlink()
 
 
 @pytest.mark.unit

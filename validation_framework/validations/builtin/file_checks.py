@@ -122,14 +122,15 @@ class RowCountRangeCheck(FileValidationRule):
         Check if row count is within specified range.
 
         Args:
-            context: Must contain 'total_rows' key with actual row count
+            context: Must contain 'total_rows' or 'estimated_rows' key with row count
 
         Returns:
             ValidationResult indicating if row count is acceptable
         """
         try:
             # Get actual row count from context (populated by engine)
-            actual_rows = context.get("total_rows", 0)
+            # Try total_rows first (accurate), then estimated_rows (from metadata)
+            actual_rows = context.get("total_rows") or context.get("estimated_rows", 0)
 
             min_rows = self.params.get("min_rows")
             max_rows = self.params.get("max_rows")
