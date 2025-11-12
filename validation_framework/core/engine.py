@@ -114,6 +114,7 @@ class ValidationEngine:
             duration_seconds=0,  # Will be updated at end
             overall_status=Status.PASSED,
             config=self.config.to_dict(),
+            description=self.config.description,
         )
 
         # Process each file

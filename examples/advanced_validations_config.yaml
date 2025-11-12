@@ -7,6 +7,7 @@
 validation_job:
   name: "Advanced Validation Example - Statistical & Quality Checks"
   version: "1.0"
+  description: "Comprehensive validation suite demonstrating advanced statistical analysis and data quality checks including outlier detection, completeness validation, and precision enforcement."
 
   files:
     - name: "financial_data"

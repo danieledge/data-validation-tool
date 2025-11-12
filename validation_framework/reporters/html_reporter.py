@@ -148,23 +148,77 @@ HTML_TEMPLATE = """
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%);
+            background: linear-gradient(135deg, #1f2335 0%, #24283b 50%, #1a1b26 100%);
             color: white;
-            padding: 2rem 1.5rem;
+            padding: 0;
             border-radius: 12px;
             margin-bottom: 2rem;
             box-shadow: 0 8px 32px var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%);
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            font-size: 2.5rem;
+            animation: pulse-icon 2s infinite;
+        }
+
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-content {
+            padding: 2rem;
         }
 
         header h1 {
             font-size: clamp(1.5rem, 4vw, 2.5rem);
             font-weight: 700;
             margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         header .subtitle {
-            opacity: 0.95;
+            color: var(--text-secondary);
             font-size: clamp(0.875rem, 2vw, 1.125rem);
+            margin-bottom: 1.5rem;
+        }
+
+        header .description {
+            color: var(--text-muted);
+            font-size: 0.938rem;
+            line-height: 1.6;
+            max-width: 800px;
         }
 
         /* Status Badge */
@@ -628,16 +682,72 @@ HTML_TEMPLATE = """
         .summary-card {
             animation: fadeIn 0.5s ease-out;
         }
+
+        /* Charts Section */
+        .charts-section {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart-container {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-container h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header>
-            <h1>📊 {{ report.job_name }}</h1>
-            <div class="subtitle">
-                🕐 {{ report.execution_time.strftime('%Y-%m-%d %H:%M:%S') }}
-                | ⏱️ Duration: {{ "%.2f"|format(report.duration_seconds) }}s
+            <div class="header-banner">
+                <div class="header-brand">
+                    <span class="header-icon">🔍</span>
+                    <span style="font-weight: 600; font-size: 1.125rem;">Data Quality Validation</span>
+                </div>
+                <div class="header-badge">
+                    Report Generated
+                </div>
+            </div>
+            <div class="header-content">
+                <h1>{{ report.job_name }}</h1>
+                <div class="subtitle">
+                    🕐 {{ report.execution_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                    | ⏱️ Duration: {{ "%.2f"|format(report.duration_seconds) }}s
+                    | 📁 {{ report.file_reports|length }} file{{ 's' if report.file_reports|length != 1 else '' }} processed
+                </div>
+                {% if report.description %}
+                <div class="description">{{ report.description }}</div>
+                {% endif %}
             </div>
         </header>
 
@@ -675,6 +785,34 @@ HTML_TEMPLATE = """
             <div class="summary-card">
                 <h3>📁 Files</h3>
                 <div class="value">{{ report.file_reports|length }}</div>
+            </div>
+        </div>
+
+        <!-- Charts & Visualizations -->
+        <div class="charts-section">
+            <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">📊 Validation Insights</h2>
+            <p style="color: var(--text-muted); font-size: 0.938rem; margin-bottom: 1.5rem;">
+                Visual overview of validation results and data quality metrics
+            </p>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Validation Results Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Results by Severity</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Files Validation Status</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="filesChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -825,7 +963,204 @@ HTML_TEMPLATE = """
         {% endfor %}
     </div>
 
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <script>
+        // Chart.js global configuration
+        Chart.defaults.color = '#9aa5ce';
+        Chart.defaults.borderColor = '#3b4261';
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+        // Color palette matching Tokyo Night theme
+        const colors = {
+            success: '#9ece6a',
+            error: '#f7768e',
+            warning: '#e0af68',
+            info: '#7aa2f7',
+            purple: '#bb9af7',
+        };
+
+        // Results Distribution Chart (Donut)
+        const resultsCtx = document.getElementById('resultsChart');
+        if (resultsCtx) {
+            new Chart(resultsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Passed', 'Errors', 'Warnings'],
+                    datasets: [{
+                        data: [
+                            {{ passed_validations }},
+                            {{ report.total_errors }},
+                            {{ report.total_warnings }}
+                        ],
+                        backgroundColor: [
+                            colors.success,
+                            colors.error,
+                            colors.warning
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#24283b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1a1b26',
+                            titleColor: '#c0caf5',
+                            bodyColor: '#9aa5ce',
+                            borderColor: '#3b4261',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Severity Chart (Horizontal Bar)
+        const severityCtx = document.getElementById('severityChart');
+        if (severityCtx) {
+            // Calculate severity breakdown
+            const errorCount = {{ report.total_errors }};
+            const warningCount = {{ report.total_warnings }};
+
+            new Chart(severityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Errors', 'Warnings'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [errorCount, warningCount],
+                        backgroundColor: [colors.error, colors.warning],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1b26',
+                            titleColor: '#c0caf5',
+                            bodyColor: '#9aa5ce',
+                            borderColor: '#3b4261',
+                            borderWidth: 1,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 },
+                            grid: { color: '#3b4261' }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Files Status Chart (Bar)
+        const filesCtx = document.getElementById('filesChart');
+        if (filesCtx) {
+            const fileNames = [
+                {% for file_report in report.file_reports %}
+                '{{ file_report.file_name }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const fileErrors = [
+                {% for file_report in report.file_reports %}
+                {{ file_report.error_count }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const fileWarnings = [
+                {% for file_report in report.file_reports %}
+                {{ file_report.warning_count }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            new Chart(filesCtx, {
+                type: 'bar',
+                data: {
+                    labels: fileNames,
+                    datasets: [
+                        {
+                            label: 'Errors',
+                            data: fileErrors,
+                            backgroundColor: colors.error,
+                            borderWidth: 0
+                        },
+                        {
+                            label: 'Warnings',
+                            data: fileWarnings,
+                            backgroundColor: colors.warning,
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1a1b26',
+                            titleColor: '#c0caf5',
+                            bodyColor: '#9aa5ce',
+                            borderColor: '#3b4261',
+                            borderWidth: 1,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: false,
+                            beginAtZero: true,
+                            ticks: { precision: 0 },
+                            grid: { color: '#3b4261' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // File and validation toggle functions
         function toggleFile(fileId) {
             const content = document.getElementById(fileId);
             const icon = document.getElementById('toggle-' + fileId);

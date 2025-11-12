@@ -54,6 +54,7 @@ class ValidationConfig:
         # Job metadata
         self.job_name = job_config.get("name", "Unnamed Validation Job")
         self.version = job_config.get("version", "1.0")
+        self.description = job_config.get("description", None)
 
         # Files to validate
         if "files" not in job_config or not job_config["files"]:

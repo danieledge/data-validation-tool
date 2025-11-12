@@ -118,6 +118,7 @@ class ValidationReport:
     total_warnings: int = 0
     total_validations: int = 0
     config: Dict[str, Any] = field(default_factory=dict)
+    description: str = None
 
     def add_file_report(self, report: FileValidationReport):
         """Add a file validation report."""
