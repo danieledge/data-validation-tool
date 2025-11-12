@@ -83,18 +83,31 @@ class MandatoryFieldCheck(DataValidationRule):
                         failed_count=1,
                     )
 
+                # Apply conditional filter if condition is specified
+                if self.condition:
+                    condition_mask = self._evaluate_condition(chunk)
+                    # Only validate rows that match the condition
+                    rows_to_check = chunk[condition_mask]
+
+                    # If no rows match condition in this chunk, skip validation
+                    if len(rows_to_check) == 0:
+                        total_rows += len(chunk)
+                        continue
+                else:
+                    rows_to_check = chunk
+
                 # Check each required field
                 for field in fields:
-                    # Find rows with missing values
-                    mask = chunk[field].isna()
+                    # Find rows with missing values (check only rows that meet condition)
+                    mask = rows_to_check[field].isna()
 
                     # Also check for empty strings if not allowing whitespace
-                    if not allow_whitespace and chunk[field].dtype == 'object':
+                    if not allow_whitespace and rows_to_check[field].dtype == 'object':
                         # Convert to string and check for empty/whitespace
-                        mask = mask | (chunk[field].astype(str).str.strip() == '')
+                        mask = mask | (rows_to_check[field].astype(str).str.strip() == '')
 
                     # Find failed row indices
-                    failed_indices = chunk[mask].index.tolist()
+                    failed_indices = rows_to_check[mask].index.tolist()
 
                     # Collect samples
                     for idx in failed_indices:
@@ -231,8 +244,20 @@ class RegexCheck(DataValidationRule):
                         failed_count=1,
                     )
 
+                # Apply conditional filter if condition is specified
+                if self.condition:
+                    condition_mask = self._evaluate_condition(chunk)
+                    rows_to_check = chunk[condition_mask]
+
+                    # If no rows match condition in this chunk, skip validation
+                    if len(rows_to_check) == 0:
+                        total_rows += len(chunk)
+                        continue
+                else:
+                    rows_to_check = chunk
+
                 # Convert to string for regex matching (skip nulls)
-                field_values = chunk[field].dropna().astype(str)
+                field_values = rows_to_check[field].dropna().astype(str)
 
                 # Test each value against pattern
                 for idx, value in field_values.items():
@@ -355,8 +380,20 @@ class ValidValuesCheck(DataValidationRule):
                         failed_count=1,
                     )
 
+                # Apply conditional filter if condition is specified
+                if self.condition:
+                    condition_mask = self._evaluate_condition(chunk)
+                    rows_to_check = chunk[condition_mask]
+
+                    # If no rows match condition in this chunk, skip validation
+                    if len(rows_to_check) == 0:
+                        total_rows += len(chunk)
+                        continue
+                else:
+                    rows_to_check = chunk
+
                 # Check each value (skip nulls)
-                field_values = chunk[field].dropna()
+                field_values = rows_to_check[field].dropna()
 
                 for idx, value in field_values.items():
                     check_value = str(value) if case_sensitive else str(value).lower()
@@ -478,9 +515,21 @@ class RangeCheck(DataValidationRule):
                         failed_count=1,
                     )
 
+                # Apply conditional filter if condition is specified
+                if self.condition:
+                    condition_mask = self._evaluate_condition(chunk)
+                    rows_to_check = chunk[condition_mask]
+
+                    # If no rows match condition in this chunk, skip validation
+                    if len(rows_to_check) == 0:
+                        total_rows += len(chunk)
+                        continue
+                else:
+                    rows_to_check = chunk
+
                 # Convert to numeric if needed
                 try:
-                    field_values = pd.to_numeric(chunk[field], errors='coerce')
+                    field_values = pd.to_numeric(rows_to_check[field], errors='coerce')
                 except Exception:
                     return self._create_result(
                         passed=False,
@@ -606,8 +655,20 @@ class DateFormatCheck(DataValidationRule):
                         failed_count=1,
                     )
 
+                # Apply conditional filter if condition is specified
+                if self.condition:
+                    condition_mask = self._evaluate_condition(chunk)
+                    rows_to_check = chunk[condition_mask]
+
+                    # If no rows match condition in this chunk, skip validation
+                    if len(rows_to_check) == 0:
+                        total_rows += len(chunk)
+                        continue
+                else:
+                    rows_to_check = chunk
+
                 # Check each value
-                for idx, value in chunk[field].items():
+                for idx, value in rows_to_check[field].items():
                     # Handle nulls
                     if pd.isna(value):
                         if not allow_null and len(failed_rows) < max_samples:

@@ -118,6 +118,7 @@ class ValidationConfig:
                 "params": validation.get("params", {}),
                 "enabled": validation.get("enabled", True),
                 "description": validation.get("description", ""),
+                "condition": validation.get("condition", None),
             }
 
             parsed_validations.append(parsed_validation)

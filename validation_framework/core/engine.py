@@ -234,6 +234,7 @@ class ValidationEngine:
                         name=validation_type,
                         severity=validation_config["severity"],
                         params=validation_config.get("params", {}),
+                        condition=validation_config.get("condition"),
                     )
 
                     # Execute validation

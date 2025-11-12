@@ -741,11 +741,159 @@ Row #567: 'YY' not in approved list [US, UK, CA, AU, DE, FR]
 
 ---
 
+## Conditional Validation Checks
+
+These validations allow you to apply different validation rules based on conditions in your data, enabling complex business logic without custom code.
+
+### 17. ConditionalValidation
+
+**Purpose**: Executes different validations based on conditional expressions (if-then-else logic).
+
+**Use Cases**:
+- Different validation rules for different account types (business vs individual)
+- Additional checks for high-value transactions
+- Different requirements based on customer tier or region
+- Complex business rules that vary by record type
+
+**Configuration Parameters**:
+- `condition` (string, required): Boolean expression to evaluate
+- `then_validate` (list, required): List of validation configs to execute if condition is True
+- `else_validate` (list, optional): List of validation configs to execute if condition is False
+
+**Example YAML - Simple conditional**:
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "account_type == 'BUSINESS'"
+    then_validate:
+      # Business accounts must have company details
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["company_name", "tax_id", "business_license"]
+```
+
+**Example YAML - If-then-else logic**:
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "customer_type == 'INDIVIDUAL'"
+    then_validate:
+      # Individual customers need personal details
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["first_name", "last_name", "date_of_birth"]
+      - type: "RangeCheck"
+        params:
+          field: "age"
+          min_value: 18
+    else_validate:
+      # Corporate customers need business details
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["company_name", "registration_number"]
+```
+
+**Example YAML - Multiple validations in branches**:
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "order_total > 1000"
+    then_validate:
+      # High-value orders require manager approval
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["manager_approval"]
+      - type: "RegexCheck"
+        params:
+          field: "manager_approval"
+          pattern: "^MGR[0-9]{6}$"
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["authorized_by"]
+```
+
+**Example YAML - Nested conditions**:
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "country == 'US'"
+    then_validate:
+      # US customers need SSN
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["ssn"]
+      # Only check SSN format for high-value customers
+      - type: "RegexCheck"
+        condition: "customer_value > 10000"
+        params:
+          field: "ssn"
+          pattern: "^[0-9]{3}-[0-9]{2}-[0-9]{4}$"
+    else_validate:
+      # International customers need passport
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["passport_number"]
+```
+
+**Condition Expression Syntax**:
+- Comparison operators: `==`, `!=`, `>`, `>=`, `<`, `<=`
+- Logical operators: `AND`, `OR`, `NOT`
+- String values must be in single quotes: `'BUSINESS'`
+- Numeric values: no quotes needed
+- Examples:
+  - `"status == 'ACTIVE'"`
+  - `"age >= 18 AND age <= 65"`
+  - `"balance < 0 OR credit_score < 500"`
+  - `"NOT (status == 'CANCELLED')"`
+
+**How It Works**:
+1. Evaluates the condition expression on each row of data
+2. Splits rows into matching and non-matching subsets
+3. Executes `then_validate` rules on rows where condition is True
+4. Executes `else_validate` rules on rows where condition is False (if specified)
+5. Aggregates results from all sub-validations
+
+**Sample Output**:
+```
+✓ PASS - Conditional validation passed all 2 sub-validation(s)
+
+Or if failures:
+
+✗ FAIL - Conditional validation failed: 1 sub-validation(s) failed (MandatoryFieldCheck)
+  Failed rows: 3
+  Total rows processed: 1000
+```
+
+**Best Practices**:
+- Use clear, readable condition expressions
+- Prefer simple inline conditions for single validations
+- Use ConditionalValidation for complex if-then-else logic
+- Ensure field names in conditions exist in your data
+- Test conditions with sample data first
+- Document business rules in YAML comments
+
+**Note**: You can also use inline conditions on any validation by adding a `condition` parameter:
+```yaml
+- type: "MandatoryFieldCheck"
+  severity: "ERROR"
+  params:
+    fields: ["company_name"]
+  condition: "account_type == 'BUSINESS'"
+```
+
+This is simpler than ConditionalValidation for single validations.
+
+---
+
 ## Advanced Validation Checks
 
 These validations were added based on research into leading data quality frameworks like Great Expectations.
 
-### 17. StatisticalOutlierCheck
+### 18. StatisticalOutlierCheck
 
 **Purpose**: Detects statistical outliers using Z-score or IQR methods.
 
@@ -791,7 +939,7 @@ These validations were added based on research into leading data quality framewo
 
 ---
 
-### 18. CrossFieldComparisonCheck
+### 19. CrossFieldComparisonCheck
 
 **Purpose**: Validates logical relationships between two fields.
 
@@ -833,7 +981,7 @@ These validations were added based on research into leading data quality framewo
 
 ---
 
-### 19. FreshnessCheck
+### 20. FreshnessCheck
 
 **Purpose**: Validates file or data is fresh (recently updated).
 
@@ -874,7 +1022,7 @@ These validations were added based on research into leading data quality framewo
 
 ---
 
-### 20. CompletenessCheck
+### 21. CompletenessCheck
 
 **Purpose**: Validates field completeness (percentage of non-null values).
 
@@ -913,7 +1061,7 @@ These validations were added based on research into leading data quality framewo
 
 ---
 
-### 21. StringLengthCheck
+### 22. StringLengthCheck
 
 **Purpose**: Validates string field length is within acceptable range.
 
@@ -962,7 +1110,7 @@ Row #567: Length 25 > maximum 20
 
 ---
 
-### 22. NumericPrecisionCheck
+### 23. NumericPrecisionCheck
 
 **Purpose**: Validates numeric precision (decimal places).
 

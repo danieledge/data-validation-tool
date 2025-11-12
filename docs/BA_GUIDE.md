@@ -14,8 +14,9 @@ This guide shows you how to define custom data validation rules without writing 
 4. [Business Rules](#business-rules)
 5. [Reference Data Lookups](#reference-data-lookups)
 6. [Working with Different File Formats](#working-with-different-file-formats)
-7. [Common Examples](#common-examples)
-8. [Troubleshooting](#troubleshooting)
+7. [Conditional Validations](#conditional-validations)
+8. [Common Examples](#common-examples)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -725,6 +726,184 @@ validation_job:
 - **Parquet**: Use for large data warehouse extracts, analytics datasets over 50GB
 - **JSON**: Use for API responses, NoSQL exports, log files, modern data interchange
 - **Delimiter**: Always specify custom delimiters (pipe, tab) for non-comma CSV files
+
+---
+
+## Conditional Validations
+
+Sometimes you need to apply different validation rules based on the values in your data. For example:
+- Business accounts must have a company name, but individual accounts don't
+- Orders over $1000 require manager approval
+- Premium customers have different validation rules than standard customers
+
+The framework supports two types of conditional validations:
+
+### Method 1: Simple Inline Conditions
+
+Add a `condition` parameter to any validation to only check rows that match the condition.
+
+#### Example: Check company name only for business accounts
+
+```yaml
+- type: "MandatoryFieldCheck"
+  severity: "ERROR"
+  params:
+    fields: ["company_name", "tax_id"]
+  condition: "account_type == 'BUSINESS'"
+```
+
+**What it does**: Only validates company_name and tax_id for rows where account_type is 'BUSINESS'. Individual account rows are skipped.
+
+#### Example: Validate credit limit for high-value customers
+
+```yaml
+- type: "RangeCheck"
+  severity: "WARNING"
+  params:
+    field: "credit_limit"
+    min_value: 50000
+    max_value: 1000000
+  condition: "customer_tier == 'PREMIUM'"
+```
+
+**What it does**: Only checks credit_limit range for rows where customer_tier is 'PREMIUM'.
+
+#### Example: Multiple conditions with AND
+
+```yaml
+- type: "MandatoryFieldCheck"
+  severity: "ERROR"
+  params:
+    fields: ["manager_approval_id"]
+  condition: "order_type == 'BULK' AND order_total > 10000"
+```
+
+**What it does**: Only checks manager_approval_id for bulk orders over $10,000.
+
+**Supported operators**:
+- `==` (equals)
+- `!=` (not equals)
+- `>`, `>=`, `<`, `<=` (comparisons)
+- `AND`, `OR`, `NOT` (logical operators)
+
+### Method 2: If-Then-Else Logic (ConditionalValidation)
+
+For more complex scenarios where you want to run different validations based on a condition, use the `ConditionalValidation` wrapper.
+
+#### Example: Different fields for business vs individual accounts
+
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "account_type == 'BUSINESS'"
+    then_validate:
+      # If BUSINESS account, check these fields
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["company_name", "tax_id", "business_license"]
+    else_validate:
+      # If NOT BUSINESS (i.e., INDIVIDUAL), check these fields
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["first_name", "last_name", "date_of_birth"]
+```
+
+**What it does**:
+- IF account_type is BUSINESS → checks company_name, tax_id, business_license
+- ELSE (for INDIVIDUAL accounts) → checks first_name, last_name, date_of_birth
+
+#### Example: High-value orders require extra checks
+
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "order_total > 1000"
+    then_validate:
+      # High-value orders need manager approval
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["manager_approval"]
+      - type: "RegexCheck"
+        params:
+          field: "manager_approval"
+          pattern: "^MGR[0-9]{6}$"
+```
+
+**What it does**: Orders over $1000 must have a manager_approval field that matches the pattern MGR followed by 6 digits.
+
+#### Example: Multiple validations in then/else branches
+
+```yaml
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "payment_method == 'CREDIT_CARD'"
+    then_validate:
+      # Credit card payments require these fields
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["card_number", "expiry_date", "cvv"]
+      - type: "RegexCheck"
+        params:
+          field: "card_number"
+          pattern: "^[0-9]{16}$"
+      - type: "RegexCheck"
+        params:
+          field: "expiry_date"
+          pattern: "^(0[1-9]|1[0-2])/[0-9]{2}$"
+    else_validate:
+      # Other payment methods require bank details
+      - type: "MandatoryFieldCheck"
+        params:
+          fields: ["bank_account", "routing_number"]
+```
+
+**What it does**:
+- IF credit card payment → validates card details
+- ELSE (bank transfer, cash, etc.) → validates bank account details
+
+### When to Use Each Method
+
+**Use Simple Inline Conditions** when:
+- You want to skip a validation for certain rows
+- The logic is straightforward (just one condition)
+- Example: "Only check this field for premium customers"
+
+**Use ConditionalValidation (If-Then-Else)** when:
+- You need to run completely different validations based on a condition
+- You have multiple validations in the THEN or ELSE branches
+- You want to make the business logic explicit and readable
+- Example: "Business accounts need X, Y, Z checked; Individual accounts need A, B, C checked"
+
+### Condition Expression Syntax
+
+Conditions use familiar syntax similar to Excel formulas:
+
+```yaml
+# Simple comparisons
+"status == 'ACTIVE'"
+"age >= 18"
+"balance < 0"
+
+# Multiple conditions
+"customer_type == 'BUSINESS' AND country == 'US'"
+"balance < 0 OR credit_score < 500"
+
+# Numeric ranges
+"order_total >= 1000 AND order_total <= 50000"
+
+# NOT operator
+"status != 'CANCELLED'"
+"NOT (status == 'PENDING' OR status == 'DRAFT')"
+```
+
+**Important notes**:
+- Field names must exist in your data
+- Use single quotes for text values: `'BUSINESS'` not `BUSINESS`
+- Use AND/OR for multiple conditions (not &&, ||)
+- Conditions are case-sensitive by default
 
 ---
 

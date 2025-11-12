@@ -38,6 +38,7 @@ from validation_framework.validations.builtin.inline_checks import (
     InlineBusinessRuleCheck,
     InlineLookupCheck,
 )
+from validation_framework.validations.builtin.conditional import ConditionalValidation
 
 from validation_framework.validations.builtin.advanced_checks import (
     StatisticalOutlierCheck,
@@ -80,6 +81,9 @@ def register_all_builtin_validations():
     register_validation("InlineRegexCheck", InlineRegexCheck)
     register_validation("InlineBusinessRuleCheck", InlineBusinessRuleCheck)
     register_validation("InlineLookupCheck", InlineLookupCheck)
+
+    # Conditional validation wrapper
+    register_validation("ConditionalValidation", ConditionalValidation)
 
     # Advanced checks (statistical, cross-field, freshness)
     register_validation("StatisticalOutlierCheck", StatisticalOutlierCheck)
