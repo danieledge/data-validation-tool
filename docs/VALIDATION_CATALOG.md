@@ -27,24 +27,39 @@ These validations check properties of the entire file before processing individu
 
 ### EmptyFileCheck
 
-**Purpose:** Ensures the file contains data (not empty or 0 bytes)
+**Purpose:** Ensures the file contains data (not empty or 0 bytes) and optionally has data rows
 
 **Use Cases:**
 - Detect upstream pipeline failures
 - Catch missing or corrupted files
 - Prevent processing empty exports
+- Detect header-only files with no data rows
 
-**Parameters:** None
+**Parameters:**
+- `check_data_rows` (boolean, optional): If `true`, also verifies file has at least one data row (not just headers). Default: `false`
 
-**Example:**
+**Examples:**
 ```yaml
+# Check only for literal empty files (0 bytes)
 - type: "EmptyFileCheck"
   severity: "ERROR"
+
+# Check for both empty files AND header-only files
+- type: "EmptyFileCheck"
+  severity: "ERROR"
+  params:
+    check_data_rows: true
 ```
 
-**Passes when:** File has content (size > 0 bytes)
+**Passes when:**
+- Basic mode: File has content (size > 0 bytes)
+- With `check_data_rows: true`: File has content AND contains at least one data row
 
-**Fails when:** File is empty or 0 bytes
+**Fails when:**
+- Basic mode: File is empty or 0 bytes
+- With `check_data_rows: true`: File is empty OR contains only headers with no data rows
+
+**Supported Formats:** CSV, Excel, JSON, Parquet
 
 ---
 

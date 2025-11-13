@@ -16,21 +16,39 @@ from validation_framework.validations.base import FileValidationRule, Validation
 
 class EmptyFileCheck(FileValidationRule):
     """
-    Validates that a file is not empty (0 bytes).
+    Validates that a file is not empty and optionally has data rows.
 
     This is a critical check that should run before any data processing.
     An empty file often indicates an upstream failure in data generation.
 
+    Checks for:
+    1. File is not 0 bytes (literal empty file)
+    2. File has data rows, not just a header (when check_data_rows=true)
+
     Configuration:
         severity: ERROR or WARNING (typically ERROR)
+        params:
+            check_data_rows (bool, optional): If true, also verify file has at least
+                one data row (not just a header). Default: false
 
     Example YAML:
+        # Check only for 0-byte files
         - type: "EmptyFileCheck"
           severity: "ERROR"
+
+        # Check for both empty files and header-only files
+        - type: "EmptyFileCheck"
+          severity: "ERROR"
+          params:
+            check_data_rows: true
     """
 
     def get_description(self) -> str:
         """Get human-readable description."""
+        check_data_rows = self.params.get("check_data_rows", False)
+
+        if check_data_rows:
+            return "Checks that the file is not empty and contains data rows (not just headers)"
         return "Checks that the file is not empty (0 bytes)"
 
     def validate_file(self, context: Dict[str, Any]) -> ValidationResult:
@@ -61,6 +79,80 @@ class EmptyFileCheck(FileValidationRule):
                     message=f"File is empty (0 bytes): {file_path}",
                     failed_count=1,
                 )
+
+            # Check if we should also verify data rows exist
+            check_data_rows = self.params.get("check_data_rows", False)
+
+            if check_data_rows:
+                # Need to peek at the file to check for data rows
+                # since FileValidationRule runs before data processing
+                file_format = context.get("file_format", "csv")
+
+                try:
+                    if file_format.lower() == "csv":
+                        # Read first 2 lines to check if there's data beyond header
+                        import csv
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            reader = csv.reader(f)
+                            lines = []
+                            for i, line in enumerate(reader):
+                                lines.append(line)
+                                if i >= 1:  # Read header + first data row
+                                    break
+
+                            # If we only got 1 line or less, it's header-only
+                            if len(lines) <= 1:
+                                return self._create_result(
+                                    passed=False,
+                                    message=f"File contains only headers with no data rows: {file_path}",
+                                    failed_count=1,
+                                )
+
+                    elif file_format.lower() in ["excel", "xlsx", "xls"]:
+                        # Check Excel file for data rows
+                        df = pd.read_excel(file_path, nrows=1)
+                        if len(df) == 0:
+                            return self._create_result(
+                                passed=False,
+                                message=f"File contains only headers with no data rows: {file_path}",
+                                failed_count=1,
+                            )
+
+                    elif file_format.lower() == "json":
+                        # Check JSON file for data
+                        import json
+                        with open(file_path, 'r') as f:
+                            data = json.load(f)
+                            if isinstance(data, list) and len(data) == 0:
+                                return self._create_result(
+                                    passed=False,
+                                    message=f"File contains no data records: {file_path}",
+                                    failed_count=1,
+                                )
+
+                    elif file_format.lower() == "parquet":
+                        # Check Parquet file for data rows
+                        df = pd.read_parquet(file_path)
+                        if len(df) == 0:
+                            return self._create_result(
+                                passed=False,
+                                message=f"File contains only headers with no data rows: {file_path}",
+                                failed_count=1,
+                            )
+
+                    return self._create_result(
+                        passed=True,
+                        message=f"File contains data rows ({file_size} bytes)",
+                        total_count=1,
+                    )
+
+                except Exception as e:
+                    # If we can't read the file, report error
+                    return self._create_result(
+                        passed=False,
+                        message=f"Error checking for data rows: {str(e)}",
+                        failed_count=1,
+                    )
 
             return self._create_result(
                 passed=True,
