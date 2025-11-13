@@ -91,16 +91,17 @@ open report.html
 
 **Key Features:**
 - 🗂️ **Multiple Files** - Configure complex multi-file validations
-- 📋 **Template Library** - 5 pre-built templates for common scenarios
+- 📋 **Template Library** - 5 generic templates (Blank, Single File, Multiple Files, Schema Focus)
 - 📥 **Import YAML** - Load and edit existing configurations
 - 💾 **Auto-Save** - Browser localStorage with auto-save every 30 seconds
 - 🔗 **Shareable URLs** - Generate links to share configurations
 - ⚙️ **Advanced Settings** - chunk_size, fail_fast, log_level configuration
 - 🎨 **Syntax Highlighting** - Color-coded YAML preview
 - ⌨️ **Keyboard Shortcuts** - Ctrl+S, Ctrl+D, Ctrl+I, ? for help
-- 📱 **Mobile-Optimized** - Full responsive design with touch controls
+- 📱 **Mobile-Optimized** - Stacked buttons, 44px touch targets, optimized spacing
 - 🔍 **Smart Parameters** - Type-specific inputs with validation and hints
 - 📊 **Dashboard** - Real-time summary of files, validations, and severity counts
+- 🎯 **Clear UI** - Labeled severity dropdowns with color-coding (🔴 ERROR, 🟡 WARNING)
 
 ---
 

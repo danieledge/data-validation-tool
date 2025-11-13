@@ -14,7 +14,7 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 **Phase 1 - Critical Features:**
 - **Multiple File Support** - Add/remove files dynamically, configure each independently
-- **Template Library** - 5 pre-built templates (Basic Quality, E-Commerce, Financial, CRM, Data Warehouse)
+- **Template Library** - 5 generic templates (Blank, Single File - Basic/Complete, Multiple Files, Schema Validation)
 - **Import YAML** - Load existing configurations for editing
 - **Advanced Settings Panel** - Configure chunk_size, max_sample_failures, fail_fast, log_level
 
@@ -55,13 +55,20 @@ python3 -m validation_framework.cli validate config.yaml --html report.html
 - **GitHub Source**: https://github.com/danieledge/data-validation-tool/blob/main/docs/config-builder.html
 
 **Benefits:**
-- ✅ **Production-Ready** - Advanced settings, multiple files, template library
+- ✅ **Production-Ready** - Advanced settings, multiple files, generic template library
 - ✅ **No Coding Required** - Visual interface with guided parameter forms
 - ✅ **Save & Share** - Auto-save, shareable URLs, saved config manager
-- ✅ **Mobile-Friendly** - Full responsive design with touch-optimized controls
+- ✅ **Mobile-Optimized** - Full responsive design with stacked buttons, touch-friendly controls (44px targets)
 - ✅ **35+ Validations** - All validation types with tooltips and examples
 - ✅ **Smart Workflows** - Import existing configs, start from templates, keyboard shortcuts
+- ✅ **Clear UI** - Severity dropdown with labels and color-coding to prevent confusion
 - ✅ **Perfect for All Users** - Business analysts, data engineers, developers
+
+**Recent Improvements (v2.2.1):**
+- 🎯 **Generic Templates** - Replaced use-case specific templates with flexible, reusable ones
+- 📱 **Enhanced Mobile UX** - Buttons stack vertically, proper spacing, 44px touch targets
+- 🎨 **Clearer Severity Selection** - Added "Severity:" label and emoji indicators (🔴 ERROR, 🟡 WARNING)
+- ✅ **Better Accessibility** - All interactive elements meet touch target size standards
 
 ---
 
