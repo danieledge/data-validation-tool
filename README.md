@@ -83,18 +83,24 @@ open report.html
 
 ---
 
-## 🎨 Visual Config Builder
+## 🎨 Visual Config Builder v2
 
-**NEW!** Build validation configurations with zero coding required.
+**NEW v2!** Production-ready config builder with advanced features - no coding required.
 
 **🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
 
-**Features:**
-- Browse 35+ validations by category
-- Configure parameters with guided forms
-- Live YAML preview
-- Download or copy your config
-- No installation needed - runs in browser
+**Key Features:**
+- 🗂️ **Multiple Files** - Configure complex multi-file validations
+- 📋 **Template Library** - 5 pre-built templates for common scenarios
+- 📥 **Import YAML** - Load and edit existing configurations
+- 💾 **Auto-Save** - Browser localStorage with auto-save every 30 seconds
+- 🔗 **Shareable URLs** - Generate links to share configurations
+- ⚙️ **Advanced Settings** - chunk_size, fail_fast, log_level configuration
+- 🎨 **Syntax Highlighting** - Color-coded YAML preview
+- ⌨️ **Keyboard Shortcuts** - Ctrl+S, Ctrl+D, Ctrl+I, ? for help
+- 📱 **Mobile-Optimized** - Full responsive design with touch controls
+- 🔍 **Smart Parameters** - Type-specific inputs with validation and hints
+- 📊 **Dashboard** - Real-time summary of files, validations, and severity counts
 
 ---
 

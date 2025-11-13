@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validation Config Builder - Data Validation Framework</title>
+    <title>Validation Config Builder v2 - Enhanced</title>
     <style>
         * {
             margin: 0;
@@ -11,548 +11,139 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --bg-dark: #1e1e2e;
+            --bg-medium: #2d2d44;
+            --bg-light: #1a1a2e;
+            --border: #4a5568;
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e0;
+            --text-muted: #a0aec0;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --error: #f56565;
+            --info: #4299e1;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #e0e0e0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-secondary);
             padding: 20px;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
-            background: #1e1e2e;
+            background: var(--bg-dark);
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px;
-            text-align: center;
-            border-bottom: 4px solid #4a5568;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 30px 40px;
+            border-bottom: 4px solid var(--border);
         }
 
-        .header h1 {
-            color: #ffffff;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            color: var(--text-primary);
+            font-size: 2.2em;
+            margin-bottom: 8px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .header .subtitle {
-            color: #e0e0e0;
-            font-size: 1.1em;
+        .header-left .subtitle {
+            color: var(--text-secondary);
+            font-size: 1em;
             opacity: 0.9;
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 30px;
-        }
-
-        .section {
-            background: #2d2d44;
-            border-radius: 12px;
-            padding: 25px;
-            border: 2px solid #4a5568;
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            color: #ffffff;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #cbd5e0;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: #1a1a2e;
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            color: #e0e0e0;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-group small {
-            display: block;
-            color: #a0aec0;
-            margin-top: 5px;
+        .version-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.85em;
+            font-weight: bold;
         }
 
-        .button {
-            background: #667eea;
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1em;
-            transition: background 0.3s, transform 0.2s;
-            display: inline-block;
-            margin-right: 10px;
-            margin-top: 10px;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .button:hover {
-            background: #5a67d8;
+        .btn:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
         }
 
-        .button:active {
+        .btn:active {
             transform: translateY(0);
         }
 
-        .button-secondary {
-            background: #4a5568;
+        .btn-secondary {
+            background: var(--border);
         }
 
-        .button-secondary:hover {
+        .btn-secondary:hover {
             background: #718096;
         }
 
-        .button-danger {
-            background: #f56565;
+        .btn-success {
+            background: var(--success);
         }
 
-        .button-danger:hover {
-            background: #e53e3e;
-        }
-
-        .button-success {
-            background: #48bb78;
-        }
-
-        .button-success:hover {
+        .btn-success:hover {
             background: #38a169;
         }
 
-        .validation-list {
-            margin-top: 20px;
+        .btn-danger {
+            background: var(--error);
         }
 
-        .validation-item {
-            background: #1a1a2e;
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
+        .btn-danger:hover {
+            background: #e53e3e;
         }
 
-        .validation-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .validation-type {
-            font-weight: bold;
-            color: #ffffff;
-            font-size: 1.1em;
-        }
-
-        .severity-badge {
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .severity-error {
-            background: #f56565;
-            color: white;
-        }
-
-        .severity-warning {
-            background: #ed8936;
-            color: white;
-        }
-
-        .param-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .param-row input {
-            padding: 8px;
-        }
-
-        .remove-btn {
-            background: #f56565;
-            color: white;
-            border: none;
+        .btn-small {
             padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
             font-size: 0.85em;
         }
 
-        .remove-btn:hover {
-            background: #e53e3e;
-        }
-
-        .code-preview {
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #e0e0e0;
-            border: 1px solid #4a5568;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .code-preview pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .add-param-btn {
-            background: #48bb78;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .add-param-btn:hover {
-            background: #38a169;
-        }
-
-        .help-text {
-            background: #2d3748;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #4299e1;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            color: #cbd5e0;
-        }
-
-        .file-section {
-            background: #1a1a2e;
-            border: 2px dashed #4a5568;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .file-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .file-name {
-            font-weight: bold;
-            color: #ffffff;
-            font-size: 1.1em;
-        }
-
-        /* Tablet and below */
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .header {
-                padding: 20px 15px;
-            }
-
-            .header h1 {
-                font-size: 1.6em;
-                line-height: 1.2;
-            }
-
-            .header .subtitle {
-                font-size: 0.9em;
-            }
-
-            .main-content {
-                padding: 15px;
-                gap: 15px;
-            }
-
-            .section {
-                padding: 15px;
-            }
-
-            .section-title {
-                font-size: 1.2em;
-                margin-bottom: 15px;
-            }
-
-            /* Make all buttons touch-friendly (min 44px) */
-            .button {
-                padding: 14px 20px;
-                font-size: 0.95em;
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-
-            .category-btn {
-                padding: 14px 10px;
-                font-size: 0.9em;
-                min-height: 44px;
-            }
-
-            .validation-categories {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-
-            .validation-options {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .validation-option {
-                padding: 14px;
-                min-height: 60px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .param-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .remove-btn {
-                width: 100%;
-                padding: 12px;
-                margin-top: 8px;
-            }
-
-            .validation-item {
-                padding: 12px;
-            }
-
-            .validation-item-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .validation-item-header select {
-                width: 100%;
-            }
-
-            .code-preview {
-                font-size: 0.75em;
-                padding: 12px;
-                max-height: 400px;
-            }
-
-            .form-group input,
-            .form-group select {
-                font-size: 16px; /* Prevents zoom on iOS */
-                padding: 14px 12px;
-            }
-
-            .help-text {
-                padding: 12px;
-                font-size: 0.85em;
-            }
-
-            .file-section {
-                padding: 15px;
-            }
-        }
-
-        /* Extra small mobile phones */
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.3em;
-            }
-
-            .header .subtitle {
-                font-size: 0.8em;
-            }
-
-            .validation-categories {
-                grid-template-columns: 1fr;
-            }
-
-            .category-btn {
-                font-size: 0.85em;
-            }
-
-            .section {
-                padding: 12px;
-                border-radius: 8px;
-            }
-
-            .code-preview {
-                font-size: 0.7em;
-                padding: 10px;
-            }
-
-            .validation-option-name {
-                font-size: 0.95em;
-            }
-
-            .validation-option-desc {
-                font-size: 0.75em;
-            }
-        }
-
-        /* Landscape mobile */
-        @media (max-width: 896px) and (orientation: landscape) {
-            .header {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.4em;
-            }
-
-            .main-content {
-                padding: 15px;
-            }
-
-            .code-preview {
-                max-height: 250px;
-            }
-        }
-
-        /* Improve touch targets across all sizes */
-        @media (hover: none) and (pointer: coarse) {
-            .button,
-            .category-btn,
-            .validation-option,
-            .remove-btn,
-            select {
-                min-height: 44px;
-            }
-
-            .form-group input,
-            .form-group select {
-                min-height: 48px;
-            }
-        }
-
-        .validation-categories {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .category-btn {
-            background: #2d3748;
-            color: #cbd5e0;
-            border: 2px solid #4a5568;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .category-btn:hover,
-        .category-btn.active {
-            background: #667eea;
-            border-color: #667eea;
-            color: white;
-        }
-
-        .validation-options {
-            display: none;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .validation-options.active {
-            display: grid;
-        }
-
-        .validation-option {
-            background: #1a1a2e;
-            border: 2px solid #4a5568;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .validation-option:hover {
-            border-color: #667eea;
-            background: #2d2d44;
-        }
-
-        .validation-option-name {
-            font-weight: bold;
-            color: #ffffff;
-            margin-bottom: 5px;
-        }
-
-        .validation-option-desc {
-            font-size: 0.85em;
-            color: #a0aec0;
-        }
-
-        /* Mobile tab switcher */
+        /* Mobile tabs */
         .mobile-tabs {
             display: none;
-            background: #2d2d44;
-            border-bottom: 2px solid #4a5568;
+            background: var(--bg-medium);
+            border-bottom: 2px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -565,54 +156,713 @@
 
         .mobile-tab {
             flex: 1;
-            padding: 16px;
-            background: #1a1a2e;
+            padding: 14px;
+            background: var(--bg-light);
             border: none;
-            color: #cbd5e0;
+            color: var(--text-secondary);
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.9em;
             cursor: pointer;
             transition: all 0.3s;
             border-bottom: 3px solid transparent;
         }
 
         .mobile-tab.active {
-            background: #2d2d44;
-            color: #ffffff;
-            border-bottom-color: #667eea;
+            background: var(--bg-medium);
+            color: var(--text-primary);
+            border-bottom-color: var(--primary);
         }
 
-        .mobile-tab:active {
-            background: #667eea;
+        /* Main layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Sections */
+        .section {
+            background: var(--bg-medium);
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .collapse-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .section-content {
+            display: block;
+        }
+
+        .section-content.collapsed {
+            display: none;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group label.required::after {
+            content: " *";
+            color: var(--error);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--error);
+        }
+
+        .form-group small {
+            display: block;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+
+        .form-group .error-message {
+            color: var(--error);
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group .error-message.show {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* File cards */
+        .file-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .file-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .file-card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+
+        /* Validation items */
+        .validation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .validation-item {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .validation-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .validation-type {
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 1.05em;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .severity-ERROR {
+            background: var(--error);
+            color: white;
+        }
+
+        .severity-WARNING {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* Categories */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            background: #2d3748;
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .validation-options {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .validation-options.active {
+            display: grid;
+        }
+
+        .validation-option {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .validation-option:hover {
+            border-color: var(--primary);
+            background: var(--bg-medium);
+        }
+
+        .validation-option-name {
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+
+        .validation-option-desc {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .tooltip-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 18px;
+            height: 18px;
+            background: var(--info);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+            cursor: help;
+        }
+
+        /* Templates */
+        .template-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .template-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-medium);
+        }
+
+        .template-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .template-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .template-desc {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .template-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        /* Code preview */
+        .code-preview {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            font-size: 0.85em;
+            border: 1px solid var(--border);
+            max-height: 600px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .code-preview pre {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        /* YAML syntax highlighting */
+        .yaml-key { color: #e06c75; }
+        .yaml-string { color: #98c379; }
+        .yaml-number { color: #d19a66; }
+        .yaml-boolean { color: #56b6c2; }
+        .yaml-comment { color: #5c6370; font-style: italic; }
+        .yaml-dash { color: #61afef; }
+
+        /* Summary dashboard */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+
+        .summary-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Help text */
+        .help-box {
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .help-box strong {
+            color: var(--text-primary);
+        }
+
+        /* Alert box */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.2);
+            border-left: 4px solid var(--success);
+            color: #9ae6b4;
+        }
+
+        .alert-error {
+            background: rgba(245, 101, 101, 0.2);
+            border-left: 4px solid var(--error);
+            color: #feb2b2;
+        }
+
+        .alert-warning {
+            background: rgba(237, 137, 54, 0.2);
+            border-left: 4px solid var(--warning);
+            color: #fbd38d;
+        }
+
+        .alert-info {
+            background: rgba(66, 153, 225, 0.2);
+            border-left: 4px solid var(--info);
+            color: #90cdf4;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcuts-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-medium);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            font-size: 0.85em;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            z-index: 50;
+        }
+
+        .shortcuts-hint:hover {
+            opacity: 1;
+        }
+
+        .kbd {
+            background: var(--bg-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-left h1 {
+                font-size: 1.6em;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
             .mobile-tabs {
                 display: block;
             }
 
-            .main-content > div:not(.mobile-active) {
+            .main-content {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .main-content > .panel:not(.mobile-active) {
                 display: none !important;
             }
 
-            .main-content > div {
-                display: block;
+            .section {
+                padding: 15px;
             }
 
-            .main-content > div.mobile-active {
-                display: block !important;
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
+
+            .validation-options {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .shortcuts-hint {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-left h1 {
+                font-size: 1.3em;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-hint {
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>⚙️ Validation Config Builder</h1>
-            <div class="subtitle">Build validation configurations visually - no coding required</div>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>⚙️ Validation Config Builder <span class="version-badge">v2.0</span></h1>
+                    <div class="subtitle">Build professional data validation configs with zero coding</div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="showTemplates()">
+                        📋 Templates
+                    </button>
+                    <button class="btn btn-secondary" onclick="showImport()">
+                        📤 Import YAML
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveToLocalStorage()">
+                        💾 Save
+                    </button>
+                    <button class="btn btn-success" onclick="downloadConfig()">
+                        📥 Download
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <!-- Mobile tab switcher -->
+        <!-- Alert area -->
+        <div id="alertArea" style="padding: 20px 30px 0;"></div>
+
+        <!-- Mobile tabs -->
         <div class="mobile-tabs">
             <div class="mobile-tabs-container">
                 <button class="mobile-tab active" onclick="switchMobileTab('builder')">
@@ -624,365 +874,831 @@
             </div>
         </div>
 
+        <!-- Main content -->
         <div class="main-content">
-            <!-- Left Panel: Configuration Builder -->
-            <div id="builder-panel" class="mobile-active">
+            <!-- Left panel: Builder -->
+            <div id="builder-panel" class="panel mobile-active">
                 <!-- Job Settings -->
                 <div class="section">
-                    <h2 class="section-title">📋 Job Settings</h2>
-                    <div class="form-group">
-                        <label for="jobName">Job Name</label>
-                        <input type="text" id="jobName" placeholder="My Validation Job" value="My Validation Job">
-                        <small>A descriptive name for this validation job</small>
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            📋 Job Settings
+                        </h2>
+                        <button class="collapse-btn" onclick="toggleSection(this)">−</button>
                     </div>
-                    <div class="form-group">
-                        <label for="chunkSize">Chunk Size</label>
-                        <input type="number" id="chunkSize" placeholder="50000" value="50000">
-                        <small>Number of rows to process at once (default: 50000)</small>
-                    </div>
-                </div>
-
-                <!-- File Configuration -->
-                <div class="section">
-                    <h2 class="section-title">📁 File Configuration</h2>
-                    <div class="file-section">
+                    <div class="section-content">
                         <div class="form-group">
-                            <label for="fileName">File Name</label>
-                            <input type="text" id="fileName" placeholder="my_data" value="my_data">
-                            <small>A unique identifier for this file</small>
+                            <label for="jobName" class="required">Job Name</label>
+                            <input type="text" id="jobName" placeholder="My Validation Job" value="My Validation Job">
+                            <small>A descriptive name for this validation job</small>
                         </div>
                         <div class="form-group">
-                            <label for="filePath">File Path</label>
-                            <input type="text" id="filePath" placeholder="data/input.csv" value="data/input.csv">
-                            <small>Path to the data file to validate</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="fileFormat">File Format</label>
-                            <select id="fileFormat">
-                                <option value="csv">CSV</option>
-                                <option value="excel">Excel</option>
-                                <option value="json">JSON</option>
-                                <option value="parquet">Parquet</option>
-                            </select>
+                            <label for="jobDescription">Description</label>
+                            <textarea id="jobDescription" rows="2" placeholder="Optional description"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <!-- Add Validations -->
+                <!-- Advanced Settings -->
                 <div class="section">
-                    <h2 class="section-title">✨ Add Validations</h2>
-
-                    <div class="help-text">
-                        💡 Select a validation category, then choose specific validations to add.
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            🔧 Advanced Settings
+                        </h2>
+                        <button class="collapse-btn" onclick="toggleSection(this)">−</button>
                     </div>
-
-                    <div class="validation-categories">
-                        <button class="category-btn" onclick="showCategory('file')">File Checks</button>
-                        <button class="category-btn" onclick="showCategory('schema')">Schema Checks</button>
-                        <button class="category-btn" onclick="showCategory('field')">Field Checks</button>
-                        <button class="category-btn" onclick="showCategory('record')">Record Checks</button>
-                        <button class="category-btn" onclick="showCategory('cross')">Cross-File</button>
-                        <button class="category-btn" onclick="showCategory('statistical')">Statistical</button>
-                    </div>
-
-                    <div id="file-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('EmptyFileCheck')">
-                            <div class="validation-option-name">Empty File Check</div>
-                            <div class="validation-option-desc">Ensure file is not empty</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="chunkSize">Chunk Size</label>
+                                <input type="number" id="chunkSize" value="50000" min="1000">
+                                <small>Rows per chunk (default: 50000)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="maxSampleFailures">Max Sample Failures</label>
+                                <input type="number" id="maxSampleFailures" value="100" min="0">
+                                <small>Samples to collect (default: 100)</small>
+                            </div>
                         </div>
-                        <div class="validation-option" onclick="addValidation('RowCountRangeCheck')">
-                            <div class="validation-option-name">Row Count Range</div>
-                            <div class="validation-option-desc">Check row count within range</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('FileSizeCheck')">
-                            <div class="validation-option-name">File Size Check</div>
-                            <div class="validation-option-desc">Validate file size limits</div>
-                        </div>
-                    </div>
-
-                    <div id="schema-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('SchemaMatchCheck')">
-                            <div class="validation-option-name">Schema Match</div>
-                            <div class="validation-option-desc">Exact schema validation</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('ColumnPresenceCheck')">
-                            <div class="validation-option-name">Column Presence</div>
-                            <div class="validation-option-desc">Required columns exist</div>
-                        </div>
-                    </div>
-
-                    <div id="field-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('MandatoryFieldCheck')">
-                            <div class="validation-option-name">Mandatory Field</div>
-                            <div class="validation-option-desc">Required fields not null</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('RegexCheck')">
-                            <div class="validation-option-name">Regex Pattern</div>
-                            <div class="validation-option-desc">Pattern validation</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('ValidValuesCheck')">
-                            <div class="validation-option-name">Valid Values</div>
-                            <div class="validation-option-desc">Values in allowed list</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('RangeCheck')">
-                            <div class="validation-option-name">Range Check</div>
-                            <div class="validation-option-desc">Numeric range validation</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('DateFormatCheck')">
-                            <div class="validation-option-name">Date Format</div>
-                            <div class="validation-option-desc">Date format validation</div>
-                        </div>
-                    </div>
-
-                    <div id="record-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('DuplicateRowCheck')">
-                            <div class="validation-option-name">Duplicate Rows</div>
-                            <div class="validation-option-desc">Detect duplicate records</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('UniqueKeyCheck')">
-                            <div class="validation-option-name">Unique Key</div>
-                            <div class="validation-option-desc">Unique constraint validation</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('BlankRecordCheck')">
-                            <div class="validation-option-name">Blank Records</div>
-                            <div class="validation-option-desc">Find empty rows</div>
-                        </div>
-                    </div>
-
-                    <div id="cross-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('ReferentialIntegrityCheck')">
-                            <div class="validation-option-name">Referential Integrity</div>
-                            <div class="validation-option-desc">Foreign key validation</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('CrossFileComparisonCheck')">
-                            <div class="validation-option-name">Cross-File Comparison</div>
-                            <div class="validation-option-desc">Compare aggregates</div>
-                        </div>
-                    </div>
-
-                    <div id="statistical-validations" class="validation-options">
-                        <div class="validation-option" onclick="addValidation('StatisticalOutlierCheck')">
-                            <div class="validation-option-name">Outlier Detection</div>
-                            <div class="validation-option-desc">Detect statistical anomalies</div>
-                        </div>
-                        <div class="validation-option" onclick="addValidation('DistributionCheck')">
-                            <div class="validation-option-name">Distribution Check</div>
-                            <div class="validation-option-desc">Validate distributions</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="failFast">Fail Fast</label>
+                                <select id="failFast">
+                                    <option value="false">No - Run all validations</option>
+                                    <option value="true">Yes - Stop on first error</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="logLevel">Log Level</label>
+                                <select id="logLevel">
+                                    <option value="INFO">INFO</option>
+                                    <option value="DEBUG">DEBUG</option>
+                                    <option value="WARNING">WARNING</option>
+                                    <option value="ERROR">ERROR</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Current Validations -->
+                <!-- Files -->
                 <div class="section">
-                    <h2 class="section-title">📝 Current Validations</h2>
-                    <div id="validationsList" class="validation-list">
-                        <div class="help-text">
-                            No validations added yet. Select validations from the categories above.
-                        </div>
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            📁 Files
+                        </h2>
+                        <button class="btn btn-small btn-success" onclick="addFile()">
+                            ➕ Add File
+                        </button>
+                    </div>
+                    <div class="section-content">
+                        <div id="filesContainer"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Preview and Actions -->
-            <div id="preview-panel">
-                <!-- YAML Preview -->
-                <div class="section full-width">
-                    <h2 class="section-title">👁️ Configuration Preview</h2>
-                    <div class="code-preview">
-                        <pre id="yamlPreview"># Your validation configuration will appear here</pre>
+            <!-- Right panel: Preview & Dashboard -->
+            <div id="preview-panel" class="panel">
+                <!-- Summary Dashboard -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            📊 Summary
+                        </h2>
                     </div>
-                    <div style="margin-top: 20px;">
-                        <button class="button button-success" onclick="downloadConfig()">
-                            📥 Download Config
-                        </button>
-                        <button class="button button-secondary" onclick="copyConfig()">
-                            📋 Copy to Clipboard
-                        </button>
-                        <button class="button button-secondary" onclick="clearAll()">
-                            🗑️ Clear All
-                        </button>
+                    <div class="section-content">
+                        <div class="summary-grid">
+                            <div class="summary-card">
+                                <div class="summary-value" id="totalFiles">0</div>
+                                <div class="summary-label">Files</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-value" id="totalValidations">0</div>
+                                <div class="summary-label">Validations</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-value" id="totalErrors">0</div>
+                                <div class="summary-label">Errors</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-value" id="totalWarnings">0</div>
+                                <div class="summary-label">Warnings</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Quick Start Guide -->
-                <div class="section full-width" style="margin-top: 20px;">
-                    <h2 class="section-title">🚀 Quick Start</h2>
-                    <div class="help-text">
-                        <strong>1. Configure Job Settings</strong><br>
-                        Set your job name and chunk size for processing large files.<br><br>
+                <!-- YAML Preview -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            👁️ Configuration Preview
+                        </h2>
+                        <div class="section-actions">
+                            <button class="btn btn-small btn-secondary" onclick="copyConfig()">
+                                📋 Copy
+                            </button>
+                            <button class="btn btn-small btn-success" onclick="downloadConfig()">
+                                📥 Download
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="code-preview">
+                            <pre id="yamlPreview"># Your configuration will appear here</pre>
+                        </div>
+                    </div>
+                </div>
 
-                        <strong>2. Configure File</strong><br>
-                        Specify the file to validate (path and format).<br><br>
-
-                        <strong>3. Add Validations</strong><br>
-                        Click validation categories and select specific checks.<br><br>
-
-                        <strong>4. Configure Parameters</strong><br>
-                        Fill in the parameters for each validation.<br><br>
-
-                        <strong>5. Download Config</strong><br>
-                        Download the YAML configuration and run it with:<br>
-                        <code style="color: #48bb78;">python3 -m validation_framework.cli validate config.yaml --html report.html</code>
+                <!-- Quick Actions -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            🚀 Quick Actions
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div style="display: grid; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="showShare()">
+                                🔗 Share Config
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSaved()">
+                                📂 Load Saved
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAll()">
+                                🗑️ Clear All
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Template Modal -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📋 Choose Template</h3>
+                <button class="close-btn" onclick="closeModal('templateModal')">&times;</button>
+            </div>
+            <div id="templateList" class="template-grid"></div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📤 Import YAML</h3>
+                <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Paste YAML Configuration</label>
+                <textarea id="importYaml" rows="15" placeholder="Paste your YAML configuration here..."></textarea>
+            </div>
+            <button class="btn btn-success" onclick="importYAML()" style="width: 100%;">
+                Import Configuration
+            </button>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🔗 Share Configuration</h3>
+                <button class="close-btn" onclick="closeModal('shareModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Shareable URL</label>
+                <input type="text" id="shareUrl" readonly>
+                <small>Copy this URL to share your configuration</small>
+            </div>
+            <button class="btn btn-secondary" onclick="copyShareUrl()" style="width: 100%;">
+                📋 Copy URL
+            </button>
+        </div>
+    </div>
+
+    <!-- Saved Configs Modal -->
+    <div id="savedModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📂 Saved Configurations</h3>
+                <button class="close-btn" onclick="closeModal('savedModal')">&times;</button>
+            </div>
+            <div id="savedList"></div>
+        </div>
+    </div>
+
+    <!-- Shortcuts hint -->
+    <div class="shortcuts-hint">
+        Press <span class="kbd">?</span> for keyboard shortcuts
+    </div>
+
     <script>
-        // Validation definitions with parameters
+        // Global state
+        let state = {
+            files: [],
+            fileCounter: 0
+        };
+
+        // Templates
+        const templates = [
+            {
+                name: "Basic Quality",
+                icon: "📦",
+                description: "Essential validations for any dataset",
+                files: 1,
+                validations: 5,
+                config: {
+                    files: [{
+                        name: "data",
+                        path: "data.csv",
+                        format: "csv",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id"] } },
+                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
+                            { type: "DuplicateRowCheck", severity: "WARNING", params: {} },
+                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } }
+                        ]
+                    }]
+                }
+            },
+            {
+                name: "E-Commerce Orders",
+                icon: "🛒",
+                description: "Customer orders with referential integrity",
+                files: 2,
+                validations: 12,
+                config: {
+                    files: [
+                        {
+                            name: "customers",
+                            path: "customers.csv",
+                            format: "csv",
+                            validations: [
+                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "email"] } },
+                                { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
+                                { type: "RegexCheck", severity: "ERROR", params: { field: "email", pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$" } }
+                            ]
+                        },
+                        {
+                            name: "orders",
+                            path: "orders.csv",
+                            format: "csv",
+                            validations: [
+                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["order_id", "customer_id", "amount"] } },
+                                { type: "ReferentialIntegrityCheck", severity: "ERROR", params: { foreign_key: "customer_id", reference_file: "customers.csv", reference_key: "id" } },
+                                { type: "RangeCheck", severity: "ERROR", params: { field: "amount", min_value: 0 } },
+                                { type: "DateFormatCheck", severity: "ERROR", params: { field: "order_date", format: "%Y-%m-%d" } }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                name: "Financial Transactions",
+                icon: "💰",
+                description: "Banking/financial data with precision checks",
+                files: 1,
+                validations: 8,
+                config: {
+                    files: [{
+                        name: "transactions",
+                        path: "transactions.csv",
+                        format: "csv",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["transaction_id", "account_id", "amount", "date"] } },
+                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["transaction_id"] } },
+                            { type: "NumericPrecisionCheck", severity: "ERROR", params: { field: "amount", max_decimals: 2 } },
+                            { type: "RangeCheck", severity: "WARNING", params: { field: "amount", min_value: -1000000, max_value: 1000000 } },
+                            { type: "DateFormatCheck", severity: "ERROR", params: { field: "date", format: "%Y-%m-%d" } },
+                            { type: "DuplicateRowCheck", severity: "ERROR", params: { subset: ["transaction_id"] } }
+                        ]
+                    }]
+                }
+            },
+            {
+                name: "Customer Data (CRM)",
+                icon: "👥",
+                description: "Customer relationship management data",
+                files: 1,
+                validations: 10,
+                config: {
+                    files: [{
+                        name: "customers",
+                        path: "customers.csv",
+                        format: "csv",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "email", "first_name", "last_name"] } },
+                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
+                            { type: "RegexCheck", severity: "ERROR", params: { field: "email", pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$" } },
+                            { type: "RegexCheck", severity: "WARNING", params: { field: "phone", pattern: "^\\+?[0-9]{10,15}$" } },
+                            { type: "ValidValuesCheck", severity: "ERROR", params: { field: "status", valid_values: ["active", "inactive", "pending"] } },
+                            { type: "StringLengthCheck", severity: "WARNING", params: { field: "first_name", max_length: 50 } },
+                            { type: "StringLengthCheck", severity: "WARNING", params: { field: "last_name", max_length: 50 } }
+                        ]
+                    }]
+                }
+            },
+            {
+                name: "Data Warehouse Load",
+                icon: "🏢",
+                description: "Production-grade ETL validations",
+                files: 1,
+                validations: 15,
+                config: {
+                    files: [{
+                        name: "fact_table",
+                        path: "fact_data.parquet",
+                        format: "parquet",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "FileSizeCheck", severity: "WARNING", params: { min_size_mb: 0.1, max_size_mb: 10000 } },
+                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1000 } },
+                            { type: "SchemaMatchCheck", severity: "ERROR", params: { expected_columns: ["id", "date", "metric1", "metric2"] } },
+                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "date"] } },
+                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id", "date"] } },
+                            { type: "DateFormatCheck", severity: "ERROR", params: { field: "date", format: "%Y-%m-%d" } },
+                            { type: "DuplicateRowCheck", severity: "ERROR", params: {} },
+                            { type: "StatisticalOutlierCheck", severity: "WARNING", params: { field: "metric1", method: "iqr" } },
+                            { type: "CompletenessCheck", severity: "WARNING", params: { field: "metric2", min_completeness_pct: 95 } }
+                        ]
+                    }]
+                }
+            }
+        ];
+
+        // Validation definitions with parameter hints
         const validationDefs = {
             'EmptyFileCheck': {
                 category: 'file',
-                params: []
+                description: 'Ensures the file is not empty',
+                params: [],
+                example: 'Validates that the file contains at least one row'
             },
             'RowCountRangeCheck': {
                 category: 'file',
+                description: 'Validates row count within expected range',
                 params: [
-                    { name: 'min_rows', type: 'number', required: false, description: 'Minimum row count' },
-                    { name: 'max_rows', type: 'number', required: false, description: 'Maximum row count' }
-                ]
+                    { name: 'min_rows', type: 'number', required: false, description: 'Minimum row count', hint: 'e.g., 1000' },
+                    { name: 'max_rows', type: 'number', required: false, description: 'Maximum row count', hint: 'e.g., 100000' }
+                ],
+                example: 'Checks if file has between 1000-100000 rows'
             },
             'FileSizeCheck': {
                 category: 'file',
+                description: 'Validates file size within limits',
                 params: [
-                    { name: 'min_size_mb', type: 'number', required: false, description: 'Minimum size (MB)' },
-                    { name: 'max_size_mb', type: 'number', required: false, description: 'Maximum size (MB)' }
-                ]
+                    { name: 'min_size_mb', type: 'number', required: false, description: 'Minimum size (MB)', hint: 'e.g., 0.1' },
+                    { name: 'max_size_mb', type: 'number', required: false, description: 'Maximum size (MB)', hint: 'e.g., 1000' }
+                ],
+                example: 'Ensures file is between 0.1MB and 1GB'
             },
             'SchemaMatchCheck': {
                 category: 'schema',
+                description: 'Validates exact schema match',
                 params: [
-                    { name: 'expected_columns', type: 'list', required: true, description: 'Expected column names' }
-                ]
+                    { name: 'expected_columns', type: 'list', required: true, description: 'Expected column names', hint: 'id, name, email' }
+                ],
+                example: 'Ensures file has exactly these columns'
             },
             'ColumnPresenceCheck': {
                 category: 'schema',
+                description: 'Checks required columns exist',
                 params: [
-                    { name: 'columns', type: 'list', required: true, description: 'Required column names' }
-                ]
+                    { name: 'columns', type: 'list', required: true, description: 'Required column names', hint: 'id, email' }
+                ],
+                example: 'Validates that specific columns are present'
             },
             'MandatoryFieldCheck': {
                 category: 'field',
+                description: 'Validates required fields are not null',
                 params: [
-                    { name: 'fields', type: 'list', required: true, description: 'Field names that cannot be null' }
-                ]
+                    { name: 'fields', type: 'list', required: true, description: 'Required field names', hint: 'id, email, name' }
+                ],
+                example: 'Ensures these fields have no NULL values'
             },
             'RegexCheck': {
                 category: 'field',
+                description: 'Pattern matching validation',
                 params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name' },
-                    { name: 'pattern', type: 'text', required: true, description: 'Regex pattern' }
-                ]
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'email' },
+                    { name: 'pattern', type: 'text', required: true, description: 'Regex pattern', hint: '^[\\w.-]+@[\\w.-]+\\.\\w+$' }
+                ],
+                example: 'Validates email format using regex'
             },
             'ValidValuesCheck': {
                 category: 'field',
+                description: 'Validates values in allowed list',
                 params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name' },
-                    { name: 'valid_values', type: 'list', required: true, description: 'Allowed values' }
-                ]
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'status' },
+                    { name: 'valid_values', type: 'list', required: true, description: 'Allowed values', hint: 'active, inactive, pending' }
+                ],
+                example: 'Ensures values are in allowed list'
             },
             'RangeCheck': {
                 category: 'field',
+                description: 'Validates numeric range',
                 params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name' },
-                    { name: 'min_value', type: 'number', required: false, description: 'Minimum value' },
-                    { name: 'max_value', type: 'number', required: false, description: 'Maximum value' }
-                ]
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'age' },
+                    { name: 'min_value', type: 'number', required: false, description: 'Minimum value', hint: '0' },
+                    { name: 'max_value', type: 'number', required: false, description: 'Maximum value', hint: '120' }
+                ],
+                example: 'Checks if numeric values are within range'
             },
             'DateFormatCheck': {
                 category: 'field',
+                description: 'Validates date format',
                 params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name' },
-                    { name: 'format', type: 'text', required: true, description: 'Date format (e.g., %Y-%m-%d)' }
-                ]
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'birth_date' },
+                    { name: 'format', type: 'select', required: true, description: 'Date format',
+                      options: ['%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%Y/%m/%d', '%d-%m-%Y'],
+                      hint: '%Y-%m-%d for 2025-01-13' }
+                ],
+                example: 'Validates dates match specified format'
             },
             'DuplicateRowCheck': {
                 category: 'record',
+                description: 'Detects duplicate rows',
                 params: [
-                    { name: 'subset', type: 'list', required: false, description: 'Columns to check (all if empty)' }
-                ]
+                    { name: 'subset', type: 'list', required: false, description: 'Columns to check (all if empty)', hint: 'id, email' }
+                ],
+                example: 'Finds duplicate records'
             },
             'UniqueKeyCheck': {
                 category: 'record',
+                description: 'Validates unique constraint',
                 params: [
-                    { name: 'fields', type: 'list', required: true, description: 'Field(s) that must be unique' }
-                ]
+                    { name: 'fields', type: 'list', required: true, description: 'Field(s) that must be unique', hint: 'id' }
+                ],
+                example: 'Ensures field values are unique'
             },
             'BlankRecordCheck': {
                 category: 'record',
-                params: []
+                description: 'Finds completely empty rows',
+                params: [],
+                example: 'Detects rows with all NULL values'
             },
             'ReferentialIntegrityCheck': {
                 category: 'cross',
+                description: 'Validates foreign key relationships',
                 params: [
-                    { name: 'foreign_key', type: 'text', required: true, description: 'Foreign key field' },
-                    { name: 'reference_file', type: 'text', required: true, description: 'Reference file path' },
-                    { name: 'reference_key', type: 'text', required: true, description: 'Reference key field' },
-                    { name: 'allow_null', type: 'boolean', required: false, description: 'Allow null foreign keys' }
-                ]
+                    { name: 'foreign_key', type: 'text', required: true, description: 'Foreign key field', hint: 'customer_id' },
+                    { name: 'reference_file', type: 'file_picker', required: true, description: 'Reference file', hint: 'customers.csv' },
+                    { name: 'reference_key', type: 'text', required: true, description: 'Reference key field', hint: 'id' },
+                    { name: 'allow_null', type: 'boolean', required: false, description: 'Allow NULL foreign keys', hint: 'false' }
+                ],
+                example: 'Ensures foreign keys exist in reference table'
             },
             'CrossFileComparisonCheck': {
                 category: 'cross',
+                description: 'Compares aggregates across files',
                 params: [
-                    { name: 'aggregation', type: 'text', required: true, description: 'Aggregation (count, sum, mean)' },
-                    { name: 'reference_file', type: 'text', required: true, description: 'Reference file path' },
-                    { name: 'reference_aggregation', type: 'text', required: true, description: 'Reference aggregation' },
-                    { name: 'tolerance_pct', type: 'number', required: false, description: 'Tolerance percentage' }
-                ]
+                    { name: 'aggregation', type: 'select', required: true, description: 'Aggregation function',
+                      options: ['count', 'sum', 'mean', 'min', 'max'], hint: 'count' },
+                    { name: 'column', type: 'text', required: false, description: 'Column to aggregate', hint: 'amount' },
+                    { name: 'reference_file', type: 'file_picker', required: true, description: 'Reference file', hint: 'summary.csv' },
+                    { name: 'reference_aggregation', type: 'select', required: true, description: 'Reference aggregation',
+                      options: ['count', 'sum', 'mean', 'min', 'max'], hint: 'sum' },
+                    { name: 'tolerance_pct', type: 'number', required: false, description: 'Tolerance %', hint: '5' }
+                ],
+                example: 'Compares totals between related files'
             },
             'StatisticalOutlierCheck': {
                 category: 'statistical',
+                description: 'Detects statistical anomalies',
                 params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name' },
-                    { name: 'method', type: 'text', required: true, description: 'Method (iqr, zscore, isolation_forest)' },
-                    { name: 'threshold', type: 'number', required: false, description: 'Threshold value' }
-                ]
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'amount' },
+                    { name: 'method', type: 'select', required: true, description: 'Detection method',
+                      options: ['iqr', 'zscore', 'isolation_forest'], hint: 'iqr' },
+                    { name: 'threshold', type: 'number', required: false, description: 'Threshold value', hint: '1.5' }
+                ],
+                example: 'Finds outliers using statistical methods'
             },
             'DistributionCheck': {
                 category: 'statistical',
+                description: 'Validates statistical distribution',
                 params: [
-                    { name: 'column', type: 'text', required: true, description: 'Column name' },
-                    { name: 'expected_distribution', type: 'text', required: true, description: 'Distribution (normal, uniform)' },
-                    { name: 'significance_level', type: 'number', required: false, description: 'Significance level (default: 0.05)' }
-                ]
+                    { name: 'column', type: 'text', required: true, description: 'Column name', hint: 'score' },
+                    { name: 'expected_distribution', type: 'select', required: true, description: 'Expected distribution',
+                      options: ['normal', 'uniform', 'exponential'], hint: 'normal' },
+                    { name: 'significance_level', type: 'number', required: false, description: 'Significance level', hint: '0.05' }
+                ],
+                example: 'Tests if data follows expected distribution'
+            },
+            'CompletenessCheck': {
+                category: 'field',
+                description: 'Validates field completeness percentage',
+                params: [
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'phone' },
+                    { name: 'min_completeness_pct', type: 'number', required: true, description: 'Min completeness %', hint: '95' }
+                ],
+                example: 'Ensures field has at least X% non-null values'
+            },
+            'StringLengthCheck': {
+                category: 'field',
+                description: 'Validates string length limits',
+                params: [
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'name' },
+                    { name: 'min_length', type: 'number', required: false, description: 'Minimum length', hint: '1' },
+                    { name: 'max_length', type: 'number', required: false, description: 'Maximum length', hint: '100' }
+                ],
+                example: 'Checks string length within limits'
+            },
+            'NumericPrecisionCheck': {
+                category: 'field',
+                description: 'Validates decimal precision',
+                params: [
+                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'price' },
+                    { name: 'max_decimals', type: 'number', required: true, description: 'Max decimal places', hint: '2' }
+                ],
+                example: 'Ensures numbers have correct precision'
             }
         };
 
-        let validations = [];
-        let validationCounter = 0;
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load from URL hash if present
+            loadFromURLHash();
 
-        function showCategory(category) {
-            // Hide all validation options
-            document.querySelectorAll('.validation-options').forEach(el => {
-                el.classList.remove('active');
-            });
-
-            // Deactivate all category buttons
-            document.querySelectorAll('.category-btn').forEach(el => {
-                el.classList.remove('active');
-            });
-
-            // Show selected category
-            const categoryEl = document.getElementById(`${category}-validations`);
-            if (categoryEl) {
-                categoryEl.classList.add('active');
+            // Load from localStorage if present and no URL hash
+            if (!window.location.hash && localStorage.getItem('validationConfig_autosave')) {
+                const saved = JSON.parse(localStorage.getItem('validationConfig_autosave'));
+                if (saved && confirm('Load your last saved configuration?')) {
+                    loadConfig(saved);
+                }
             }
 
-            // Activate selected category button
-            event.target.classList.add('active');
+            // Auto-save every 30 seconds
+            setInterval(() => {
+                if (state.files.length > 0) {
+                    saveToLocalStorage(true);
+                }
+            }, 30000);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + S: Save
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveToLocalStorage();
+                }
+                // Ctrl/Cmd + D: Download
+                if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                    e.preventDefault();
+                    downloadConfig();
+                }
+                // Ctrl/Cmd + I: Import
+                if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                    e.preventDefault();
+                    showImport();
+                }
+                // ?: Show shortcuts
+                if (e.key === '?') {
+                    showShortcuts();
+                }
+            });
+
+            // Initialize with one file if empty
+            if (state.files.length === 0) {
+                addFile();
+            }
+
+            updatePreview();
+        });
+
+        // File management
+        function addFile() {
+            const fileId = state.fileCounter++;
+            const file = {
+                id: fileId,
+                name: `file_${fileId + 1}`,
+                path: 'data.csv',
+                format: 'csv',
+                validations: []
+            };
+            state.files.push(file);
+            renderFiles();
+            updatePreview();
+            showAlert('File added successfully', 'success');
         }
 
-        function addValidation(type) {
-            const id = validationCounter++;
+        function removeFile(fileId) {
+            if (!confirm('Remove this file and all its validations?')) return;
+            state.files = state.files.filter(f => f.id !== fileId);
+            renderFiles();
+            updatePreview();
+            showAlert('File removed', 'info');
+        }
+
+        function renderFiles() {
+            const container = document.getElementById('filesContainer');
+
+            if (state.files.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <div class="empty-state-text">No files added yet</div>
+                        <div class="empty-state-hint">Click "Add File" to get started</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.files.map(file => `
+                <div class="file-card">
+                    <div class="file-card-header">
+                        <div class="file-card-title">
+                            📄 ${escapeHtml(file.name)}
+                            <span class="file-badge">${file.validations.length} validations</span>
+                        </div>
+                        <button class="btn btn-small btn-danger" onclick="removeFile(${file.id})">
+                            🗑️ Remove
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>File Name</label>
+                        <input type="text" value="${escapeHtml(file.name)}"
+                               onchange="updateFile(${file.id}, 'name', this.value)">
+                        <small>Unique identifier for this file</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>File Path</label>
+                            <input type="text" value="${escapeHtml(file.path)}"
+                                   onchange="updateFile(${file.id}, 'path', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Format</label>
+                            <select onchange="updateFile(${file.id}, 'format', this.value)">
+                                <option value="csv" ${file.format === 'csv' ? 'selected' : ''}>CSV</option>
+                                <option value="excel" ${file.format === 'excel' ? 'selected' : ''}>Excel</option>
+                                <option value="json" ${file.format === 'json' ? 'selected' : ''}>JSON</option>
+                                <option value="parquet" ${file.format === 'parquet' ? 'selected' : ''}>Parquet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <strong style="color: var(--text-primary);">Validations</strong>
+                            <button class="btn btn-small btn-success" onclick="showValidationPicker(${file.id})">
+                                ➕ Add Validation
+                            </button>
+                        </div>
+                        <div class="validation-list">
+                            ${file.validations.length === 0 ?
+                                '<div class="help-box">No validations added. Click "Add Validation" to start.</div>' :
+                                file.validations.map((v, idx) => renderValidation(file.id, v, idx)).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateFile(fileId, field, value) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file) {
+                file[field] = value;
+                updatePreview();
+            }
+        }
+
+        function renderValidation(fileId, validation, index) {
+            const def = validationDefs[validation.type];
+            if (!def) return '';
+
+            return `
+                <div class="validation-item">
+                    <div class="validation-item-header">
+                        <div class="validation-type">${validation.type}</div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select onchange="updateValidationSeverity(${fileId}, ${index}, this.value)"
+                                    style="padding: 6px 12px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 6px;">
+                                <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''}>ERROR</option>
+                                <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''}>WARNING</option>
+                            </select>
+                            <button class="btn btn-small btn-danger" onclick="removeValidation(${fileId}, ${index})">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                    ${def.params && def.params.length > 0 ? `
+                        <div style="margin-top: 12px; display: grid; gap: 12px;">
+                            ${def.params.map(param => renderParameter(fileId, index, param, validation.params[param.name])).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderParameter(fileId, validationIndex, param, value) {
+            const file = state.files.find(f => f.id === fileId);
+            let input = '';
+
+            if (param.type === 'boolean') {
+                input = `
+                    <input type="checkbox" ${value ? 'checked' : ''}
+                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.checked)"
+                           style="width: auto;">
+                `;
+            } else if (param.type === 'select') {
+                input = `
+                    <select onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)">
+                        <option value="">Select...</option>
+                        ${param.options.map(opt => `
+                            <option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>
+                        `).join('')}
+                    </select>
+                `;
+            } else if (param.type === 'list') {
+                input = `
+                    <input type="text" value="${value || ''}"
+                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)"
+                           placeholder="${param.hint || 'comma-separated values'}">
+                `;
+            } else if (param.type === 'file_picker') {
+                const otherFiles = state.files.filter(f => f.id !== fileId);
+                input = `
+                    <select onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)">
+                        <option value="">Select file...</option>
+                        ${otherFiles.map(f => `
+                            <option value="${f.path}" ${value === f.path ? 'selected' : ''}>${f.name} (${f.path})</option>
+                        `).join('')}
+                    </select>
+                `;
+            } else {
+                input = `
+                    <input type="${param.type === 'number' ? 'number' : 'text'}"
+                           value="${value || ''}"
+                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)"
+                           placeholder="${param.hint || ''}">
+                `;
+            }
+
+            return `
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <label ${param.required ? 'class="required"' : ''}>${param.name}</label>
+                    ${input}
+                    <small>${param.description}</small>
+                </div>
+            `;
+        }
+
+        function showValidationPicker(fileId) {
+            const modal = createModal('Add Validation', `
+                <div class="category-grid">
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'file')">File Checks</button>
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'schema')">Schema</button>
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'field')">Field Checks</button>
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'record')">Records</button>
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'cross')">Cross-File</button>
+                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'statistical')">Statistical</button>
+                </div>
+                <div id="validationPickerOptions"></div>
+            `);
+            showModalElement(modal);
+        }
+
+        function showValidationCategory(fileId, category) {
+            const validations = Object.entries(validationDefs).filter(([, def]) => def.category === category);
+            const container = document.getElementById('validationPickerOptions');
+
+            container.innerHTML = `
+                <div class="validation-options active">
+                    ${validations.map(([type, def]) => `
+                        <div class="validation-option" onclick="addValidation(${fileId}, '${type}')">
+                            <div class="tooltip-icon" title="${def.example}">?</div>
+                            <div class="validation-option-name">${type}</div>
+                            <div class="validation-option-desc">${def.description}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function addValidation(fileId, type) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file) return;
+
             const validation = {
-                id: id,
                 type: type,
                 severity: 'ERROR',
                 params: {}
             };
 
-            // Initialize params from definition
+            // Initialize params
             const def = validationDefs[type];
             if (def && def.params) {
                 def.params.forEach(param => {
@@ -994,181 +1710,267 @@
                 });
             }
 
-            validations.push(validation);
-            renderValidations();
+            file.validations.push(validation);
+            closeAllModals();
+            renderFiles();
+            updatePreview();
+            showAlert(`${type} added`, 'success');
+        }
+
+        function removeValidation(fileId, index) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file) return;
+            file.validations.splice(index, 1);
+            renderFiles();
             updatePreview();
         }
 
-        function removeValidation(id) {
-            validations = validations.filter(v => v.id !== id);
-            renderValidations();
+        function updateValidationSeverity(fileId, index, severity) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file || !file.validations[index]) return;
+            file.validations[index].severity = severity;
             updatePreview();
         }
 
-        function updateValidationParam(id, paramName, value) {
-            const validation = validations.find(v => v.id === id);
-            if (validation) {
-                validation.params[paramName] = value;
-                updatePreview();
-            }
+        function updateValidationParam(fileId, index, paramName, value) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file || !file.validations[index]) return;
+            file.validations[index].params[paramName] = value;
+            updatePreview();
         }
 
-        function updateValidationSeverity(id, severity) {
-            const validation = validations.find(v => v.id === id);
-            if (validation) {
-                validation.severity = severity;
-                renderValidations();
-                updatePreview();
-            }
-        }
-
-        function renderValidations() {
-            const container = document.getElementById('validationsList');
-
-            if (validations.length === 0) {
-                container.innerHTML = '<div class="help-text">No validations added yet. Select validations from the categories above.</div>';
-                return;
-            }
-
-            let html = '';
-            validations.forEach(validation => {
-                const def = validationDefs[validation.type];
-                html += `
-                    <div class="validation-item">
-                        <div class="validation-item-header">
-                            <span class="validation-type">${validation.type}</span>
-                            <div>
-                                <select onchange="updateValidationSeverity(${validation.id}, this.value)" style="padding: 4px 8px; margin-right: 10px; background: #1a1a2e; border: 1px solid #4a5568; color: #e0e0e0; border-radius: 4px;">
-                                    <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''}>ERROR</option>
-                                    <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''}>WARNING</option>
-                                </select>
-                                <button class="remove-btn" onclick="removeValidation(${validation.id})">Remove</button>
-                            </div>
-                        </div>
-                `;
-
-                if (def && def.params && def.params.length > 0) {
-                    html += '<div style="margin-top: 10px;">';
-                    def.params.forEach(param => {
-                        const value = validation.params[param.name] || '';
-                        html += `
-                            <div class="form-group" style="margin-bottom: 10px;">
-                                <label style="font-size: 0.9em;">${param.name}${param.required ? ' *' : ''}</label>
-                        `;
-
-                        if (param.type === 'boolean') {
-                            html += `
-                                <input type="checkbox"
-                                       ${value ? 'checked' : ''}
-                                       onchange="updateValidationParam(${validation.id}, '${param.name}', this.checked)"
-                                       style="width: auto;">
-                            `;
-                        } else if (param.type === 'list') {
-                            html += `
-                                <input type="text"
-                                       value="${value}"
-                                       onchange="updateValidationParam(${validation.id}, '${param.name}', this.value)"
-                                       placeholder="Enter comma-separated values">
-                            `;
-                        } else {
-                            html += `
-                                <input type="${param.type === 'number' ? 'number' : 'text'}"
-                                       value="${value}"
-                                       onchange="updateValidationParam(${validation.id}, '${param.name}', this.value)"
-                                       placeholder="${param.description}">
-                            `;
-                        }
-
-                        html += `
-                                <small>${param.description}</small>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                }
-
-                html += '</div>';
-            });
-
-            container.innerHTML = html;
-        }
-
+        // YAML generation with syntax highlighting
         function generateYAML() {
             const jobName = document.getElementById('jobName').value || 'My Validation Job';
+            const jobDesc = document.getElementById('jobDescription').value;
             const chunkSize = document.getElementById('chunkSize').value || '50000';
-            const fileName = document.getElementById('fileName').value || 'my_data';
-            const filePath = document.getElementById('filePath').value || 'data/input.csv';
-            const fileFormat = document.getElementById('fileFormat').value || 'csv';
+            const maxSamples = document.getElementById('maxSampleFailures').value || '100';
+            const failFast = document.getElementById('failFast').value;
 
             let yaml = `# Auto-generated validation configuration\n`;
-            yaml += `# Generated at: ${new Date().toISOString()}\n\n`;
+            yaml += `# Generated: ${new Date().toISOString()}\n\n`;
             yaml += `validation_job:\n`;
             yaml += `  name: "${jobName}"\n`;
-            yaml += `  description: "Generated with Validation Config Builder"\n\n`;
+            if (jobDesc) yaml += `  description: "${jobDesc}"\n`;
+            yaml += `\n`;
             yaml += `settings:\n`;
             yaml += `  chunk_size: ${chunkSize}\n`;
-            yaml += `  max_sample_failures: 100\n\n`;
-            yaml += `files:\n`;
-            yaml += `  - name: "${fileName}"\n`;
-            yaml += `    path: "${filePath}"\n`;
-            yaml += `    format: "${fileFormat}"\n`;
+            yaml += `  max_sample_failures: ${maxSamples}\n`;
+            if (failFast === 'true') yaml += `  fail_fast: true\n`;
             yaml += `\n`;
-            yaml += `    validations:\n`;
+            yaml += `files:\n`;
 
-            if (validations.length === 0) {
-                yaml += `      # No validations configured yet\n`;
-            } else {
-                validations.forEach(validation => {
-                    yaml += `      - type: "${validation.type}"\n`;
-                    yaml += `        severity: "${validation.severity}"\n`;
+            state.files.forEach(file => {
+                yaml += `  - name: "${file.name}"\n`;
+                yaml += `    path: "${file.path}"\n`;
+                yaml += `    format: "${file.format}"\n`;
+                yaml += `\n`;
+                yaml += `    validations:\n`;
 
-                    const def = validationDefs[validation.type];
-                    const hasParams = def && def.params && def.params.length > 0;
-                    const filledParams = hasParams && def.params.some(p => {
-                        const value = validation.params[p.name];
-                        return value !== '' && value !== false && value !== null && value !== undefined;
-                    });
+                if (file.validations.length === 0) {
+                    yaml += `      # No validations configured\n`;
+                } else {
+                    file.validations.forEach(validation => {
+                        yaml += `      - type: "${validation.type}"\n`;
+                        yaml += `        severity: "${validation.severity}"\n`;
 
-                    if (filledParams) {
-                        yaml += `        params:\n`;
-                        def.params.forEach(param => {
-                            const value = validation.params[param.name];
-                            if (value !== '' && value !== null && value !== undefined) {
-                                if (param.type === 'list') {
-                                    // Handle list parameters
-                                    const items = value.split(',').map(s => s.trim()).filter(s => s);
-                                    if (items.length > 0) {
-                                        yaml += `          ${param.name}:\n`;
-                                        items.forEach(item => {
-                                            // Try to parse as number
-                                            const numValue = parseFloat(item);
-                                            if (!isNaN(numValue) && numValue.toString() === item) {
-                                                yaml += `            - ${numValue}\n`;
-                                            } else {
-                                                yaml += `            - "${item}"\n`;
+                        const def = validationDefs[validation.type];
+                        if (def && def.params && def.params.length > 0) {
+                            const hasParams = def.params.some(p => {
+                                const value = validation.params[p.name];
+                                return value !== '' && value !== false && value !== null && value !== undefined;
+                            });
+
+                            if (hasParams) {
+                                yaml += `        params:\n`;
+                                def.params.forEach(param => {
+                                    const value = validation.params[param.name];
+                                    if (value !== '' && value !== null && value !== undefined) {
+                                        if (param.type === 'list') {
+                                            const items = String(value).split(',').map(s => s.trim()).filter(s => s);
+                                            if (items.length > 0) {
+                                                yaml += `          ${param.name}:\n`;
+                                                items.forEach(item => {
+                                                    const numValue = parseFloat(item);
+                                                    yaml += `            - ${!isNaN(numValue) && numValue.toString() === item ? numValue : `"${item}"`}\n`;
+                                                });
                                             }
-                                        });
+                                        } else if (param.type === 'boolean') {
+                                            if (value) yaml += `          ${param.name}: ${value}\n`;
+                                        } else if (param.type === 'number') {
+                                            yaml += `          ${param.name}: ${value}\n`;
+                                        } else {
+                                            yaml += `          ${param.name}: "${value}"\n`;
+                                        }
                                     }
-                                } else if (param.type === 'boolean') {
-                                    yaml += `          ${param.name}: ${value}\n`;
-                                } else if (param.type === 'number') {
-                                    yaml += `          ${param.name}: ${value}\n`;
-                                } else {
-                                    yaml += `          ${param.name}: "${value}"\n`;
-                                }
+                                });
                             }
-                        });
-                    }
-                    yaml += `\n`;
-                });
-            }
+                        }
+                        yaml += `\n`;
+                    });
+                }
+            });
 
             return yaml;
         }
 
+        function highlightYAML(yaml) {
+            return yaml
+                .replace(/(^|\n)(#.*)/g, '$1<span class="yaml-comment">$2</span>')
+                .replace(/^(\s*)([\w_]+):/gm, '$1<span class="yaml-key">$2</span>:')
+                .replace(/:\s+"([^"]+)"/g, ': <span class="yaml-string">"$1"</span>')
+                .replace(/:\s+(\d+)/g, ': <span class="yaml-number">$1</span>')
+                .replace(/:\s+(true|false)/g, ': <span class="yaml-boolean">$1</span>')
+                .replace(/^(\s*)-/gm, '$1<span class="yaml-dash">-</span>');
+        }
+
         function updatePreview() {
             const yaml = generateYAML();
-            document.getElementById('yamlPreview').textContent = yaml;
+            const highlighted = highlightYAML(yaml);
+            document.getElementById('yamlPreview').innerHTML = highlighted;
+
+            // Update summary
+            let totalValidations = 0;
+            let totalErrors = 0;
+            let totalWarnings = 0;
+
+            state.files.forEach(file => {
+                totalValidations += file.validations.length;
+                file.validations.forEach(v => {
+                    if (v.severity === 'ERROR') totalErrors++;
+                    else totalWarnings++;
+                });
+            });
+
+            document.getElementById('totalFiles').textContent = state.files.length;
+            document.getElementById('totalValidations').textContent = totalValidations;
+            document.getElementById('totalErrors').textContent = totalErrors;
+            document.getElementById('totalWarnings').textContent = totalWarnings;
+        }
+
+        // Templates
+        function showTemplates() {
+            const modal = createModal('Choose Template', `
+                <div class="template-grid">
+                    ${templates.map((t, idx) => `
+                        <div class="template-card" onclick="applyTemplate(${idx})">
+                            <div class="template-card-header">
+                                <div class="template-name">${t.icon} ${t.name}</div>
+                            </div>
+                            <div class="template-desc">${t.description}</div>
+                            <div class="template-stats">
+                                <span>📁 ${t.files} file${t.files > 1 ? 's' : ''}</span>
+                                <span>✓ ${t.validations} validations</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div class="template-card" onclick="closeAllModals()">
+                        <div class="template-card-header">
+                            <div class="template-name">➕ Blank</div>
+                        </div>
+                        <div class="template-desc">Start from scratch</div>
+                        <div class="template-stats">
+                            <span>Build your own</span>
+                        </div>
+                    </div>
+                </div>
+            `);
+            showModalElement(modal);
+        }
+
+        function applyTemplate(index) {
+            const template = templates[index];
+            if (!confirm(`Load "${template.name}" template? This will replace your current configuration.`)) {
+                return;
+            }
+
+            state.files = template.config.files.map((f, idx) => ({
+                id: state.fileCounter++,
+                ...f
+            }));
+
+            closeAllModals();
+            renderFiles();
+            updatePreview();
+            showAlert(`Template "${template.name}" loaded`, 'success');
+        }
+
+        // Import/Export
+        function showImport() {
+            document.getElementById('importModal').classList.add('show');
+        }
+
+        function importYAML() {
+            const yaml = document.getElementById('importYaml').value;
+            if (!yaml.trim()) {
+                showAlert('Please paste a YAML configuration', 'error');
+                return;
+            }
+
+            try {
+                // Simple YAML parser (for demo - in production use js-yaml library)
+                const config = parseYAML(yaml);
+                loadConfig(config);
+                closeModal('importModal');
+                showAlert('Configuration imported successfully', 'success');
+            } catch (e) {
+                showAlert('Error parsing YAML: ' + e.message, 'error');
+            }
+        }
+
+        function parseYAML(yaml) {
+            // Simplified parser - in production use js-yaml
+            // This is a basic implementation for demonstration
+            const lines = yaml.split('\n');
+            const config = { files: [] };
+            let currentFile = null;
+            let currentValidation = null;
+            let inParams = false;
+
+            lines.forEach(line => {
+                line = line.replace(/^  /, '').replace(/^    /, '');
+
+                if (line.includes('- name:')) {
+                    if (currentFile) config.files.push(currentFile);
+                    currentFile = {
+                        name: line.match(/name:\s*"?([^"]+)"?/)[1],
+                        validations: []
+                    };
+                } else if (currentFile && line.includes('path:')) {
+                    currentFile.path = line.match(/path:\s*"?([^"]+)"?/)[1];
+                } else if (currentFile && line.includes('format:')) {
+                    currentFile.format = line.match(/format:\s*"?([^"]+)"?/)[1];
+                } else if (line.includes('- type:')) {
+                    if (currentValidation) currentFile.validations.push(currentValidation);
+                    currentValidation = {
+                        type: line.match(/type:\s*"?([^"]+)"?/)[1],
+                        params: {}
+                    };
+                    inParams = false;
+                } else if (currentValidation && line.includes('severity:')) {
+                    currentValidation.severity = line.match(/severity:\s*"?([^"]+)"?/)[1];
+                } else if (line.includes('params:')) {
+                    inParams = true;
+                }
+            });
+
+            if (currentValidation) currentFile.validations.push(currentValidation);
+            if (currentFile) config.files.push(currentFile);
+
+            return config;
+        }
+
+        function loadConfig(config) {
+            state.files = config.files.map((f, idx) => ({
+                id: state.fileCounter++,
+                name: f.name || `file_${idx + 1}`,
+                path: f.path || 'data.csv',
+                format: f.format || 'csv',
+                validations: f.validations || []
+            }));
+
+            renderFiles();
+            updatePreview();
         }
 
         function downloadConfig() {
@@ -1182,37 +1984,131 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showAlert('Configuration downloaded', 'success');
         }
 
         function copyConfig() {
             const yaml = generateYAML();
             navigator.clipboard.writeText(yaml).then(() => {
-                alert('Configuration copied to clipboard!');
+                showAlert('Configuration copied to clipboard', 'success');
+            }).catch(() => {
+                showAlert('Failed to copy to clipboard', 'error');
             });
         }
 
-        function clearAll() {
-            if (confirm('Are you sure you want to clear all validations?')) {
-                validations = [];
-                renderValidations();
-                updatePreview();
+        // LocalStorage
+        function saveToLocalStorage(auto = false) {
+            const config = {
+                files: state.files,
+                settings: {
+                    jobName: document.getElementById('jobName').value,
+                    jobDescription: document.getElementById('jobDescription').value,
+                    chunkSize: document.getElementById('chunkSize').value,
+                    maxSampleFailures: document.getElementById('maxSampleFailures').value,
+                    failFast: document.getElementById('failFast').value
+                },
+                savedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('validationConfig_autosave', JSON.stringify(config));
+
+            if (!auto) {
+                showAlert('Configuration saved locally', 'success');
             }
         }
 
-        // Mobile tab switching
+        function showSaved() {
+            const modal = createModal('Saved Configurations', `
+                <div class="help-box">
+                    <strong>Auto-saved configuration</strong><br>
+                    Your work is automatically saved every 30 seconds.
+                </div>
+                <button class="btn btn-success" onclick="loadSaved(); closeAllModals();" style="width: 100%;">
+                    Load Last Saved Configuration
+                </button>
+                <button class="btn btn-danger" onclick="clearSaved(); closeAllModals();" style="width: 100%; margin-top: 10px;">
+                    Clear Saved Data
+                </button>
+            `);
+            showModalElement(modal);
+        }
+
+        function loadSaved() {
+            const saved = localStorage.getItem('validationConfig_autosave');
+            if (!saved) {
+                showAlert('No saved configuration found', 'warning');
+                return;
+            }
+
+            const config = JSON.parse(saved);
+            loadConfig(config);
+
+            if (config.settings) {
+                document.getElementById('jobName').value = config.settings.jobName || '';
+                document.getElementById('jobDescription').value = config.settings.jobDescription || '';
+                document.getElementById('chunkSize').value = config.settings.chunkSize || '50000';
+                document.getElementById('maxSampleFailures').value = config.settings.maxSampleFailures || '100';
+                document.getElementById('failFast').value = config.settings.failFast || 'false';
+            }
+
+            showAlert('Configuration loaded', 'success');
+        }
+
+        function clearSaved() {
+            if (!confirm('Clear all saved data?')) return;
+            localStorage.removeItem('validationConfig_autosave');
+            showAlert('Saved data cleared', 'info');
+        }
+
+        // Sharing
+        function showShare() {
+            const yaml = generateYAML();
+            const encoded = btoa(encodeURIComponent(yaml));
+            const url = window.location.origin + window.location.pathname + '#config=' + encoded;
+
+            document.getElementById('shareUrl').value = url;
+            document.getElementById('shareModal').classList.add('show');
+        }
+
+        function copyShareUrl() {
+            const input = document.getElementById('shareUrl');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                showAlert('Share URL copied', 'success');
+            });
+        }
+
+        function loadFromURLHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#config=')) {
+                try {
+                    const encoded = hash.substring(8);
+                    const yaml = decodeURIComponent(atob(encoded));
+                    const config = parseYAML(yaml);
+                    loadConfig(config);
+                    showAlert('Configuration loaded from URL', 'success');
+                } catch (e) {
+                    console.error('Error loading from URL:', e);
+                }
+            }
+        }
+
+        // UI helpers
+        function toggleSection(btn) {
+            const content = btn.parentElement.nextElementSibling;
+            content.classList.toggle('collapsed');
+            btn.textContent = content.classList.contains('collapsed') ? '+' : '−';
+        }
+
         function switchMobileTab(tab) {
             const builderPanel = document.getElementById('builder-panel');
             const previewPanel = document.getElementById('preview-panel');
             const tabs = document.querySelectorAll('.mobile-tab');
 
-            // Remove active class from all panels
             builderPanel.classList.remove('mobile-active');
             previewPanel.classList.remove('mobile-active');
-
-            // Remove active class from all tabs
             tabs.forEach(t => t.classList.remove('active'));
 
-            // Add active class to selected panel and tab
             if (tab === 'builder') {
                 builderPanel.classList.add('mobile-active');
                 tabs[0].classList.add('active');
@@ -1222,15 +2118,85 @@
             }
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            updatePreview();
+        function showAlert(message, type = 'info') {
+            const alertArea = document.getElementById('alertArea');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            alertArea.appendChild(alert);
 
-            // Add listeners to form inputs
-            ['jobName', 'chunkSize', 'fileName', 'filePath', 'fileFormat'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updatePreview);
-            });
-        });
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+
+        function createModal(title, content) {
+            return `
+                <div class="modal-header">
+                    <h3 class="modal-title">${title}</h3>
+                    <button class="close-btn" onclick="closeAllModals()">&times;</button>
+                </div>
+                ${content}
+            `;
+        }
+
+        function showModalElement(html) {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `<div class="modal-content">${html}</div>`;
+            modal.onclick = (e) => {
+                if (e.target === modal) closeAllModals();
+            };
+            document.body.appendChild(modal);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(m => m.remove());
+            document.querySelectorAll('.modal.show').forEach(m => m.classList.remove('show'));
+        }
+
+        function clearAll() {
+            if (!confirm('Clear all files and validations?')) return;
+            state.files = [];
+            state.fileCounter = 0;
+            addFile();
+            showAlert('Configuration cleared', 'info');
+        }
+
+        function showShortcuts() {
+            const modal = createModal('⌨️ Keyboard Shortcuts', `
+                <div style="display: grid; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Save configuration</span>
+                        <span class="kbd">Ctrl/Cmd + S</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Download configuration</span>
+                        <span class="kbd">Ctrl/Cmd + D</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Import YAML</span>
+                        <span class="kbd">Ctrl/Cmd + I</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Show this help</span>
+                        <span class="kbd">?</span>
+                    </div>
+                </div>
+            `);
+            showModalElement(modal);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
