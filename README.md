@@ -24,8 +24,8 @@ pip install -r requirements.txt
 
 # 2. Create configuration
 # Option A: Use the visual config builder (no coding!)
-# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
-# Or local: open docs/config-builder.html
+# Online: https://raw.githack.com/danieledge/data-validation-tool/main/config-builder/index.html
+# Or local: open config-builder/index.html
 # Note: If you see an old version, hard refresh with Ctrl+Shift+R (or Cmd+Shift+R on Mac)
 
 # Option B: Create YAML manually
@@ -56,7 +56,7 @@ python3 -m validation_framework.cli validate validation.yaml --html report.html
 open report.html
 ```
 
-**🎨 NEW: [Visual Config Builder →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html)** - Build validation configs with a modern three-panel interface and validation wizard!
+**🎨 NEW: [Visual Config Builder →](https://raw.githack.com/danieledge/data-validation-tool/main/config-builder/index.html)** - Build validation configs with a modern three-panel interface and validation wizard!
 
 **New to the framework?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
 
@@ -88,7 +88,7 @@ open report.html
 
 **NEW!** Complete UI/UX redesign with three-panel layout and validation wizard - no coding required.
 
-**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/config-builder/index.html
 
 **💡 Cache Issue?** If you see an old version, hard refresh with **Ctrl+Shift+R** (or **Cmd+Shift+R** on Mac). Check the version badge in the top-right corner - should show **v2.3.0**.
 
