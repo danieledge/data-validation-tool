@@ -4,12 +4,12 @@
 
 A robust, extensible Python framework for validating data quality before loading to databases, data warehouses, or analytics platforms. Designed to handle enterprise-scale datasets (200GB+) with memory-efficient chunked processing.
 
-[![Version 2.2.0](https://img.shields.io/badge/version-2.2.0-blue.svg)](docs/WHATS_NEW.md)
+[![Version 2.3.0](https://img.shields.io/badge/version-2.3.0-blue.svg)](docs/WHATS_NEW.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Tests: 115+ passing](https://img.shields.io/badge/tests-115%2B%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
 
-**🎉 NEW in v2.2:** [Visual Config Builder](docs/WHATS_NEW.md#-visual-config-builder) • [Testing Suite (115+ tests)](docs/WHATS_NEW.md#-comprehensive-testing-suite) • [Testing Guide](docs/TESTING.md) • **[See What's New →](docs/WHATS_NEW.md)**
+**🎉 NEW in v2.3:** [Config Builder v3 - Complete UI/UX Redesign](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Validation Type Wizard](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Three-Panel Layout](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • **[See What's New →](docs/WHATS_NEW.md)**
 
 ---
 
@@ -23,9 +23,10 @@ cd data-validation-tool
 pip install -r requirements.txt
 
 # 2. Create configuration
-# Option A: Use the visual config builder (no coding!)
-# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
-# Or local: open docs/config-builder.html
+# Option A: Use the visual config builder v3 (no coding!)
+# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html
+# Or local: open docs/config-builder-v3.html
+# Note: If you see an old version, hard refresh with Ctrl+Shift+R (or Cmd+Shift+R on Mac)
 
 # Option B: Create YAML manually
 cat > validation.yaml <<EOF
@@ -55,7 +56,7 @@ python3 -m validation_framework.cli validate validation.yaml --html report.html
 open report.html
 ```
 
-**🎨 NEW: [Visual Config Builder →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html)** - Build validation configs with an intuitive web interface!
+**🎨 NEW: [Visual Config Builder v3 →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html)** - Build validation configs with a modern three-panel interface and validation wizard!
 
 **New to the framework?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
 
@@ -83,21 +84,23 @@ open report.html
 
 ---
 
-## 🎨 Visual Config Builder v2
+## 🎨 Visual Config Builder v3
 
-**NEW v2!** Production-ready config builder with advanced features - no coding required.
+**NEW v3!** Complete UI/UX redesign with three-panel layout and validation wizard - no coding required.
 
-**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html
+
+**💡 Cache Issue?** If you see an old version, hard refresh with **Ctrl+Shift+R** (or **Cmd+Shift+R** on Mac). Check the version badge in the top-right corner - should show **v2.3.0**.
 
 **Key Features:**
+- 🎯 **Three-Panel Layout** - Sidebar navigation, main workspace, live YAML preview
+- 🧙 **Validation Wizard** - Choose from 21 validation types organized in 6 color-coded categories
+- 📱 **Mobile-First Design** - Responsive with hamburger menu and collapsible panels
+- 🎨 **Modern UI** - Professional dark theme with smooth animations
 - 🗂️ **Multiple Files** - Configure complex multi-file validations
-- 📋 **Template Library** - 5 generic templates (Blank, Single File, Multiple Files, Schema Focus)
-- 📥 **Import YAML** - Load and edit existing configurations
-- 💾 **Auto-Save** - Browser localStorage with auto-save every 30 seconds
-- 🔗 **Shareable URLs** - Generate links to share configurations
+- 📋 **Category Organization** - File, Schema, Field, Record, Cross-File, Statistical validations
+- 🎨 **Syntax Highlighting** - Real-time color-coded YAML preview
 - ⚙️ **Advanced Settings** - chunk_size, fail_fast, log_level configuration
-- 🎨 **Syntax Highlighting** - Color-coded YAML preview
-- ⌨️ **Keyboard Shortcuts** - Ctrl+S, Ctrl+D, Ctrl+I, ? for help
 - 📱 **Mobile-Optimized** - Stacked buttons, 44px touch targets, optimized spacing
 - 🔍 **Smart Parameters** - Type-specific inputs with validation and hints
 - 📊 **Dashboard** - Real-time summary of files, validations, and severity counts
