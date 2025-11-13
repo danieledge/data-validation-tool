@@ -288,5 +288,128 @@ def version():
     click.echo("A robust tool for pre-load data quality validation")
 
 
+@cli.command()
+@click.argument('file_path', type=click.Path(exists=True))
+@click.option('--format', '-f', type=click.Choice(['csv', 'excel', 'json', 'parquet'], case_sensitive=False),
+              help='File format (auto-detected if not specified)')
+@click.option('--html-output', '-o', help='Path for HTML profile report (default: profile_report.html)')
+@click.option('--json-output', '-j', help='Path for JSON profile output')
+@click.option('--config-output', '-c', help='Path to save generated validation config (default: <filename>_validation.yaml)')
+@click.option('--chunk-size', type=int, default=50000, help='Number of rows per chunk for large files')
+@click.option('--log-level', type=click.Choice(['DEBUG', 'INFO', 'WARNING', 'ERROR'], case_sensitive=False),
+              default='INFO', help='Logging level')
+def profile(file_path, format, html_output, json_output, config_output, chunk_size, log_level):
+    """
+    Profile a data file to understand its structure and quality.
+
+    Generates a comprehensive analysis including:
+    - Schema and data type inference (known vs inferred)
+    - Statistical distributions and patterns
+    - Data quality metrics
+    - Correlations between fields
+    - Suggested validations
+    - Auto-generated validation configuration
+
+    FILE_PATH: Path to data file to profile
+
+    Examples:
+
+    \b
+    # Profile a CSV file
+    data-validate profile data/customers.csv
+
+    \b
+    # Profile with custom output paths
+    data-validate profile data.csv -o profile.html -c validation.yaml
+
+    \b
+    # Profile large Parquet file with custom chunk size
+    data-validate profile large_data.parquet --chunk-size 100000
+    """
+    from validation_framework.profiler.engine import DataProfiler
+    from validation_framework.profiler.html_reporter import ProfileHTMLReporter
+
+    # Setup logging
+    setup_logging(level=log_level)
+    logger.info(f"Starting profile of: {file_path}")
+
+    try:
+        # Auto-detect format if not specified
+        if not format:
+            file_ext = Path(file_path).suffix.lower()
+            format_map = {
+                '.csv': 'csv',
+                '.xlsx': 'excel',
+                '.xls': 'excel',
+                '.json': 'json',
+                '.jsonl': 'json',
+                '.parquet': 'parquet'
+            }
+            format = format_map.get(file_ext, 'csv')
+            logger.info(f"Auto-detected format: {format}")
+
+        # Set default output paths
+        file_stem = Path(file_path).stem
+        if not html_output:
+            html_output = f"{file_stem}_profile_report.html"
+        if not config_output:
+            config_output = f"{file_stem}_validation.yaml"
+
+        # Create profiler and run analysis
+        click.echo(f"🔍 Profiling {file_path}...")
+        profiler = DataProfiler(chunk_size=chunk_size)
+        profile_result = profiler.profile_file(
+            file_path=file_path,
+            file_format=format
+        )
+
+        click.echo(f"\n📊 Profile Summary:")
+        click.echo(f"  • File: {profile_result.file_name}")
+        click.echo(f"  • Size: {profile_result.file_size_bytes / (1024*1024):.2f} MB")
+        click.echo(f"  • Rows: {profile_result.row_count:,}")
+        click.echo(f"  • Columns: {profile_result.column_count}")
+        click.echo(f"  • Overall Quality Score: {profile_result.overall_quality_score:.1f}%")
+        click.echo(f"  • Processing Time: {profile_result.processing_time_seconds:.2f}s")
+
+        # Generate HTML report
+        reporter = ProfileHTMLReporter()
+        reporter.generate_report(profile_result, html_output)
+        click.echo(f"\n✅ HTML report generated: {html_output}")
+
+        # Generate JSON output if requested
+        if json_output:
+            import json
+            with open(json_output, 'w') as f:
+                json.dump(profile_result.to_dict(), f, indent=2)
+            click.echo(f"✅ JSON output saved: {json_output}")
+
+        # Save generated validation config
+        if profile_result.generated_config_yaml:
+            with open(config_output, 'w') as f:
+                f.write(profile_result.generated_config_yaml)
+            click.echo(f"✅ Validation config saved: {config_output}")
+            click.echo(f"\n💡 To run validations, use:")
+            click.echo(f"   {profile_result.generated_config_command}")
+
+        # Show top suggestions
+        if profile_result.suggested_validations:
+            click.echo(f"\n💡 Top Validation Suggestions:")
+            for sugg in profile_result.suggested_validations[:5]:
+                click.echo(f"  • {sugg.validation_type} ({sugg.severity})")
+                click.echo(f"    {sugg.reason}")
+
+        sys.exit(0)
+
+    except FileNotFoundError as e:
+        click.echo(f"❌ Error: {str(e)}", err=True)
+        sys.exit(1)
+
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {str(e)}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
 if __name__ == '__main__':
     cli()
