@@ -248,6 +248,9 @@
         .sidebar-footer {
             padding: 16px;
             border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
         /* ==================== WORKSPACE ==================== */
@@ -650,6 +653,15 @@
             .validation-grid {
                 grid-template-columns: 1fr;
             }
+
+            /* Hide download button text on mobile, keep icon */
+            .header-actions .btn-primary span:not(.icon) {
+                display: none;
+            }
+
+            .header-actions .btn-primary {
+                padding: 8px 12px;
+            }
         }
 
         /* Mobile backdrop */
@@ -1028,6 +1040,10 @@
                     </div>
                     <div class="header-actions">
                         <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.3.0</span>
+                        <button class="btn btn-primary" onclick="downloadConfig()" title="Download YAML Configuration" style="margin-right: 8px;">
+                            <span class="icon">📥</span>
+                            <span>Download</span>
+                        </button>
                         <button class="btn btn-secondary btn-icon" onclick="togglePreview()" title="Toggle Preview">
                             <span>👁️</span>
                         </button>
@@ -1397,7 +1413,20 @@
                 'summary': 'Summary'
             };
 
-            const title = titles[section] || section;
+            let title = titles[section];
+
+            // If it's a file section (numeric ID), use the file name
+            if (!title && !isNaN(section)) {
+                const fileId = parseInt(section);
+                const file = state.files.find(f => f.id === fileId);
+                if (file) {
+                    title = file.name;
+                }
+            }
+
+            // Fallback to section value if no title found
+            title = title || section;
+
             document.getElementById('breadcrumb').textContent = title;
             document.getElementById('pageTitle').textContent = title;
 
@@ -1555,7 +1584,11 @@
                                         type="text"
                                         value="${file.name}"
                                         onchange="updateFile(${fileId}, 'name', this.value);"
+                                        placeholder="customers"
                                         style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                    <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                        A friendly label to identify this file (e.g., "customers", "transactions"). This appears in reports and logs.
+                                    </small>
                                 </div>
                                 <div>
                                     <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
@@ -1565,7 +1598,11 @@
                                         type="text"
                                         value="${file.path}"
                                         onchange="updateFile(${fileId}, 'path', this.value);"
+                                        placeholder="data/customers.csv"
                                         style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                    <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                        The actual file system path where the file is located (relative or absolute path).
+                                    </small>
                                 </div>
                                 <div>
                                     <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
