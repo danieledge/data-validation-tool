@@ -731,7 +731,16 @@
             }
 
             .header-left h1 {
-                font-size: 1.6em;
+                font-size: 1.4em;
+            }
+
+            .header-left .subtitle {
+                font-size: 0.85em;
+            }
+
+            .version-badge {
+                font-size: 0.7em;
+                padding: 4px 8px;
             }
 
             .header-actions {
@@ -799,6 +808,21 @@
             textarea {
                 font-size: 16px !important; /* Prevent iOS zoom */
                 min-height: 44px;
+                padding: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-group label {
+                margin-bottom: 8px;
+                font-size: 0.95em;
+            }
+
+            .form-group small {
+                margin-top: 6px;
+                font-size: 0.8em;
             }
 
             /* Validation item header on mobile */
@@ -812,11 +836,83 @@
                 width: 100%;
                 justify-content: space-between;
             }
+
+            .validation-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            /* File card improvements */
+            .file-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .file-card-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+
+            .file-card-title {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 8px;
+                width: 100%;
+                font-size: 1.1em;
+            }
+
+            .file-badge {
+                align-self: flex-start;
+                font-size: 0.8em;
+                padding: 6px 12px;
+            }
+
+            .file-card-header .btn {
+                width: 100%;
+                font-size: 0.95em;
+            }
+
+            /* Section spacing */
+            .section {
+                margin-bottom: 18px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .section-title {
+                font-size: 1.1em;
+            }
+
+            .section-header .btn {
+                width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
             .header-left h1 {
                 font-size: 1.3em;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 12px;
             }
 
             .category-grid {
@@ -825,6 +921,10 @@
 
             .summary-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .file-card {
+                padding: 12px;
             }
         }
 
