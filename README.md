@@ -4,12 +4,12 @@
 
 A robust, extensible Python framework for validating data quality before loading to databases, data warehouses, or analytics platforms. Designed to handle enterprise-scale datasets (200GB+) with memory-efficient chunked processing.
 
-[![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg)](docs/WHATS_NEW.md)
+[![Version 2.1.0](https://img.shields.io/badge/version-2.1.0-blue.svg)](docs/WHATS_NEW.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Tests: 102 passing](https://img.shields.io/badge/tests-102%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
 
-**🎉 NEW in v2.0:** [Data Profiling](docs/DATA_PROFILING.md) • [Enhanced Empty File Detection](docs/WHATS_NEW.md#enhanced-empty-file-detection) • [Mobile-Responsive Reports](docs/WHATS_NEW.md#mobile-responsive-html-reports) • **[See What's New →](docs/WHATS_NEW.md)**
+**🎉 NEW in v2.1:** [Cross-File Validations](docs/WHATS_NEW.md#-cross-file-validations) • [Database Connectivity](docs/WHATS_NEW.md#-database-connectivity) • [Temporal Validations](docs/WHATS_NEW.md#-temporalhistorical-validations) • [Statistical Tests](docs/WHATS_NEW.md#-advanced-statistical-validations) • **[See What's New →](docs/WHATS_NEW.md)**
 
 ---
 
@@ -58,7 +58,7 @@ open report.html
 
 ### For Business Users
 - ✅ **No Coding Required** - Define validations in simple YAML configuration
-- ✅ **23 Built-in Validations** - File, schema, field, record, and conditional checks
+- ✅ **35+ Built-in Validations** - File, schema, field, record, cross-file, database, temporal, and statistical checks
 - ✅ **Professional Reports** - Interactive HTML and JSON outputs
 - ✅ **Conditional Logic** - Apply different rules based on data values
 
@@ -229,7 +229,26 @@ fi
 - **StringLengthCheck** - String length limits
 - **NumericPrecisionCheck** - Decimal precision
 
-**See [Validation Catalog](docs/VALIDATION_CATALOG.md) for complete reference**
+### Cross-File Validations 🆕
+- **ReferentialIntegrityCheck** - Foreign key relationships between files
+- **CrossFileComparisonCheck** - Compare aggregates across files
+- **CrossFileDuplicateCheck** - Duplicates across multiple files
+
+### Database Validations 🆕
+- **SQLCustomCheck** - Custom SQL-based validations
+- **DatabaseReferentialIntegrityCheck** - Database foreign keys
+- **DatabaseConstraintCheck** - Database constraint validation
+
+### Temporal/Historical Validations 🆕
+- **BaselineComparisonCheck** - Compare against historical averages
+- **TrendDetectionCheck** - Detect unusual growth/decline rates
+
+### Statistical Validations 🆕
+- **DistributionCheck** - Validate statistical distributions
+- **CorrelationCheck** - Column correlation validation
+- **AdvancedAnomalyDetectionCheck** - Multiple anomaly detection methods
+
+**See [Validation Catalog](docs/VALIDATION_CATALOG.md) for complete reference of 35+ validations**
 
 ---
 

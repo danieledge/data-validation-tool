@@ -15,6 +15,10 @@ This catalog provides comprehensive documentation for every validation check ava
 - [Record-Level Validations](#record-level-validations) - Check across rows
 - [Conditional Validations](#conditional-validations) - Apply rules conditionally
 - [Advanced Validations](#advanced-validations) - Statistical and complex checks
+- [Cross-File Validations](#cross-file-validations) - Validate relationships between files
+- [Database Validations](#database-validations) - Direct database validation support
+- [Temporal/Historical Validations](#temporalhistorical-validations) - Compare against historical baselines
+- [Statistical Validations](#statistical-validations) - Advanced statistical tests
 
 ### Quick Reference
 [Jump to specific validation](#quick-reference-table)
@@ -1201,6 +1205,390 @@ validations:
     severity: "WARNING"
     params:
       field: "order_amount"
+```
+
+---
+
+## Cross-File Validations
+
+**NEW in v2.1!** Validate relationships and consistency across multiple data files.
+
+### ReferentialIntegrityCheck
+
+**Purpose:** Validates foreign key relationships between two files
+
+**Use Cases:**
+- Ensure customer IDs in orders file exist in customers file
+- Validate product references across related files
+- Check referential integrity before data loads
+
+**Parameters:**
+- `foreign_key` (string, required): Column name in current file
+- `reference_file` (string, required): Path to reference file
+- `reference_key` (string, required): Column name in reference file
+- `allow_null` (boolean, optional): Allow NULL values in foreign key. Default: false
+- `reference_file_format` (string, optional): Format of reference file. Default: csv
+
+**Examples:**
+```yaml
+# Validate customer_id exists in customers file
+- type: "ReferentialIntegrityCheck"
+  severity: "ERROR"
+  params:
+    foreign_key: "customer_id"
+    reference_file: "customers.csv"
+    reference_key: "id"
+    allow_null: false
+```
+
+---
+
+### CrossFileComparisonCheck
+
+**Purpose:** Compares aggregate values between two files
+
+**Use Cases:**
+- Validate total order amount matches sum in order_items file
+- Compare row counts between related files
+- Ensure aggregates match across systems
+
+**Parameters:**
+- `aggregation` (string, required): Type: sum, count, mean, min, max
+- `column` (string, optional): Column to aggregate (not needed for count)
+- `comparison` (string, required): Operator: ==, !=, >, <, >=, <=
+- `reference_file` (string, required): Path to reference file
+- `reference_aggregation` (string, required): Aggregation in reference file
+- `reference_column` (string, optional): Column in reference file
+- `reference_file_format` (string, optional): Format. Default: csv
+- `tolerance` (float, optional): Absolute tolerance. Default: 0
+- `tolerance_pct` (float, optional): Percentage tolerance. Default: 0
+
+**Examples:**
+```yaml
+# Check total amounts match within 0.01%
+- type: "CrossFileComparisonCheck"
+  severity: "ERROR"
+  params:
+    aggregation: "sum"
+    column: "total_amount"
+    comparison: "=="
+    reference_file: "order_items.csv"
+    reference_aggregation: "sum"
+    reference_column: "item_amount"
+    tolerance_pct: 0.01
+```
+
+---
+
+### CrossFileDuplicateCheck
+
+**Purpose:** Detects duplicate records across multiple files
+
+**Use Cases:**
+- Check for duplicate customer IDs across archive files
+- Ensure no overlap between active and historical data
+- Validate data migration completeness
+
+**Parameters:**
+- `columns` (list, required): Columns to check for duplicates
+- `reference_files` (list, required): List of files to check against
+- `reference_file_format` (string, optional): Format. Default: csv
+
+**Examples:**
+```yaml
+# Check for duplicate customer IDs across files
+- type: "CrossFileDuplicateCheck"
+  severity: "ERROR"
+  params:
+    columns: ["customer_id"]
+    reference_files:
+      - "customers_archive.csv"
+      - "customers_old.csv"
+```
+
+---
+
+## Database Validations
+
+**NEW in v2.1!** Validate data directly from databases using SQL.
+
+### SQLCustomCheck
+
+**Purpose:** Execute custom SQL-based validation logic
+
+**Use Cases:**
+- Complex business rules requiring SQL
+- Validate data in databases without extracting to files
+- Leverage database-specific functions
+
+**Parameters:**
+- `connection_string` (string, required): Database connection string
+- `sql_query` (string, required): SQL query that returns failing records
+- `db_type` (string, optional): Database type. Default: postgresql
+- `max_sample_size` (int, optional): Max sample failures. Default: 10
+
+**Supported Databases:**
+- PostgreSQL
+- MySQL
+- SQL Server
+- Oracle
+- SQLite
+
+**Examples:**
+```yaml
+# Find customers with invalid emails
+- type: "SQLCustomCheck"
+  severity: "WARNING"
+  params:
+    connection_string: "postgresql://user:pass@localhost/db"
+    db_type: "postgresql"
+    sql_query: |
+      SELECT customer_id, email
+      FROM customers
+      WHERE email NOT LIKE '%@%'
+```
+
+---
+
+### DatabaseReferentialIntegrityCheck
+
+**Purpose:** Validates foreign key relationships within a database
+
+**Use Cases:**
+- Check referential integrity without loading data
+- Validate database constraints are satisfied
+- Find orphaned records
+
+**Parameters:**
+- `connection_string` (string, required): Database connection string
+- `foreign_key_table` (string, required): Table with foreign key
+- `foreign_key_column` (string, required): Foreign key column
+- `reference_table` (string, required): Reference table
+- `reference_key_column` (string, required): Primary key column
+- `allow_null` (boolean, optional): Allow NULL values. Default: false
+- `db_type` (string, optional): Database type. Default: postgresql
+
+**Examples:**
+```yaml
+# Validate order.customer_id references customers.id
+- type: "DatabaseReferentialIntegrityCheck"
+  severity: "ERROR"
+  params:
+    connection_string: "postgresql://user:pass@localhost/db"
+    foreign_key_table: "orders"
+    foreign_key_column: "customer_id"
+    reference_table: "customers"
+    reference_key_column: "id"
+```
+
+---
+
+### DatabaseConstraintCheck
+
+**Purpose:** Validates database constraints are not violated
+
+**Use Cases:**
+- Check for constraint violations
+- Validate UNIQUE constraints
+- Find data violating CHECK constraints
+
+**Parameters:**
+- `connection_string` (string, required): Database connection string
+- `table` (string, required): Table to check
+- `constraint_query` (string, required): SQL query finding violations
+- `constraint_name` (string, optional): Constraint name for reporting
+- `db_type` (string, optional): Database type. Default: postgresql
+
+**Examples:**
+```yaml
+# Check for age constraint violations
+- type: "DatabaseConstraintCheck"
+  severity: "ERROR"
+  params:
+    connection_string: "postgresql://user:pass@localhost/db"
+    table: "customers"
+    constraint_name: "age_check"
+    constraint_query: |
+      SELECT customer_id, age
+      FROM customers
+      WHERE age < 0 OR age > 150
+```
+
+---
+
+## Temporal/Historical Validations
+
+**NEW in v2.1!** Compare current data against historical baselines.
+
+### BaselineComparisonCheck
+
+**Purpose:** Compares current metrics against historical average
+
+**Use Cases:**
+- Detect unusual drops/spikes in row counts
+- Validate sales totals against historical norms
+- Alert on data volume anomalies
+
+**Parameters:**
+- `metric` (string, required): Metric to compare: count, sum, mean, min, max
+- `column` (string, optional): Column to aggregate (not needed for count)
+- `baseline_file` (string, required): Path to historical baseline file (CSV with date and value columns)
+- `baseline_date_column` (string, optional): Date column. Default: "date"
+- `baseline_value_column` (string, optional): Value column. Default: "value"
+- `lookback_days` (int, optional): Days to average for baseline. Default: 30
+- `tolerance_pct` (float, required): Allowed deviation percentage
+
+**Examples:**
+```yaml
+# Validate row count within 20% of 30-day average
+- type: "BaselineComparisonCheck"
+  severity: "WARNING"
+  params:
+    metric: "count"
+    baseline_file: "historical_counts.csv"
+    lookback_days: 30
+    tolerance_pct: 20
+```
+
+---
+
+### TrendDetectionCheck
+
+**Purpose:** Detects unusual trends compared to historical patterns
+
+**Use Cases:**
+- Alert on unexpected growth/decline rates
+- Detect data quality degradation over time
+- Monitor business metric changes
+
+**Parameters:**
+- `metric` (string, required): Metric to track: count, sum, mean
+- `column` (string, optional): Column to aggregate
+- `baseline_file` (string, required): Historical data file
+- `baseline_date_column` (string, optional): Date column. Default: "date"
+- `baseline_value_column` (string, optional): Value column. Default: "value"
+- `max_growth_pct` (float, optional): Maximum allowed growth percentage
+- `max_decline_pct` (float, optional): Maximum allowed decline percentage
+- `comparison_period` (int, optional): Days to compare against. Default: 1
+
+**Examples:**
+```yaml
+# Detect unusual growth in customer count
+- type: "TrendDetectionCheck"
+  severity: "WARNING"
+  params:
+    metric: "count"
+    baseline_file: "daily_customer_counts.csv"
+    max_growth_pct: 50
+    max_decline_pct: 30
+    comparison_period: 1
+```
+
+---
+
+## Statistical Validations
+
+**NEW in v2.1!** Advanced statistical tests for data quality.
+
+### DistributionCheck
+
+**Purpose:** Validates data follows an expected statistical distribution
+
+**Use Cases:**
+- Detect when data patterns change unexpectedly
+- Validate randomness assumptions
+- Monitor data generation processes
+
+**Parameters:**
+- `column` (string, required): Column to check
+- `expected_distribution` (string, required): Type: normal, uniform, exponential
+- `significance_level` (float, optional): Significance level. Default: 0.05
+- `min_sample_size` (int, optional): Minimum samples required. Default: 30
+
+**Examples:**
+```yaml
+# Validate age follows normal distribution
+- type: "DistributionCheck"
+  severity: "WARNING"
+  params:
+    column: "age"
+    expected_distribution: "normal"
+    significance_level: 0.05
+```
+
+---
+
+### CorrelationCheck
+
+**Purpose:** Validates correlation between columns is within expected range
+
+**Use Cases:**
+- Detect when expected relationships break down
+- Monitor feature engineering pipelines
+- Validate business assumptions
+
+**Parameters:**
+- `column1` (string, required): First column
+- `column2` (string, required): Second column
+- `expected_correlation` (float, optional): Expected correlation (-1 to 1)
+- `min_correlation` (float, optional): Minimum acceptable correlation
+- `max_correlation` (float, optional): Maximum acceptable correlation
+- `correlation_type` (string, optional): Type: pearson, spearman, kendall. Default: pearson
+- `tolerance` (float, optional): Tolerance for expected_correlation. Default: 0.1
+
+**Examples:**
+```yaml
+# Validate price and quantity have negative correlation
+- type: "CorrelationCheck"
+  severity: "WARNING"
+  params:
+    column1: "price"
+    column2: "quantity_sold"
+    min_correlation: -0.8
+    max_correlation: -0.3
+```
+
+---
+
+### AdvancedAnomalyDetectionCheck
+
+**Purpose:** Detects anomalies using multiple statistical methods
+
+**Use Cases:**
+- Detect outliers more accurately
+- Find fraudulent transactions
+- Identify data entry errors
+
+**Parameters:**
+- `column` (string, required): Column to check for anomalies
+- `method` (string, optional): Method: iqr, zscore, modified_zscore, isolation_forest. Default: iqr
+- `threshold` (float, optional): Threshold for method. Default varies by method
+- `max_anomaly_pct` (float, optional): Maximum acceptable percentage of anomalies. Default: 5
+
+**Methods:**
+- `iqr`: Interquartile Range method
+- `zscore`: Standard Z-score method
+- `modified_zscore`: Robust to outliers
+- `isolation_forest`: Machine learning-based (requires scikit-learn)
+
+**Examples:**
+```yaml
+# Detect price anomalies using IQR
+- type: "AdvancedAnomalyDetectionCheck"
+  severity: "WARNING"
+  params:
+    column: "price"
+    method: "iqr"
+    max_anomaly_pct: 2
+
+# Detect anomalies using Isolation Forest
+- type: "AdvancedAnomalyDetectionCheck"
+  severity: "WARNING"
+  params:
+    column: "transaction_amount"
+    method: "isolation_forest"
+    threshold: 0.1
+    max_anomaly_pct: 5
 ```
 
 ---

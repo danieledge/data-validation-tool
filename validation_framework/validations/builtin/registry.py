@@ -49,6 +49,29 @@ from validation_framework.validations.builtin.advanced_checks import (
     NumericPrecisionCheck,
 )
 
+from validation_framework.validations.builtin.cross_file_checks import (
+    ReferentialIntegrityCheck,
+    CrossFileComparisonCheck,
+    CrossFileDuplicateCheck,
+)
+
+from validation_framework.validations.builtin.database_checks import (
+    SQLCustomCheck,
+    DatabaseReferentialIntegrityCheck,
+    DatabaseConstraintCheck,
+)
+
+from validation_framework.validations.builtin.temporal_checks import (
+    BaselineComparisonCheck,
+    TrendDetectionCheck,
+)
+
+from validation_framework.validations.builtin.statistical_checks import (
+    DistributionCheck,
+    CorrelationCheck,
+    AdvancedAnomalyDetectionCheck,
+)
+
 
 def register_all_builtin_validations():
     """
@@ -92,6 +115,25 @@ def register_all_builtin_validations():
     register_validation("CompletenessCheck", CompletenessCheck)
     register_validation("StringLengthCheck", StringLengthCheck)
     register_validation("NumericPrecisionCheck", NumericPrecisionCheck)
+
+    # Cross-file validation checks
+    register_validation("ReferentialIntegrityCheck", ReferentialIntegrityCheck)
+    register_validation("CrossFileComparisonCheck", CrossFileComparisonCheck)
+    register_validation("CrossFileDuplicateCheck", CrossFileDuplicateCheck)
+
+    # Database validation checks
+    register_validation("SQLCustomCheck", SQLCustomCheck)
+    register_validation("DatabaseReferentialIntegrityCheck", DatabaseReferentialIntegrityCheck)
+    register_validation("DatabaseConstraintCheck", DatabaseConstraintCheck)
+
+    # Temporal/Historical validation checks
+    register_validation("BaselineComparisonCheck", BaselineComparisonCheck)
+    register_validation("TrendDetectionCheck", TrendDetectionCheck)
+
+    # Advanced statistical validation checks
+    register_validation("DistributionCheck", DistributionCheck)
+    register_validation("CorrelationCheck", CorrelationCheck)
+    register_validation("AdvancedAnomalyDetectionCheck", AdvancedAnomalyDetectionCheck)
 
 
 # Auto-register on import

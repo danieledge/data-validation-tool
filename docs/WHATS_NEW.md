@@ -4,7 +4,171 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.0.0 (Current) - November 2025
+## Version 2.1.0 (Current) - November 2025
+
+### 🎉 Major New Features
+
+#### 📁 Cross-File Validations
+Validate relationships and consistency across multiple data files.
+
+**New Validations:**
+- **ReferentialIntegrityCheck** - Validate foreign key relationships between files
+- **CrossFileComparisonCheck** - Compare aggregates between files
+- **CrossFileDuplicateCheck** - Detect duplicates across multiple files
+
+**Use Cases:**
+- Ensure customer IDs in orders file exist in customers file
+- Validate total amounts match across related files
+- Check for duplicate keys across archive and active files
+
+**Example:**
+```yaml
+- type: "ReferentialIntegrityCheck"
+  severity: "ERROR"
+  params:
+    foreign_key: "customer_id"
+    reference_file: "customers.csv"
+    reference_key: "id"
+```
+
+---
+
+#### 🗄️ Database Connectivity
+Direct database validation support for PostgreSQL, MySQL, SQL Server, Oracle, and SQLite.
+
+**New Validations:**
+- **SQLCustomCheck** - Execute custom SQL queries for validation
+- **DatabaseReferentialIntegrityCheck** - Check foreign keys within databases
+- **DatabaseConstraintCheck** - Validate database constraints
+
+**New Components:**
+- **DatabaseLoader** - Load data from databases in chunks
+- Support for all major database engines
+
+**Use Cases:**
+- Validate data in databases without extracting to files
+- Execute complex SQL-based business rules
+- Check referential integrity directly in the database
+
+**Example:**
+```yaml
+- type: "SQLCustomCheck"
+  severity: "ERROR"
+  params:
+    connection_string: "postgresql://user:pass@localhost/db"
+    sql_query: |
+      SELECT customer_id, email
+      FROM customers
+      WHERE email NOT LIKE '%@%'
+```
+
+**Installation:**
+```bash
+pip install sqlalchemy psycopg2-binary  # PostgreSQL
+pip install sqlalchemy pymysql          # MySQL
+```
+
+---
+
+#### ⏰ Temporal/Historical Validations
+Compare current data against historical baselines to detect anomalies.
+
+**New Validations:**
+- **BaselineComparisonCheck** - Compare metrics against historical averages
+- **TrendDetectionCheck** - Detect unusual growth/decline rates
+
+**Use Cases:**
+- Detect unusual drops/spikes in row counts
+- Alert on unexpected data volume changes
+- Monitor business metrics over time
+
+**Example:**
+```yaml
+- type: "BaselineComparisonCheck"
+  severity: "WARNING"
+  params:
+    metric: "count"
+    baseline_file: "historical_counts.csv"
+    lookback_days: 30
+    tolerance_pct: 20
+```
+
+---
+
+#### 📊 Advanced Statistical Validations
+Sophisticated statistical tests for data quality.
+
+**New Validations:**
+- **DistributionCheck** - Validate data follows expected distributions (normal, uniform, exponential)
+- **CorrelationCheck** - Validate correlations between columns
+- **AdvancedAnomalyDetectionCheck** - Multiple anomaly detection methods (IQR, Z-score, Isolation Forest)
+
+**Methods:**
+- Statistical distribution tests (Shapiro-Wilk, Kolmogorov-Smirnov)
+- Correlation analysis (Pearson, Spearman, Kendall)
+- Machine learning-based anomaly detection
+
+**Use Cases:**
+- Detect when data patterns change unexpectedly
+- Monitor expected relationships between variables
+- Find fraudulent transactions or data entry errors
+
+**Example:**
+```yaml
+- type: "DistributionCheck"
+  severity: "WARNING"
+  params:
+    column: "age"
+    expected_distribution: "normal"
+
+- type: "CorrelationCheck"
+  severity: "WARNING"
+  params:
+    column1: "price"
+    column2: "quantity_sold"
+    min_correlation: -0.8
+
+- type: "AdvancedAnomalyDetectionCheck"
+  severity: "WARNING"
+  params:
+    column: "price"
+    method: "isolation_forest"
+    max_anomaly_pct: 2
+```
+
+**Installation:**
+```bash
+pip install scipy                # For statistical tests
+pip install scikit-learn         # For Isolation Forest
+```
+
+---
+
+### 📚 Documentation Updates
+
+- Updated [Validation Catalog](VALIDATION_CATALOG.md) with 12+ new validation types
+- Added examples for all new validations
+- Documented database connection strings for all supported databases
+- Added statistical validation methodology documentation
+
+---
+
+### 📦 Dependencies
+
+**New Optional Dependencies:**
+```bash
+# Database connectivity
+pip install sqlalchemy psycopg2-binary pymysql pyodbc cx-Oracle
+
+# Statistical validations
+pip install scipy scikit-learn
+```
+
+All optional - only install what you need!
+
+---
+
+## Version 2.0.0 - November 2025
 
 ### 🎉 Major New Features
 
