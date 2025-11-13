@@ -295,6 +295,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex: 1;
         }
 
         .page-title {
@@ -608,16 +609,25 @@
                 top: 0;
                 height: 100vh;
                 z-index: 900;
-                transform: translateX(0);
+                transform: translateX(-100%);
                 transition: transform var(--transition-base);
             }
 
-            .sidebar.mobile-hidden {
-                transform: translateX(-100%);
+            .sidebar.mobile-visible {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .mobile-menu-btn {
+                display: flex !important;
             }
 
             .workspace-header {
                 padding: 12px 16px;
+            }
+
+            .page-header {
+                flex-wrap: wrap;
             }
 
             .page-title {
@@ -626,11 +636,47 @@
 
             .workspace-content {
                 padding: 16px;
+                padding-bottom: 80px;
             }
 
             .validation-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Mobile backdrop */
+        .mobile-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 850;
+        }
+
+        .mobile-backdrop.show {
+            display: block;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
         /* ==================== UTILITY CLASSES ==================== */
@@ -644,6 +690,9 @@
     </style>
 </head>
 <body>
+    <!-- Mobile backdrop -->
+    <div class="mobile-backdrop" id="mobileBackdrop" onclick="toggleMobileSidebar()"></div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -721,6 +770,9 @@
                 </div>
                 <div class="page-header">
                     <div class="title-section">
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Menu">
+                            <span style="font-size: 20px;">☰</span>
+                        </button>
                         <h1 class="page-title" id="pageTitle">Job Settings</h1>
                         <span class="status-badge success" id="statusBadge">Ready</span>
                     </div>
@@ -738,7 +790,7 @@
         </main>
 
         <!-- YAML Preview Panel -->
-        <aside class="preview-panel" id="previewPanel">
+        <aside class="preview-panel collapsed" id="previewPanel">
             <div class="preview-header">
                 <h3 class="preview-title">YAML Preview</h3>
                 <button class="btn btn-secondary btn-icon" onclick="togglePreview()">
@@ -781,6 +833,14 @@
         // Navigation
         function showSection(section) {
             state.currentSection = section;
+
+            // Close mobile sidebar when navigating
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('mobileBackdrop');
+                sidebar.classList.remove('mobile-visible');
+                backdrop.classList.remove('show');
+            }
 
             // Update nav items
             document.querySelectorAll('.nav-item').forEach(item => {
@@ -1166,6 +1226,13 @@ files:
         // UI Controls
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobileBackdrop');
+            sidebar.classList.toggle('mobile-visible');
+            backdrop.classList.toggle('show');
         }
 
         function togglePreview() {
