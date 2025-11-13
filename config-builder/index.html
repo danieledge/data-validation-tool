@@ -923,7 +923,12 @@
     <div class="modal" id="validationModal" onclick="if(event.target === this) closeValidationModal()">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Add Validation</h2>
+                <div>
+                    <h2 class="modal-title">Add Validation</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Select one validation type below (you can add more validations later)
+                    </p>
+                </div>
                 <button class="btn btn-secondary btn-icon" onclick="closeValidationModal()">
                     <span>✕</span>
                 </button>
@@ -1653,6 +1658,12 @@
             const categoryClass = getValidationCategory(validation.type);
             const params = validation.params || {};
 
+            // Get the file to determine total validations count
+            const file = state.files.find(f => f.id === fileId);
+            const totalValidations = file ? file.validations.length : 0;
+            const isFirst = idx === 0;
+            const isLast = idx === totalValidations - 1;
+
             return `
                 <div class="validation-card ${categoryClass}">
                     <div class="card-header">
@@ -1660,7 +1671,21 @@
                             <span class="validation-icon">${getValidationIcon(validation.type)}</span>
                             <span class="validation-name">${validation.type}</span>
                         </div>
-                        <div class="card-actions">
+                        <div class="card-actions" style="display: flex; gap: 4px;">
+                            <button
+                                class="btn btn-secondary btn-icon"
+                                onclick="moveValidationUp(${fileId}, ${idx})"
+                                title="Move Up"
+                                ${isFirst ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
+                                <span>⬆️</span>
+                            </button>
+                            <button
+                                class="btn btn-secondary btn-icon"
+                                onclick="moveValidationDown(${fileId}, ${idx})"
+                                title="Move Down"
+                                ${isLast ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
+                                <span>⬇️</span>
+                            </button>
                             <button class="btn btn-secondary btn-icon" onclick="removeValidation(${fileId}, ${idx})" title="Remove">
                                 <span>🗑️</span>
                             </button>
@@ -1968,6 +1993,42 @@
                 renderContent(fileId);
                 updateYAMLPreview();
                 updateFilesNav();
+            }
+        }
+
+        /**
+         * Moves a validation up in the order (decreases index)
+         * @param {number} fileId - The file ID
+         * @param {number} idx - The current validation index
+         */
+        function moveValidationUp(fileId, idx) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && idx > 0) {
+                // Swap with previous item
+                [file.validations[idx - 1], file.validations[idx]] =
+                    [file.validations[idx], file.validations[idx - 1]];
+
+                // Re-render
+                renderContent(fileId);
+                updateYAMLPreview();
+            }
+        }
+
+        /**
+         * Moves a validation down in the order (increases index)
+         * @param {number} fileId - The file ID
+         * @param {number} idx - The current validation index
+         */
+        function moveValidationDown(fileId, idx) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && idx < file.validations.length - 1) {
+                // Swap with next item
+                [file.validations[idx], file.validations[idx + 1]] =
+                    [file.validations[idx + 1], file.validations[idx]];
+
+                // Re-render
+                renderContent(fileId);
+                updateYAMLPreview();
             }
         }
 
