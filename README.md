@@ -448,9 +448,12 @@ open htmlcov/index.html
 ```
 
 **Test Results:**
-- 102 tests passing
+- 115+ tests passing
 - 48% code coverage
 - Unit, integration, and end-to-end tests
+- Comprehensive profiler test suite with 49 tests
+
+**[Complete Testing Guide →](docs/TESTING.md)** - Test organization, writing new tests, CI/CD integration
 
 ---
 
@@ -476,6 +479,7 @@ Contributions welcome! See **[Developer Guide](docs/DEVELOPER_GUIDE.md)** for:
 - [Examples](docs/EXAMPLES.md)
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Developer Guide](docs/DEVELOPER_GUIDE.md)
+- [Testing Guide](docs/TESTING.md) - Comprehensive testing documentation
 
 ### Support
 - [GitHub Issues](https://github.com/danieledge/data-validation-tool/issues)
