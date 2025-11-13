@@ -1128,7 +1128,21 @@
             console.log(`Load Time: ${new Date().toISOString()}`);
             console.log('If you see an old version, clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)');
 
+            // Show job settings and mark nav item as active
             showSection('job');
+            const jobNavItem = document.querySelector('.nav-item[onclick*="job"]');
+            if (jobNavItem) {
+                jobNavItem.classList.add('active');
+            }
+
+            // Show preview panel on desktop by default
+            if (window.innerWidth > 1024) {
+                const previewPanel = document.getElementById('previewPanel');
+                if (previewPanel) {
+                    previewPanel.classList.remove('collapsed');
+                }
+            }
+
             updateYAMLPreview();
         });
 
@@ -1591,8 +1605,17 @@
             }
         }
 
+        /**
+         * Renders an editable validation card with severity selector and parameter inputs
+         * @param {number} fileId - The file ID
+         * @param {object} validation - The validation object
+         * @param {number} idx - The validation index
+         * @returns {string} HTML string for the validation card
+         */
         function renderValidationCard(fileId, validation, idx) {
             const categoryClass = getValidationCategory(validation.type);
+            const params = validation.params || {};
+
             return `
                 <div class="validation-card ${categoryClass}">
                     <div class="card-header">
@@ -1601,17 +1624,192 @@
                             <span class="validation-name">${validation.type}</span>
                         </div>
                         <div class="card-actions">
-                            <span class="severity-label ${validation.severity.toLowerCase()}">${validation.severity}</span>
                             <button class="btn btn-secondary btn-icon" onclick="removeValidation(${fileId}, ${idx})" title="Remove">
                                 <span>🗑️</span>
                             </button>
                         </div>
                     </div>
                     <div class="card-body">
-                        ${getValidationDescription(validation.type)}
+                        <div style="margin-bottom: 16px; color: var(--text-muted); font-size: 13px;">
+                            ${getValidationDescription(validation.type)}
+                        </div>
+
+                        <!-- Severity Selector -->
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500; font-size: 13px;">
+                                Severity
+                            </label>
+                            <select
+                                onchange="updateValidationSeverity(${fileId}, ${idx}, this.value)"
+                                style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                                <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''}>🔴 ERROR - Stop processing</option>
+                                <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''}>🟡 WARNING - Continue processing</option>
+                            </select>
+                        </div>
+
+                        <!-- Parameters Section -->
+                        ${renderValidationParameters(fileId, idx, validation.type, params)}
                     </div>
                 </div>
             `;
+        }
+
+        /**
+         * Renders parameter inputs based on validation type
+         * @param {number} fileId - The file ID
+         * @param {number} validationIdx - The validation index
+         * @param {string} validationType - The validation type
+         * @param {object} params - Current parameters
+         * @returns {string} HTML string for parameter inputs
+         */
+        function renderValidationParameters(fileId, validationIdx, validationType, params) {
+            // Define parameter configurations for each validation type
+            const paramConfigs = {
+                'MandatoryFieldCheck': [
+                    { name: 'fields', label: 'Required Fields', type: 'list', placeholder: 'customer_id, email, name' }
+                ],
+                'RegexCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'email' },
+                    { name: 'pattern', label: 'Regex Pattern', type: 'text', placeholder: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' }
+                ],
+                'ValidValuesCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'status' },
+                    { name: 'valid_values', label: 'Valid Values', type: 'list', placeholder: 'active, inactive, pending' }
+                ],
+                'RangeCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'age' },
+                    { name: 'min', label: 'Minimum Value', type: 'number', placeholder: '0' },
+                    { name: 'max', label: 'Maximum Value', type: 'number', placeholder: '120' }
+                ],
+                'DateFormatCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'created_date' },
+                    { name: 'format', label: 'Date Format', type: 'text', placeholder: '%Y-%m-%d' }
+                ],
+                'StringLengthCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'description' },
+                    { name: 'min_length', label: 'Minimum Length', type: 'number', placeholder: '1' },
+                    { name: 'max_length', label: 'Maximum Length', type: 'number', placeholder: '255' }
+                ],
+                'ColumnPresenceCheck': [
+                    { name: 'required_columns', label: 'Required Columns', type: 'list', placeholder: 'id, name, email' }
+                ],
+                'UniqueKeyCheck': [
+                    { name: 'key_fields', label: 'Key Fields', type: 'list', placeholder: 'customer_id' }
+                ],
+                'RowCountRangeCheck': [
+                    { name: 'min_rows', label: 'Minimum Rows', type: 'number', placeholder: '1' },
+                    { name: 'max_rows', label: 'Maximum Rows', type: 'number', placeholder: '1000000' }
+                ],
+                'DuplicateRowCheck': [
+                    { name: 'subset', label: 'Columns to Check (optional)', type: 'list', placeholder: 'email, phone' }
+                ],
+                'CompletenessCheck': [
+                    { name: 'field', label: 'Field Name', type: 'text', placeholder: 'email' },
+                    { name: 'min_completeness', label: 'Minimum Completeness %', type: 'number', placeholder: '95' }
+                ],
+                'ReferentialIntegrityCheck': [
+                    { name: 'reference_file', label: 'Reference File', type: 'text', placeholder: 'customers.csv' },
+                    { name: 'foreign_key', label: 'Foreign Key Field', type: 'text', placeholder: 'customer_id' },
+                    { name: 'reference_key', label: 'Reference Key Field', type: 'text', placeholder: 'id' }
+                ]
+            };
+
+            const configs = paramConfigs[validationType] || [];
+
+            if (configs.length === 0) {
+                return '<div style="color: var(--text-muted); font-size: 12px; font-style: italic;">No additional parameters required</div>';
+            }
+
+            return `
+                <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 12px; font-size: 13px;">
+                        Parameters
+                    </div>
+                    ${configs.map(config => {
+                        const value = params[config.name] || '';
+                        const displayValue = Array.isArray(value) ? value.join(', ') : value;
+
+                        if (config.type === 'list') {
+                            return `
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 12px;">
+                                        ${config.label}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${displayValue}"
+                                        placeholder="${config.placeholder}"
+                                        onchange="updateValidationParam(${fileId}, ${validationIdx}, '${config.name}', this.value.split(',').map(s => s.trim()).filter(s => s))"
+                                        style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                                    <small style="display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px;">
+                                        Comma-separated values
+                                    </small>
+                                </div>
+                            `;
+                        } else if (config.type === 'number') {
+                            return `
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 12px;">
+                                        ${config.label}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value="${displayValue}"
+                                        placeholder="${config.placeholder}"
+                                        onchange="updateValidationParam(${fileId}, ${validationIdx}, '${config.name}', parseFloat(this.value))"
+                                        style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 12px;">
+                                        ${config.label}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${displayValue}"
+                                        placeholder="${config.placeholder}"
+                                        onchange="updateValidationParam(${fileId}, ${validationIdx}, '${config.name}', this.value)"
+                                        style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                                </div>
+                            `;
+                        }
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        /**
+         * Updates validation severity
+         * @param {number} fileId - The file ID
+         * @param {number} validationIdx - The validation index
+         * @param {string} severity - New severity value
+         */
+        function updateValidationSeverity(fileId, validationIdx, severity) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && file.validations[validationIdx]) {
+                file.validations[validationIdx].severity = severity;
+                updateYAMLPreview();
+            }
+        }
+
+        /**
+         * Updates a validation parameter
+         * @param {number} fileId - The file ID
+         * @param {number} validationIdx - The validation index
+         * @param {string} paramName - Parameter name
+         * @param {any} paramValue - Parameter value
+         */
+        function updateValidationParam(fileId, validationIdx, paramName, paramValue) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && file.validations[validationIdx]) {
+                if (!file.validations[validationIdx].params) {
+                    file.validations[validationIdx].params = {};
+                }
+                file.validations[validationIdx].params[paramName] = paramValue;
+                updateYAMLPreview();
+            }
         }
 
         function getValidationCategory(type) {
@@ -1637,16 +1835,48 @@
             return icons[category] || '✓';
         }
 
+        /**
+         * Gets human-readable description for validation type
+         * @param {string} type - Validation type
+         * @returns {string} Description text
+         */
         function getValidationDescription(type) {
             const descriptions = {
-                'EmptyFileCheck': 'Ensures the file contains data',
-                'RowCountRangeCheck': 'Validates row count within expected range',
-                'ColumnPresenceCheck': 'Checks required columns exist',
-                'MandatoryFieldCheck': 'Ensures required fields are not null',
-                'UniqueKeyCheck': 'Validates unique constraints',
-                'DuplicateRowCheck': 'Detects duplicate rows'
+                // File Validations
+                'EmptyFileCheck': 'Ensures the file contains data and is not empty',
+                'RowCountRangeCheck': 'Validates that row count falls within expected minimum and maximum values',
+                'FileSizeCheck': 'Checks that file size is within acceptable limits',
+
+                // Schema Validations
+                'SchemaMatchCheck': 'Validates that the file schema exactly matches the expected structure',
+                'ColumnPresenceCheck': 'Checks that all required columns are present in the file',
+                'DataTypeCheck': 'Validates that column data types match expected types',
+
+                // Field Validations
+                'MandatoryFieldCheck': 'Ensures that specified required fields are not null or empty',
+                'RegexCheck': 'Validates that field values match a specified regular expression pattern',
+                'ValidValuesCheck': 'Checks that field values are within an allowed list of valid values',
+                'RangeCheck': 'Validates that numeric field values fall within min/max range',
+                'DateFormatCheck': 'Ensures date fields match the specified format (e.g., YYYY-MM-DD)',
+                'StringLengthCheck': 'Validates that string length is within min/max character limits',
+                'CompletenessCheck': 'Ensures a minimum percentage of non-null values in a field',
+
+                // Record Validations
+                'DuplicateRowCheck': 'Detects and reports duplicate rows based on specified columns',
+                'BlankRecordCheck': 'Finds rows that are completely empty across all fields',
+                'UniqueKeyCheck': 'Validates that key fields contain unique values with no duplicates',
+
+                // Cross-File Validations
+                'ReferentialIntegrityCheck': 'Validates foreign key relationships between files',
+                'CrossFileComparisonCheck': 'Compares aggregates or counts between multiple files',
+                'CrossFileDuplicateCheck': 'Finds duplicate records across multiple files',
+
+                // Statistical Validations
+                'StatisticalOutlierCheck': 'Detects values that fall outside expected statistical ranges',
+                'DistributionCheck': 'Validates that data distribution matches expected patterns',
+                'CorrelationCheck': 'Checks correlations between columns meet expected values'
             };
-            return descriptions[type] || 'Validates data quality';
+            return descriptions[type] || 'Validates data quality according to specified rules';
         }
 
         // File Management
