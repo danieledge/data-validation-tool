@@ -68,7 +68,19 @@ class ProfileHTMLReporter:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Profile Report - {profile.file_name}</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Try multiple CDNs for better compatibility -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="loadChartJSFallback()"></script>
+    <script>
+        function loadChartJSFallback() {{
+            var script = document.createElement('script');
+            script.src = 'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js';
+            script.onerror = function() {{
+                console.error('Failed to load Chart.js from all CDNs');
+                document.getElementById('chart-error').style.display = 'block';
+            }};
+            document.head.appendChild(script);
+        }}
+    </script>
     <style>
         * {{
             margin: 0;
@@ -693,6 +705,16 @@ class ProfileHTMLReporter:
         <div id="quality-overview" class="section">
             <h2 class="section-title">📈 Quality Overview</h2>
 
+            <div id="chart-error" style="display: none; background: #2d3748; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #ed8936;">
+                <p style="color: #fed7aa; margin-bottom: 10px;">
+                    <strong>⚠️ Charts Not Loading?</strong>
+                </p>
+                <p style="color: #cbd5e0; font-size: 0.9em;">
+                    For the best experience with interactive charts, please download this HTML file and open it locally in your browser.
+                    Online HTML previews may have restrictions that prevent Chart.js from loading.
+                </p>
+            </div>
+
             <div class="chart-container">
                 <h3 style="color: #cbd5e0; margin-bottom: 15px;">Data Completeness by Column</h3>
                 <div class="chart-wrapper">
@@ -757,9 +779,14 @@ class ProfileHTMLReporter:
     </div>
 
     <script>
-        // Chart.js configuration
-        Chart.defaults.color = '#cbd5e0';
-        Chart.defaults.borderColor = '#4a5568';
+        // Check if Chart.js loaded successfully
+        if (typeof Chart === 'undefined') {{
+            console.error('Chart.js failed to load');
+            document.getElementById('chart-error').style.display = 'block';
+        }} else {{
+            // Chart.js configuration
+            Chart.defaults.color = '#cbd5e0';
+            Chart.defaults.borderColor = '#4a5568';
 
         // Completeness Chart
         const completenessCtx = document.getElementById('completenessChart').getContext('2d');
@@ -862,6 +889,7 @@ class ProfileHTMLReporter:
                 }}, 2000);
             }});
         }}
+        }} // Close Chart.js check
     </script>
 </body>
 </html>'''

@@ -1,6 +1,6 @@
 # Auto-generated validation configuration
 # Generated from profile of: example_data.csv
-# Generated at: 2025-11-13 09:51:45
+# Generated at: 2025-11-13 09:57:58
 
 validation_job:
   name: "Validation for example_data.csv"
