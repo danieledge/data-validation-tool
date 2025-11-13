@@ -24,7 +24,8 @@ pip install -r requirements.txt
 
 # 2. Create configuration
 # Option A: Use the visual config builder (no coding!)
-open docs/config-builder.html
+# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+# Or local: open docs/config-builder.html
 
 # Option B: Create YAML manually
 cat > validation.yaml <<EOF
@@ -54,7 +55,7 @@ python3 -m validation_framework.cli validate validation.yaml --html report.html
 open report.html
 ```
 
-**🎨 NEW: [Visual Config Builder →](docs/config-builder.html)** - Build validation configs with an intuitive web interface!
+**🎨 NEW: [Visual Config Builder →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html)** - Build validation configs with an intuitive web interface!
 
 **New to the framework?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
 
@@ -79,6 +80,21 @@ open report.html
 - 📊 **Well Architected** - Clean separation of concerns, design patterns
 - 🧪 **Fully Tested** - Unit, integration, and end-to-end tests
 - 📖 **Complete Documentation** - Architecture, API reference, examples
+
+---
+
+## 🎨 Visual Config Builder
+
+**NEW!** Build validation configurations with zero coding required.
+
+**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+
+**Features:**
+- Browse 35+ validations by category
+- Configure parameters with guided forms
+- Live YAML preview
+- Download or copy your config
+- No installation needed - runs in browser
 
 ---
 

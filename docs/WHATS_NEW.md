@@ -19,7 +19,10 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 **How to Use:**
 ```bash
-# Open the config builder in your browser
+# Option 1: Online version (no download needed)
+# Visit: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+
+# Option 2: Local version
 open docs/config-builder.html
 
 # Build your validation config visually
@@ -27,6 +30,10 @@ open docs/config-builder.html
 # Run validation
 python3 -m validation_framework.cli validate config.yaml --html report.html
 ```
+
+**Live Demo:**
+- **Interactive Config Builder**: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+- **GitHub Source**: https://github.com/danieledge/data-validation-tool/blob/main/docs/config-builder.html
 
 **Benefits:**
 - ✅ No YAML knowledge required
