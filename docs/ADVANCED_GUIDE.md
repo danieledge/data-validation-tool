@@ -701,65 +701,125 @@ jobs:
           path: results.json
 ```
 
-### Airflow DAG Integration
+### AutoSys Job Integration
 
-```python
-from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
-from datetime import datetime, timedelta
+**AutoSys Job Control Language (JIL) Configuration:**
 
-def check_validation_results(**context):
-    """Check if validation passed."""
-    import json
+```bash
+# Data Validation Job Definition
+insert_job: VALIDATE_CUSTOMER_DATA
+job_type: c
+command: /apps/validation/scripts/validate_and_fail.sh
+machine: prod-etl-01
+owner: etluser
+permission: gx,ge,wx,we
+date_conditions: yes
+days_of_week: mo,tu,we,th,fr
+start_times: "02:00"
+description: "Validate customer data - blocks downstream on failure"
+alarm_if_fail: yes
+max_run_alarm: 30
+std_out_file: /logs/autosys/validate_$AUTO_JOB_NAME.out
+std_err_file: /logs/autosys/validate_$AUTO_JOB_NAME.err
 
-    with open('/path/to/results.json', 'r') as f:
-        results = json.load(f)
-
-    if results['overall_status'] != 'PASSED':
-        raise ValueError(f"Validation failed: {results['total_errors']} errors")
-
-    return results['total_errors']
-
-with DAG(
-    'data_validation_pipeline',
-    default_args={
-        'owner': 'data-team',
-        'retries': 1,
-        'retry_delay': timedelta(minutes=5),
-    },
-    description='Daily data validation',
-    schedule_interval='0 2 * * *',  # 2 AM daily
-    start_date=datetime(2024, 1, 1),
-    catchup=False,
-) as dag:
-
-    # Run validation
-    validate_task = BashOperator(
-        task_id='validate_data',
-        bash_command='''
-        python3 -m validation_framework.cli validate \
-            /path/to/config.yaml \
-            --json /path/to/results.json
-        '''
-    )
-
-    # Check results
-    check_results = PythonOperator(
-        task_id='check_results',
-        python_callable=check_validation_results,
-        provide_context=True,
-    )
-
-    # Send alert if failed
-    alert_task = BashOperator(
-        task_id='send_alert',
-        bash_command='echo "Validation failed!" | mail -s "Data Quality Alert" team@company.com',
-        trigger_rule='one_failed',
-    )
-
-    validate_task >> check_results >> alert_task
+# Downstream Load Job (depends on validation success)
+insert_job: LOAD_CUSTOMER_DATA
+job_type: c
+command: /apps/etl/scripts/load_customer_data.sh
+machine: prod-etl-01
+owner: etluser
+permission: gx,ge,wx,we
+condition: success(VALIDATE_CUSTOMER_DATA)
+description: "Load data - runs only if validation passes"
+alarm_if_fail: yes
+std_out_file: /logs/autosys/load_$AUTO_JOB_NAME.out
+std_err_file: /logs/autosys/load_$AUTO_JOB_NAME.err
 ```
+
+**Validation Script (`validate_and_fail.sh`):**
+
+```bash
+#!/bin/bash
+# AutoSys validation script that fails the job on critical errors
+
+set -euo pipefail
+
+CONFIG="/apps/validation/configs/customer_validation.yaml"
+REPORT_JSON="/reports/validation_$(date +%Y%m%d).json"
+
+echo "[$(date)] Starting validation: $AUTO_JOB_NAME"
+
+# Run validation
+python3 -m validation_framework.cli validate "$CONFIG" \
+    --json "$REPORT_JSON"
+
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "[$(date)] Validation PASSED"
+    exit 0
+elif [ $EXIT_CODE -eq 1 ]; then
+    echo "[$(date)] Validation FAILED - blocking downstream jobs"
+    # Send alert
+    mail -s "AutoSys Validation Failed: $AUTO_JOB_NAME" \
+        data-team@company.com < "$REPORT_JSON"
+    # Fail the AutoSys job
+    exit 1
+else
+    echo "[$(date)] Validation ERROR - command failed"
+    exit 2
+fi
+```
+
+**Complete AutoSys Box Job:**
+
+```bash
+# ETL Pipeline Box with Validation Gate
+insert_job: ETL_PIPELINE_BOX
+job_type: b
+owner: etluser
+description: "Complete ETL pipeline with validation gate"
+
+# Step 1: Extract data
+insert_job: EXTRACT_DATA
+job_type: c
+box_name: ETL_PIPELINE_BOX
+command: /apps/etl/extract.sh
+machine: prod-etl-01
+owner: etluser
+
+# Step 2: Validate data (BLOCKS on failure)
+insert_job: VALIDATE_DATA
+job_type: c
+box_name: ETL_PIPELINE_BOX
+command: /apps/validation/validate_and_fail.sh
+machine: prod-etl-01
+owner: etluser
+condition: success(EXTRACT_DATA)
+alarm_if_fail: yes
+description: "Validation gate - blocks load on failure"
+
+# Step 3: Load data (only runs if validation passes)
+insert_job: LOAD_DATA
+job_type: c
+box_name: ETL_PIPELINE_BOX
+command: /apps/etl/load.sh
+machine: prod-etl-01
+owner: etluser
+condition: success(VALIDATE_DATA)
+description: "Load data - protected by validation gate"
+
+# Step 4: Send notification (runs regardless of load status)
+insert_job: NOTIFY
+job_type: c
+box_name: ETL_PIPELINE_BOX
+command: /apps/etl/notify.sh
+machine: prod-etl-01
+owner: etluser
+condition: done(LOAD_DATA)
+```
+
+See **[Examples Guide](EXAMPLES.md)** for complete AutoSys integration examples with monitoring and alerting.
 
 ### Scheduled Cron Jobs
 
