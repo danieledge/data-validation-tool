@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Validation Config Builder v3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Validation Type Colors */
+            --color-file: #3B82F6;
+            --color-schema: #8B5CF6;
+            --color-field: #10B981;
+            --color-record: #F59E0B;
+            --color-cross-file: #EC4899;
+            --color-statistical: #14B8A6;
+
+            /* Severity Colors */
+            --severity-error: #EF4444;
+            --severity-warning: #F59E0B;
+            --severity-info: #3B82F6;
+
+            /* UI Colors (Dark Theme) */
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --bg-elevated: #475569;
+            --border: #475569;
+            --border-light: #64748B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-base);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .logo-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .collapse-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .collapse-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .search-box {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-field);
+            background: var(--bg-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 8px;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--color-field);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-label {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .nav-badge.error {
+            background: var(--severity-error);
+            color: white;
+        }
+
+        .nav-badge.warning {
+            background: var(--severity-warning);
+            color: white;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ==================== WORKSPACE ==================== */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .workspace-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb {
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .breadcrumb:hover {
+            color: var(--text-primary);
+        }
+
+        .breadcrumb.active {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-field);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .workspace-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* ==================== PREVIEW PANEL ==================== */
+        .preview-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-base);
+        }
+
+        .preview-panel.collapsed {
+            width: 0;
+            border: none;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+
+        .yaml-code {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            color: var(--text-secondary);
+        }
+
+        .preview-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--color-field);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: var(--severity-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ==================== CARDS ==================== */
+        .validation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .validation-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .validation-card:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .validation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-color, var(--color-field));
+        }
+
+        .validation-card.file-check {
+            --card-color: var(--color-file);
+        }
+
+        .validation-card.schema-check {
+            --card-color: var(--color-schema);
+        }
+
+        .validation-card.field-check {
+            --card-color: var(--color-field);
+        }
+
+        .validation-card.record-check {
+            --card-color: var(--color-record);
+        }
+
+        .validation-card.cross-file-check {
+            --card-color: var(--color-cross-file);
+        }
+
+        .validation-card.statistical-check {
+            --card-color: var(--color-statistical);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .validation-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .validation-icon {
+            font-size: 20px;
+        }
+
+        .validation-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .severity-label {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .severity-label.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--severity-error);
+        }
+
+        .severity-label.warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--severity-warning);
+        }
+
+        .card-body {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .add-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-muted);
+        }
+
+        .add-card:hover {
+            border-color: var(--color-field);
+            color: var(--color-field);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .add-card-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .add-card-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .preview-panel {
+                position: fixed;
+                right: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .preview-panel.collapsed {
+                transform: translateX(100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 900;
+                transform: translateX(0);
+                transition: transform var(--transition-base);
+            }
+
+            .sidebar.mobile-hidden {
+                transform: translateX(-100%);
+            }
+
+            .workspace-header {
+                padding: 12px 16px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .workspace-content {
+                padding: 16px;
+            }
+
+            .validation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚙️</span>
+                    <span>Config Builder</span>
+                </div>
+                <button class="collapse-btn" onclick="toggleSidebar()">
+                    ◀
+                </button>
+            </div>
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search... (⌘K)"
+                    id="searchInput"
+                    onkeyup="handleSearch(event)">
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active" onclick="showSection('job')">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Job Settings</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Configuration</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('settings')">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Advanced Settings</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Files</span>
+                        <span class="nav-badge" id="filesCount">0</span>
+                    </div>
+                    <div id="filesNav">
+                        <!-- Dynamic file items -->
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Actions</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('summary')">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Summary</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-primary btn-full" onclick="downloadConfig()">
+                    <span class="icon">📥</span>
+                    <span>Download</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <div class="workspace-header">
+                <div class="breadcrumbs">
+                    <span class="breadcrumb active" id="breadcrumb">Job Settings</span>
+                </div>
+                <div class="page-header">
+                    <div class="title-section">
+                        <h1 class="page-title" id="pageTitle">Job Settings</h1>
+                        <span class="status-badge success" id="statusBadge">Ready</span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-icon" onclick="togglePreview()" title="Toggle Preview">
+                            <span>👁️</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workspace-content" id="workspaceContent">
+                <!-- Dynamic content -->
+            </div>
+        </main>
+
+        <!-- YAML Preview Panel -->
+        <aside class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3 class="preview-title">YAML Preview</h3>
+                <button class="btn btn-secondary btn-icon" onclick="togglePreview()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="preview-body">
+                <pre class="yaml-code" id="yamlPreview"># Your configuration will appear here</pre>
+            </div>
+            <div class="preview-footer">
+                <button class="btn btn-secondary btn-full" onclick="copyYAML()">
+                    <span class="icon">📋</span>
+                    Copy
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            currentSection: 'job',
+            jobName: 'Data Validation Job',
+            files: [],
+            settings: {
+                chunk_size: 10000,
+                max_sample_failures: 100,
+                fail_fast: false,
+                log_level: 'INFO'
+            },
+            fileCounter: 0
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('job');
+            updateYAMLPreview();
+        });
+
+        // Navigation
+        function showSection(section) {
+            state.currentSection = section;
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event?.currentTarget?.classList.add('active');
+
+            // Update breadcrumb and title
+            const titles = {
+                'job': 'Job Settings',
+                'settings': 'Advanced Settings',
+                'summary': 'Summary'
+            };
+
+            const title = titles[section] || section;
+            document.getElementById('breadcrumb').textContent = title;
+            document.getElementById('pageTitle').textContent = title;
+
+            // Render content
+            renderContent(section);
+            updateYAMLPreview();
+        }
+
+        function renderContent(section) {
+            const content = document.getElementById('workspaceContent');
+
+            if (section === 'job') {
+                content.innerHTML = `
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                Job Name
+                            </label>
+                            <input
+                                type="text"
+                                value="${state.jobName}"
+                                onchange="state.jobName = this.value; updateYAMLPreview();"
+                                style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                            <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                A descriptive name for this validation job
+                            </small>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="addFile()" style="margin-top: 24px;">
+                            <span class="icon">➕</span>
+                            Add Your First File
+                        </button>
+                    </div>
+                `;
+            }  else if (section === 'settings') {
+                content.innerHTML = `
+                    <div style="max-width: 600px;">
+                        <div style="display: grid; gap: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                    Chunk Size
+                                </label>
+                                <input
+                                    type="number"
+                                    value="${state.settings.chunk_size}"
+                                    onchange="state.settings.chunk_size = parseInt(this.value); updateYAMLPreview();"
+                                    style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                    Number of rows to process at a time
+                                </small>
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                    Log Level
+                                </label>
+                                <select
+                                    onchange="state.settings.log_level = this.value; updateYAMLPreview();"
+                                    style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                    <option ${state.settings.log_level === 'DEBUG' ? 'selected' : ''}>DEBUG</option>
+                                    <option ${state.settings.log_level === 'INFO' ? 'selected' : ''}>INFO</option>
+                                    <option ${state.settings.log_level === 'WARNING' ? 'selected' : ''}>WARNING</option>
+                                    <option ${state.settings.log_level === 'ERROR' ? 'selected' : ''}>ERROR</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                    <input
+                                        type="checkbox"
+                                        ${state.settings.fail_fast ? 'checked' : ''}
+                                        onchange="state.settings.fail_fast = this.checked; updateYAMLPreview();"
+                                        style="width: 18px; height: 18px;">
+                                    <span style="color: var(--text-primary); font-weight: 500;">Fail Fast</span>
+                                </label>
+                                <small style="display: block; margin-top: 6px; margin-left: 28px; color: var(--text-muted); font-size: 13px;">
+                                    Stop validation on first error
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section === 'summary') {
+                const totalValidations = state.files.reduce((sum, f) => sum + f.validations.length, 0);
+                const errorCount = state.files.reduce((sum, f) =>
+                    sum + f.validations.filter(v => v.severity === 'ERROR').length, 0);
+                const warningCount = state.files.reduce((sum, f) =>
+                    sum + f.validations.filter(v => v.severity === 'WARNING').length, 0);
+
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                                ${state.files.length}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Files</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                                ${totalValidations}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Validations</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-error); margin-bottom: 4px;">
+                                ${errorCount}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Errors</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-warning); margin-bottom: 4px;">
+                                ${warningCount}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Warnings</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border);">
+                        <h3 style="color: var(--text-primary); margin-bottom: 16px;">Configuration Summary</h3>
+                        <div style="display: grid; gap: 12px; font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Job Name:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.jobName}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Chunk Size:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.chunk_size}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Log Level:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.log_level}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Fail Fast:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.fail_fast ? 'Yes' : 'No'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // File view
+                const fileId = parseInt(section);
+                const file = state.files.find(f => f.id === fileId);
+                if (!file) return;
+
+                content.innerHTML = `
+                    <div style="max-width: 800px;">
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                            <div style="display: grid; gap: 16px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        File Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${file.name}"
+                                        onchange="updateFile(${fileId}, 'name', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        File Path
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${file.path}"
+                                        onchange="updateFile(${fileId}, 'path', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        Format
+                                    </label>
+                                    <select
+                                        onchange="updateFile(${fileId}, 'format', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                        <option ${file.format === 'csv' ? 'selected' : ''}>csv</option>
+                                        <option ${file.format === 'excel' ? 'selected' : ''}>excel</option>
+                                        <option ${file.format === 'json' ? 'selected' : ''}>json</option>
+                                        <option ${file.format === 'parquet' ? 'selected' : ''}>parquet</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="color: var(--text-primary); font-size: 18px;">Validations</h3>
+                            <button class="btn btn-primary" onclick="addValidation(${fileId})">
+                                <span class="icon">➕</span>
+                                Add Validation
+                            </button>
+                        </div>
+
+                        <div class="validation-grid">
+                            ${file.validations.map((v, idx) => renderValidationCard(fileId, v, idx)).join('')}
+                            ${file.validations.length === 0 ? `
+                                <div class="add-card" onclick="addValidation(${fileId})">
+                                    <div class="add-card-icon">➕</div>
+                                    <div class="add-card-text">Add your first validation</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderValidationCard(fileId, validation, idx) {
+            const categoryClass = getValidationCategory(validation.type);
+            return `
+                <div class="validation-card ${categoryClass}">
+                    <div class="card-header">
+                        <div class="validation-info">
+                            <span class="validation-icon">${getValidationIcon(validation.type)}</span>
+                            <span class="validation-name">${validation.type}</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="severity-label ${validation.severity.toLowerCase()}">${validation.severity}</span>
+                            <button class="btn btn-secondary btn-icon" onclick="removeValidation(${fileId}, ${idx})" title="Remove">
+                                <span>🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        ${getValidationDescription(validation.type)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getValidationCategory(type) {
+            if (type.includes('File')) return 'file-check';
+            if (type.includes('Schema') || type.includes('Column')) return 'schema-check';
+            if (type.includes('Field') || type.includes('Mandatory') || type.includes('Regex') || type.includes('Range') || type.includes('Date')) return 'field-check';
+            if (type.includes('Duplicate') || type.includes('Blank') || type.includes('Unique')) return 'record-check';
+            if (type.includes('Referential') || type.includes('CrossFile')) return 'cross-file-check';
+            if (type.includes('Statistical') || type.includes('Outlier')) return 'statistical-check';
+            return 'field-check';
+        }
+
+        function getValidationIcon(type) {
+            const category = getValidationCategory(type);
+            const icons = {
+                'file-check': '📦',
+                'schema-check': '🔍',
+                'field-check': '✓',
+                'record-check': '📊',
+                'cross-file-check': '🔗',
+                'statistical-check': '📈'
+            };
+            return icons[category] || '✓';
+        }
+
+        function getValidationDescription(type) {
+            const descriptions = {
+                'EmptyFileCheck': 'Ensures the file contains data',
+                'RowCountRangeCheck': 'Validates row count within expected range',
+                'ColumnPresenceCheck': 'Checks required columns exist',
+                'MandatoryFieldCheck': 'Ensures required fields are not null',
+                'UniqueKeyCheck': 'Validates unique constraints',
+                'DuplicateRowCheck': 'Detects duplicate rows'
+            };
+            return descriptions[type] || 'Validates data quality';
+        }
+
+        // File Management
+        function addFile() {
+            const fileId = state.fileCounter++;
+            state.files.push({
+                id: fileId,
+                name: `file_${fileId}`,
+                path: 'data.csv',
+                format: 'csv',
+                validations: []
+            });
+            updateFilesNav();
+            showSection(fileId);
+            updateYAMLPreview();
+        }
+
+        function updateFile(fileId, field, value) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file) {
+                file[field] = value;
+                updateFilesNav();
+                updateYAMLPreview();
+            }
+        }
+
+        function updateFilesNav() {
+            const nav = document.getElementById('filesNav');
+            nav.innerHTML = state.files.map(file => `
+                <div class="nav-item ${state.currentSection === file.id ? 'active' : ''}" onclick="showSection(${file.id})">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-label">${file.name}</span>
+                    ${file.validations.length > 0 ? `<span class="nav-badge">${file.validations.length}</span>` : ''}
+                </div>
+            `).join('');
+            document.getElementById('filesCount').textContent = state.files.length;
+        }
+
+        function addValidation(fileId) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file) {
+                file.validations.push({
+                    type: 'EmptyFileCheck',
+                    severity: 'ERROR',
+                    params: {}
+                });
+                renderContent(fileId);
+                updateYAMLPreview();
+                updateFilesNav();
+            }
+        }
+
+        function removeValidation(fileId, idx) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && confirm('Remove this validation?')) {
+                file.validations.splice(idx, 1);
+                renderContent(fileId);
+                updateYAMLPreview();
+                updateFilesNav();
+            }
+        }
+
+        // YAML Generation
+        function updateYAMLPreview() {
+            const yaml = generateYAML();
+            document.getElementById('yamlPreview').textContent = yaml;
+        }
+
+        function generateYAML() {
+            let yaml = `validation_job:
+  name: "${state.jobName}"
+
+settings:
+  chunk_size: ${state.settings.chunk_size}
+  max_sample_failures: ${state.settings.max_sample_failures}
+  fail_fast: ${state.settings.fail_fast}
+  log_level: ${state.settings.log_level}
+
+files:
+`;
+            if (state.files.length === 0) {
+                yaml += '  []';
+            } else {
+                state.files.forEach(file => {
+                    yaml += `  - name: "${file.name}"
+    path: "${file.path}"
+    format: "${file.format}"
+    validations:
+`;
+                    if (file.validations.length === 0) {
+                        yaml += '      []\n';
+                    } else {
+                        file.validations.forEach(v => {
+                            yaml += `      - type: "${v.type}"
+        severity: "${v.severity}"
+        params: {}
+`;
+                        });
+                    }
+                });
+            }
+            return yaml;
+        }
+
+        // UI Controls
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function togglePreview() {
+            document.getElementById('previewPanel').classList.toggle('collapsed');
+        }
+
+        function copyYAML() {
+            const yaml = document.getElementById('yamlPreview').textContent;
+            navigator.clipboard.writeText(yaml).then(() => {
+                alert('YAML copied to clipboard!');
+            });
+        }
+
+        function downloadConfig() {
+            const yaml = generateYAML();
+            const blob = new Blob([yaml], { type: 'text/yaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'validation_config.yaml';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function handleSearch(event) {
+            // TODO: Implement search functionality
+            console.log('Search:', event.target.value);
+        }
+    </script>
+</body>
+</html>
