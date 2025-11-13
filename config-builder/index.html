@@ -11,7 +11,12 @@
 
     <!-- Version: 2.3.0 - Build: 2025-01-13 -->
 
-    <title>Data Validation Config Builder v3</title>
+    <!-- Material Design 3 - Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+
+    <title>Data Validation Config Builder</title>
     <style>
         * {
             margin: 0;
@@ -20,46 +25,175 @@
         }
 
         :root {
-            /* Validation Type Colors */
-            --color-file: #3B82F6;
-            --color-schema: #8B5CF6;
-            --color-field: #10B981;
-            --color-record: #F59E0B;
-            --color-cross-file: #EC4899;
-            --color-statistical: #14B8A6;
+            /* Material Design 3 - Color Tokens (Dark Theme) */
+            --md-sys-color-primary: #A8C7FA;
+            --md-sys-color-on-primary: #003258;
+            --md-sys-color-primary-container: #004A77;
+            --md-sys-color-on-primary-container: #D3E4FF;
 
-            /* Severity Colors */
-            --severity-error: #EF4444;
-            --severity-warning: #F59E0B;
-            --severity-info: #3B82F6;
+            --md-sys-color-secondary: #B8C8DA;
+            --md-sys-color-on-secondary: #23323F;
+            --md-sys-color-secondary-container: #394857;
+            --md-sys-color-on-secondary-container: #D3E4F7;
 
-            /* UI Colors (Dark Theme) */
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-tertiary: #334155;
-            --bg-elevated: #475569;
-            --border: #475569;
-            --border-light: #64748B;
-            --text-primary: #F1F5F9;
-            --text-secondary: #CBD5E1;
-            --text-muted: #94A3B8;
+            --md-sys-color-tertiary: #D6BBE4;
+            --md-sys-color-on-tertiary: #3B2948;
+            --md-sys-color-tertiary-container: #523F5F;
+            --md-sys-color-on-tertiary-container: #F3DBFF;
 
-            /* Shadows */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --md-sys-color-error: #FFB4AB;
+            --md-sys-color-on-error: #690005;
+            --md-sys-color-error-container: #93000A;
+            --md-sys-color-on-error-container: #FFDAD6;
 
-            /* Transitions */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --md-sys-color-surface: #1A1C1E;
+            --md-sys-color-on-surface: #E2E2E6;
+            --md-sys-color-surface-variant: #42474E;
+            --md-sys-color-on-surface-variant: #C2C7CF;
+
+            --md-sys-color-outline: #8C9199;
+            --md-sys-color-outline-variant: #42474E;
+
+            --md-sys-color-surface-container-lowest: #0F1113;
+            --md-sys-color-surface-container-low: #1A1C1E;
+            --md-sys-color-surface-container: #1E2022;
+            --md-sys-color-surface-container-high: #282A2D;
+            --md-sys-color-surface-container-highest: #333538;
+
+            /* Validation Type Colors (Material Design 3 compatible) */
+            --color-file: #78B9FF;
+            --color-schema: #B8A7FF;
+            --color-field: #6DD58C;
+            --color-record: #FFB951;
+            --color-cross-file: #FFB1C8;
+            --color-statistical: #6FE9D7;
+
+            /* Material Design 3 - Elevation */
+            --md-sys-elevation-0: none;
+            --md-sys-elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --md-sys-elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --md-sys-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+            --md-sys-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px 0px rgba(0, 0, 0, 0.3);
+            --md-sys-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+
+            /* Material Design 3 - State Layers */
+            --md-sys-state-hover-opacity: 0.08;
+            --md-sys-state-focus-opacity: 0.12;
+            --md-sys-state-pressed-opacity: 0.12;
+
+            /* Material Design 3 - Shape (Rounded Corners) */
+            --md-sys-shape-corner-none: 0px;
+            --md-sys-shape-corner-extra-small: 4px;
+            --md-sys-shape-corner-small: 8px;
+            --md-sys-shape-corner-medium: 12px;
+            --md-sys-shape-corner-large: 16px;
+            --md-sys-shape-corner-extra-large: 28px;
+            --md-sys-shape-corner-full: 9999px;
+
+            /* Transitions (Material Design 3 Motion) */
+            --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+            --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+            --md-sys-motion-duration-short: 200ms;
+            --md-sys-motion-duration-medium: 300ms;
+            --md-sys-motion-duration-long: 400ms;
+
+            /* Material Design 3 - Typography Scale */
+            --md-sys-typescale-display-large-font: Roboto;
+            --md-sys-typescale-display-large-size: 57px;
+            --md-sys-typescale-display-large-weight: 400;
+            --md-sys-typescale-display-large-line-height: 64px;
+
+            --md-sys-typescale-headline-large-font: Roboto;
+            --md-sys-typescale-headline-large-size: 32px;
+            --md-sys-typescale-headline-large-weight: 400;
+            --md-sys-typescale-headline-large-line-height: 40px;
+
+            --md-sys-typescale-headline-medium-font: Roboto;
+            --md-sys-typescale-headline-medium-size: 28px;
+            --md-sys-typescale-headline-medium-weight: 400;
+            --md-sys-typescale-headline-medium-line-height: 36px;
+
+            --md-sys-typescale-headline-small-font: Roboto;
+            --md-sys-typescale-headline-small-size: 24px;
+            --md-sys-typescale-headline-small-weight: 400;
+            --md-sys-typescale-headline-small-line-height: 32px;
+
+            --md-sys-typescale-title-large-font: Roboto;
+            --md-sys-typescale-title-large-size: 22px;
+            --md-sys-typescale-title-large-weight: 400;
+            --md-sys-typescale-title-large-line-height: 28px;
+
+            --md-sys-typescale-title-medium-font: Roboto;
+            --md-sys-typescale-title-medium-size: 16px;
+            --md-sys-typescale-title-medium-weight: 500;
+            --md-sys-typescale-title-medium-line-height: 24px;
+
+            --md-sys-typescale-title-small-font: Roboto;
+            --md-sys-typescale-title-small-size: 14px;
+            --md-sys-typescale-title-small-weight: 500;
+            --md-sys-typescale-title-small-line-height: 20px;
+
+            --md-sys-typescale-body-large-font: Roboto;
+            --md-sys-typescale-body-large-size: 16px;
+            --md-sys-typescale-body-large-weight: 400;
+            --md-sys-typescale-body-large-line-height: 24px;
+
+            --md-sys-typescale-body-medium-font: Roboto;
+            --md-sys-typescale-body-medium-size: 14px;
+            --md-sys-typescale-body-medium-weight: 400;
+            --md-sys-typescale-body-medium-line-height: 20px;
+
+            --md-sys-typescale-body-small-font: Roboto;
+            --md-sys-typescale-body-small-size: 12px;
+            --md-sys-typescale-body-small-weight: 400;
+            --md-sys-typescale-body-small-line-height: 16px;
+
+            --md-sys-typescale-label-large-font: Roboto;
+            --md-sys-typescale-label-large-size: 14px;
+            --md-sys-typescale-label-large-weight: 500;
+            --md-sys-typescale-label-large-line-height: 20px;
+
+            --md-sys-typescale-label-medium-font: Roboto;
+            --md-sys-typescale-label-medium-size: 12px;
+            --md-sys-typescale-label-medium-weight: 500;
+            --md-sys-typescale-label-medium-line-height: 16px;
+
+            --md-sys-typescale-label-small-font: Roboto;
+            --md-sys-typescale-label-small-size: 11px;
+            --md-sys-typescale-label-small-weight: 500;
+            --md-sys-typescale-label-small-line-height: 16px;
+
+            /* Legacy compatibility mappings */
+            --bg-primary: var(--md-sys-color-surface);
+            --bg-secondary: var(--md-sys-color-surface-container);
+            --bg-tertiary: var(--md-sys-color-surface-container-high);
+            --bg-elevated: var(--md-sys-color-surface-container-highest);
+            --border: var(--md-sys-color-outline-variant);
+            --border-light: var(--md-sys-color-outline);
+            --text-primary: var(--md-sys-color-on-surface);
+            --text-secondary: var(--md-sys-color-on-surface-variant);
+            --text-muted: var(--md-sys-color-outline);
+            --severity-error: var(--md-sys-color-error);
+            --severity-warning: var(--color-record);
+            --severity-info: var(--md-sys-color-primary);
+            --shadow-sm: var(--md-sys-elevation-1);
+            --shadow-md: var(--md-sys-elevation-2);
+            --shadow-lg: var(--md-sys-elevation-3);
+            --transition-fast: var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+            --transition-base: var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-standard);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-secondary);
+            font-family: var(--md-sys-typescale-body-large-font), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: var(--md-sys-typescale-body-medium-size);
+            font-weight: var(--md-sys-typescale-body-medium-weight);
+            line-height: var(--md-sys-typescale-body-medium-line-height);
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface-variant);
             overflow: hidden;
             height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Main Layout */
@@ -390,56 +524,84 @@
             gap: 8px;
         }
 
-        /* ==================== BUTTONS ==================== */
+        /* ==================== BUTTONS (Material Design 3) ==================== */
         .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            position: relative;
+            padding: 10px 24px;
+            border-radius: var(--md-sys-shape-corner-full);
+            font-family: var(--md-sys-typescale-label-large-font);
+            font-size: var(--md-sys-typescale-label-large-size);
+            font-weight: var(--md-sys-typescale-label-large-weight);
+            line-height: var(--md-sys-typescale-label-large-line-height);
             cursor: pointer;
             border: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            transition: all var(--transition-fast);
+            transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
             white-space: nowrap;
+            overflow: hidden;
+            text-transform: none;
+            letter-spacing: 0.1px;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn:hover::before {
+            opacity: var(--md-sys-state-hover-opacity);
         }
 
+        .btn:focus::before {
+            opacity: var(--md-sys-state-focus-opacity);
+        }
+
+        .btn:active::before {
+            opacity: var(--md-sys-state-pressed-opacity);
+        }
+
+        /* Filled Button (Primary) */
         .btn-primary {
-            background: var(--color-field);
-            color: white;
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            box-shadow: var(--md-sys-elevation-0);
         }
 
         .btn-primary:hover {
-            background: #059669;
+            box-shadow: var(--md-sys-elevation-1);
         }
 
+        /* Tonal Button (Secondary) */
         .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
+            background: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            box-shadow: var(--md-sys-elevation-0);
         }
 
         .btn-secondary:hover {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
+            box-shadow: var(--md-sys-elevation-1);
         }
 
+        /* Error Button (Danger) */
         .btn-danger {
-            background: var(--severity-error);
-            color: white;
+            background: var(--md-sys-color-error-container);
+            color: var(--md-sys-color-on-error-container);
+            box-shadow: var(--md-sys-elevation-0);
         }
 
         .btn-danger:hover {
-            background: #DC2626;
+            box-shadow: var(--md-sys-elevation-1);
         }
 
         .btn-icon {
@@ -456,7 +618,7 @@
             justify-content: center;
         }
 
-        /* ==================== CARDS ==================== */
+        /* ==================== CARDS (Material Design 3) ==================== */
         .validation-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -465,19 +627,22 @@
         }
 
         .validation-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: var(--md-sys-color-surface-container);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: var(--md-sys-shape-corner-medium);
             padding: 16px;
-            transition: all var(--transition-fast);
+            transition: background-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard),
+                        border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--md-sys-elevation-0);
         }
 
         .validation-card:hover {
-            border-color: var(--border-light);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            background: var(--md-sys-color-surface-container-high);
+            border-color: var(--md-sys-color-outline);
+            box-shadow: var(--md-sys-elevation-1);
         }
 
         .validation-card::before {
@@ -488,6 +653,7 @@
             width: 4px;
             height: 100%;
             background: var(--card-color, var(--color-field));
+            border-radius: var(--md-sys-shape-corner-small) 0 0 var(--md-sys-shape-corner-small);
         }
 
         .validation-card.file-check {
