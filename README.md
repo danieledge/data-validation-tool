@@ -115,11 +115,12 @@ See the profiler in action with these interactive example reports:
 ## 📚 Documentation
 
 ### Getting Started
-- **🎉 [What's New](docs/WHATS_NEW.md)** - Latest features and changes (v2.0.0)
+- **🎉 [What's New](docs/WHATS_NEW.md)** - Latest features and changes (v2.1.0)
 - **[Quick Start (5 minutes)](docs/GETTING_STARTED.md)** - Installation to first validation
 - **[User Guide](docs/USER_GUIDE.md)** - Complete configuration reference
-- **[Validation Catalog](docs/VALIDATION_CATALOG.md)** - All 23 validation types documented
+- **[Validation Catalog](docs/VALIDATION_CATALOG.md)** - All 35+ validation types documented
 - **[Data Profiling Guide](docs/DATA_PROFILING.md)** - Analyze data before validation
+- **⭐ [Best Practices](docs/BEST_PRACTICES.md)** - ERROR vs WARNING, essential validations, production tips
 
 ### Advanced Usage
 - **[Advanced Guide](docs/ADVANCED_GUIDE.md)** - Complex scenarios, performance tuning
