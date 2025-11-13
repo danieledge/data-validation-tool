@@ -727,6 +727,7 @@
             .header-content {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 15px;
             }
 
             .header-left h1 {
@@ -735,11 +736,22 @@
 
             .header-actions {
                 width: 100%;
+                flex-direction: column;
+                gap: 8px;
             }
 
             .btn {
-                flex: 1;
+                width: 100%;
                 justify-content: center;
+                min-height: 44px;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .btn-small {
+                min-height: 36px;
+                padding: 8px 12px;
+                font-size: 0.9em;
             }
 
             .mobile-tabs {
@@ -761,6 +773,7 @@
 
             .category-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
 
             .validation-options {
@@ -777,6 +790,27 @@
 
             .shortcuts-hint {
                 display: none;
+            }
+
+            /* Better mobile form inputs */
+            input[type="text"],
+            input[type="number"],
+            select,
+            textarea {
+                font-size: 16px !important; /* Prevent iOS zoom */
+                min-height: 44px;
+            }
+
+            /* Validation item header on mobile */
+            .validation-item-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+
+            .validation-item-header > div:last-child {
+                width: 100%;
+                justify-content: space-between;
             }
         }
 
@@ -1107,9 +1141,92 @@
         // Templates
         const templates = [
             {
-                name: "Basic Quality",
-                icon: "📦",
-                description: "Essential validations for any dataset",
+                name: "Blank",
+                icon: "📄",
+                description: "Start from scratch with no validations",
+                files: 0,
+                validations: 0,
+                config: {
+                    files: []
+                }
+            },
+            {
+                name: "Single File - Basic",
+                icon: "📋",
+                description: "File-level checks only",
+                files: 1,
+                validations: 3,
+                config: {
+                    files: [{
+                        name: "data",
+                        path: "data.csv",
+                        format: "csv",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } },
+                            { type: "FileSizeCheck", severity: "WARNING", params: { min_size_mb: 0.001 } }
+                        ]
+                    }]
+                }
+            },
+            {
+                name: "Single File - Complete",
+                icon: "✅",
+                description: "File, schema, field, and record checks",
+                files: 1,
+                validations: 7,
+                config: {
+                    files: [{
+                        name: "data",
+                        path: "data.csv",
+                        format: "csv",
+                        validations: [
+                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } },
+                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id"] } },
+                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
+                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
+                            { type: "DuplicateRowCheck", severity: "WARNING", params: {} },
+                            { type: "BlankRecordCheck", severity: "WARNING", params: {} }
+                        ]
+                    }]
+                }
+            },
+            {
+                name: "Multiple Files",
+                icon: "📚",
+                description: "Two files with cross-file validation",
+                files: 2,
+                validations: 9,
+                config: {
+                    files: [
+                        {
+                            name: "primary",
+                            path: "primary_data.csv",
+                            format: "csv",
+                            validations: [
+                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
+                                { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } }
+                            ]
+                        },
+                        {
+                            name: "secondary",
+                            path: "secondary_data.csv",
+                            format: "csv",
+                            validations: [
+                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
+                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "primary_id"] } },
+                                { type: "ReferentialIntegrityCheck", severity: "ERROR", params: { foreign_key: "primary_id", reference_file: "primary_data.csv", reference_key: "id" } }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                name: "Schema Validation",
+                icon: "🔍",
+                description: "Focus on schema and data type checks",
                 files: 1,
                 validations: 5,
                 config: {
@@ -1119,117 +1236,10 @@
                         format: "csv",
                         validations: [
                             { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id"] } },
-                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
-                            { type: "DuplicateRowCheck", severity: "WARNING", params: {} },
-                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } }
-                        ]
-                    }]
-                }
-            },
-            {
-                name: "E-Commerce Orders",
-                icon: "🛒",
-                description: "Customer orders with referential integrity",
-                files: 2,
-                validations: 12,
-                config: {
-                    files: [
-                        {
-                            name: "customers",
-                            path: "customers.csv",
-                            format: "csv",
-                            validations: [
-                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "email"] } },
-                                { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
-                                { type: "RegexCheck", severity: "ERROR", params: { field: "email", pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$" } }
-                            ]
-                        },
-                        {
-                            name: "orders",
-                            path: "orders.csv",
-                            format: "csv",
-                            validations: [
-                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["order_id", "customer_id", "amount"] } },
-                                { type: "ReferentialIntegrityCheck", severity: "ERROR", params: { foreign_key: "customer_id", reference_file: "customers.csv", reference_key: "id" } },
-                                { type: "RangeCheck", severity: "ERROR", params: { field: "amount", min_value: 0 } },
-                                { type: "DateFormatCheck", severity: "ERROR", params: { field: "order_date", format: "%Y-%m-%d" } }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                name: "Financial Transactions",
-                icon: "💰",
-                description: "Banking/financial data with precision checks",
-                files: 1,
-                validations: 8,
-                config: {
-                    files: [{
-                        name: "transactions",
-                        path: "transactions.csv",
-                        format: "csv",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["transaction_id", "account_id", "amount", "date"] } },
-                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["transaction_id"] } },
-                            { type: "NumericPrecisionCheck", severity: "ERROR", params: { field: "amount", max_decimals: 2 } },
-                            { type: "RangeCheck", severity: "WARNING", params: { field: "amount", min_value: -1000000, max_value: 1000000 } },
+                            { type: "SchemaMatchCheck", severity: "ERROR", params: { expected_columns: ["id", "name", "value", "date"] } },
+                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id", "name"] } },
                             { type: "DateFormatCheck", severity: "ERROR", params: { field: "date", format: "%Y-%m-%d" } },
-                            { type: "DuplicateRowCheck", severity: "ERROR", params: { subset: ["transaction_id"] } }
-                        ]
-                    }]
-                }
-            },
-            {
-                name: "Customer Data (CRM)",
-                icon: "👥",
-                description: "Customer relationship management data",
-                files: 1,
-                validations: 10,
-                config: {
-                    files: [{
-                        name: "customers",
-                        path: "customers.csv",
-                        format: "csv",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "email", "first_name", "last_name"] } },
-                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
-                            { type: "RegexCheck", severity: "ERROR", params: { field: "email", pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$" } },
-                            { type: "RegexCheck", severity: "WARNING", params: { field: "phone", pattern: "^\\+?[0-9]{10,15}$" } },
-                            { type: "ValidValuesCheck", severity: "ERROR", params: { field: "status", valid_values: ["active", "inactive", "pending"] } },
-                            { type: "StringLengthCheck", severity: "WARNING", params: { field: "first_name", max_length: 50 } },
-                            { type: "StringLengthCheck", severity: "WARNING", params: { field: "last_name", max_length: 50 } }
-                        ]
-                    }]
-                }
-            },
-            {
-                name: "Data Warehouse Load",
-                icon: "🏢",
-                description: "Production-grade ETL validations",
-                files: 1,
-                validations: 15,
-                config: {
-                    files: [{
-                        name: "fact_table",
-                        path: "fact_data.parquet",
-                        format: "parquet",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "FileSizeCheck", severity: "WARNING", params: { min_size_mb: 0.1, max_size_mb: 10000 } },
-                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1000 } },
-                            { type: "SchemaMatchCheck", severity: "ERROR", params: { expected_columns: ["id", "date", "metric1", "metric2"] } },
-                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "date"] } },
-                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id", "date"] } },
-                            { type: "DateFormatCheck", severity: "ERROR", params: { field: "date", format: "%Y-%m-%d" } },
-                            { type: "DuplicateRowCheck", severity: "ERROR", params: {} },
-                            { type: "StatisticalOutlierCheck", severity: "WARNING", params: { field: "metric1", method: "iqr" } },
-                            { type: "CompletenessCheck", severity: "WARNING", params: { field: "metric2", min_completeness_pct: 95 } }
+                            { type: "DataTypeCheck", severity: "ERROR", params: { field: "value", expected_type: "numeric" } }
                         ]
                     }]
                 }
@@ -1583,12 +1593,15 @@
                 <div class="validation-item">
                     <div class="validation-item-header">
                         <div class="validation-type">${validation.type}</div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <select onchange="updateValidationSeverity(${fileId}, ${index}, this.value)"
-                                    style="padding: 6px 12px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 6px;">
-                                <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''}>ERROR</option>
-                                <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''}>WARNING</option>
-                            </select>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 0.8em; color: var(--text-muted);">Severity:</span>
+                                <select onchange="updateValidationSeverity(${fileId}, ${index}, this.value)"
+                                        style="padding: 4px 8px; background: var(--bg-dark); border: 1px solid var(--border); color: ${validation.severity === 'ERROR' ? '#feb2b2' : '#fbd38d'}; border-radius: 6px; font-weight: 600; font-size: 0.85em;">
+                                    <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''} style="color: #feb2b2;">🔴 ERROR</option>
+                                    <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''} style="color: #fbd38d;">🟡 WARNING</option>
+                                </select>
+                            </div>
                             <button class="btn btn-small btn-danger" onclick="removeValidation(${fileId}, ${index})">
                                 ✕
                             </button>
