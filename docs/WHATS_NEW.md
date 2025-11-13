@@ -43,8 +43,8 @@ Analyzed 6 leading open-source projects (n8n.io, OpenAPI-GUI, Grafana, Google YA
 
 **How to Use:**
 ```bash
-# Open the new v3 config builder
-open docs/config-builder-v3.html
+# Open the config builder
+open docs/config-builder.html
 
 # Features:
 # 1. Click "Add Your First File" in Job Settings

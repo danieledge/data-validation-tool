@@ -9,7 +9,7 @@ A robust, extensible Python framework for validating data quality before loading
 [![Tests: 115+ passing](https://img.shields.io/badge/tests-115%2B%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
 
-**🎉 NEW in v2.3:** [Config Builder v3 - Complete UI/UX Redesign](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Validation Type Wizard](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Three-Panel Layout](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • **[See What's New →](docs/WHATS_NEW.md)**
+**🎉 NEW in v2.3:** [Config Builder - Complete UI/UX Redesign](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Validation Type Wizard](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • [Three-Panel Layout](docs/WHATS_NEW.md#-visual-config-builder-v3---complete-uiux-redesign) • **[See What's New →](docs/WHATS_NEW.md)**
 
 ---
 
@@ -23,9 +23,9 @@ cd data-validation-tool
 pip install -r requirements.txt
 
 # 2. Create configuration
-# Option A: Use the visual config builder v3 (no coding!)
-# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html
-# Or local: open docs/config-builder-v3.html
+# Option A: Use the visual config builder (no coding!)
+# Online: https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
+# Or local: open docs/config-builder.html
 # Note: If you see an old version, hard refresh with Ctrl+Shift+R (or Cmd+Shift+R on Mac)
 
 # Option B: Create YAML manually
@@ -56,7 +56,7 @@ python3 -m validation_framework.cli validate validation.yaml --html report.html
 open report.html
 ```
 
-**🎨 NEW: [Visual Config Builder v3 →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html)** - Build validation configs with a modern three-panel interface and validation wizard!
+**🎨 NEW: [Visual Config Builder →](https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html)** - Build validation configs with a modern three-panel interface and validation wizard!
 
 **New to the framework?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
 
@@ -84,11 +84,11 @@ open report.html
 
 ---
 
-## 🎨 Visual Config Builder v3
+## 🎨 Visual Config Builder
 
-**NEW v3!** Complete UI/UX redesign with three-panel layout and validation wizard - no coding required.
+**NEW!** Complete UI/UX redesign with three-panel layout and validation wizard - no coding required.
 
-**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder-v3.html
+**🌐 Live Demo:** https://raw.githack.com/danieledge/data-validation-tool/main/docs/config-builder.html
 
 **💡 Cache Issue?** If you see an old version, hard refresh with **Ctrl+Shift+R** (or **Cmd+Shift+R** on Mac). Check the version badge in the top-right corner - should show **v2.3.0**.
 

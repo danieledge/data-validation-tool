@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validation Config Builder v2 - Enhanced</title>
+
+    <!-- Cache Busting: Force browsers to always fetch latest version -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Version: 2.3.0 - Build: 2025-01-13 -->
+
+    <title>Data Validation Config Builder v3</title>
     <style>
         * {
             margin: 0;
@@ -12,2078 +20,1753 @@
         }
 
         :root {
-            --primary: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary: #764ba2;
-            --bg-dark: #1e1e2e;
-            --bg-medium: #2d2d44;
-            --bg-light: #1a1a2e;
-            --border: #4a5568;
-            --text-primary: #ffffff;
-            --text-secondary: #cbd5e0;
-            --text-muted: #a0aec0;
-            --success: #48bb78;
-            --warning: #ed8936;
-            --error: #f56565;
-            --info: #4299e1;
+            /* Validation Type Colors */
+            --color-file: #3B82F6;
+            --color-schema: #8B5CF6;
+            --color-field: #10B981;
+            --color-record: #F59E0B;
+            --color-cross-file: #EC4899;
+            --color-statistical: #14B8A6;
+
+            /* Severity Colors */
+            --severity-error: #EF4444;
+            --severity-warning: #F59E0B;
+            --severity-info: #3B82F6;
+
+            /* UI Colors (Dark Theme) */
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --bg-elevated: #475569;
+            --border: #475569;
+            --border-light: #64748B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
             color: var(--text-secondary);
-            padding: 20px;
-            min-height: 100vh;
+            overflow: hidden;
+            height: 100vh;
         }
 
-        .container {
-            max-width: 1800px;
-            margin: 0 auto;
-            background: var(--bg-dark);
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 30px 40px;
-            border-bottom: 4px solid var(--border);
-        }
-
-        .header-content {
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            transition: width var(--transition-base);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .header-left h1 {
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 16px;
             color: var(--text-primary);
-            font-size: 2.2em;
-            margin-bottom: 8px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .header-left .subtitle {
+        .logo-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .collapse-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
             color: var(--text-secondary);
-            font-size: 1em;
-            opacity: 0.9;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
         }
 
-        .version-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
+        .collapse-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .search-box {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-field);
+            background: var(--bg-primary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 8px;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--color-field);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-label {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .nav-badge.error {
+            background: var(--severity-error);
+            color: white;
+        }
+
+        .nav-badge.warning {
+            background: var(--severity-warning);
+            color: white;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ==================== WORKSPACE ==================== */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .workspace-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb {
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .breadcrumb:hover {
+            color: var(--text-primary);
+        }
+
+        .breadcrumb.active {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-field);
         }
 
         .header-actions {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
             gap: 8px;
         }
 
+        .workspace-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* ==================== PREVIEW PANEL ==================== */
+        .preview-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-base);
+        }
+
+        .preview-panel.collapsed {
+            width: 0;
+            border: none;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+
+        .yaml-code {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            color: var(--text-secondary);
+        }
+
+        .preview-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
         .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .btn:active {
             transform: translateY(0);
         }
 
+        .btn-primary {
+            background: var(--color-field);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
         .btn-secondary {
-            background: var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background: #718096;
-        }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        .btn-success:hover {
-            background: #38a169;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
         .btn-danger {
-            background: var(--error);
+            background: var(--severity-error);
+            color: white;
         }
 
         .btn-danger:hover {
-            background: #e53e3e;
+            background: #DC2626;
         }
 
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.85em;
-        }
-
-        /* Mobile tabs */
-        .mobile-tabs {
-            display: none;
-            background: var(--bg-medium);
-            border-bottom: 2px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .mobile-tabs-container {
-            display: flex;
-            gap: 0;
-        }
-
-        .mobile-tab {
-            flex: 1;
-            padding: 14px;
-            background: var(--bg-light);
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-
-        .mobile-tab.active {
-            background: var(--bg-medium);
-            color: var(--text-primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* Main layout */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 30px;
-        }
-
-        .panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Sections */
-        .section {
-            background: var(--bg-medium);
-            border-radius: 12px;
-            padding: 25px;
-            border: 2px solid var(--border);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--primary);
-        }
-
-        .section-title {
-            font-size: 1.4em;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .collapse-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 5px;
-            transition: color 0.3s;
-        }
-
-        .collapse-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .section-content {
-            display: block;
-        }
-
-        .section-content.collapsed {
-            display: none;
-        }
-
-        /* Form elements */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-
-        .form-group label.required::after {
-            content: " *";
-            color: var(--error);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .form-group input.error,
-        .form-group select.error {
-            border-color: var(--error);
-        }
-
-        .form-group small {
-            display: block;
-            color: var(--text-muted);
-            margin-top: 5px;
-            font-size: 0.85em;
-        }
-
-        .form-group .error-message {
-            color: var(--error);
-            font-size: 0.85em;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .form-group .error-message.show {
-            display: block;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        /* File cards */
-        .file-card {
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .file-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .file-card-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .file-badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-        }
-
-        /* Validation items */
-        .validation-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .validation-item {
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            position: relative;
-        }
-
-        .validation-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .validation-type {
-            font-weight: bold;
-            color: var(--text-primary);
-            font-size: 1.05em;
-        }
-
-        .severity-badge {
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .severity-ERROR {
-            background: var(--error);
-            color: white;
-        }
-
-        .severity-WARNING {
-            background: var(--warning);
-            color: white;
-        }
-
-        /* Categories */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .category-btn {
-            background: #2d3748;
-            color: var(--text-secondary);
-            border: 2px solid var(--border);
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .category-btn:hover,
-        .category-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .validation-options {
-            display: none;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .validation-options.active {
-            display: grid;
-        }
-
-        .validation-option {
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            padding: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .validation-option:hover {
-            border-color: var(--primary);
-            background: var(--bg-medium);
-        }
-
-        .validation-option-name {
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-            font-size: 0.95em;
-        }
-
-        .validation-option-desc {
-            font-size: 0.8em;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        .tooltip-icon {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 18px;
-            height: 18px;
-            background: var(--info);
-            color: white;
-            border-radius: 50%;
+        .btn-icon {
+            padding: 8px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7em;
-            font-weight: bold;
-            cursor: help;
         }
 
-        /* Templates */
-        .template-grid {
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ==================== CARDS ==================== */
+        .validation-grid {
             display: grid;
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        .template-card {
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            padding: 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .validation-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
         }
 
-        .template-card:hover {
-            border-color: var(--primary);
-            background: var(--bg-medium);
+        .validation-card:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
-        .template-card-header {
+        .validation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-color, var(--color-field));
+        }
+
+        .validation-card.file-check {
+            --card-color: var(--color-file);
+        }
+
+        .validation-card.schema-check {
+            --card-color: var(--color-schema);
+        }
+
+        .validation-card.field-check {
+            --card-color: var(--color-field);
+        }
+
+        .validation-card.record-check {
+            --card-color: var(--color-record);
+        }
+
+        .validation-card.cross-file-check {
+            --card-color: var(--color-cross-file);
+        }
+
+        .validation-card.statistical-check {
+            --card-color: var(--color-statistical);
+        }
+
+        .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
         }
 
-        .template-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-
-        .template-desc {
-            color: var(--text-muted);
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-
-        .template-stats {
+        .validation-info {
             display: flex;
-            gap: 15px;
-            font-size: 0.85em;
-            color: var(--text-secondary);
+            align-items: center;
+            gap: 10px;
+            flex: 1;
         }
 
-        /* Code preview */
-        .code-preview {
-            background: var(--bg-light);
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'Courier New', Consolas, Monaco, monospace;
-            font-size: 0.85em;
-            border: 1px solid var(--border);
-            max-height: 600px;
-            overflow-y: auto;
-            position: relative;
+        .validation-icon {
+            font-size: 20px;
         }
 
-        .code-preview pre {
-            margin: 0;
-            color: var(--text-secondary);
+        .validation-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
         }
 
-        /* YAML syntax highlighting */
-        .yaml-key { color: #e06c75; }
-        .yaml-string { color: #98c379; }
-        .yaml-number { color: #d19a66; }
-        .yaml-boolean { color: #56b6c2; }
-        .yaml-comment { color: #5c6370; font-style: italic; }
-        .yaml-dash { color: #61afef; }
-
-        /* Summary dashboard */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-        .summary-card {
-            background: var(--bg-light);
-            padding: 20px;
+        .severity-label {
+            font-size: 11px;
+            padding: 4px 8px;
             border-radius: 10px;
-            text-align: center;
-            border: 2px solid var(--border);
-        }
-
-        .summary-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .summary-label {
-            color: var(--text-muted);
-            font-size: 0.85em;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.02em;
         }
 
-        /* Help text */
-        .help-box {
-            background: #2d3748;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--info);
-            margin-bottom: 20px;
-            font-size: 0.9em;
+        .severity-label.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--severity-error);
         }
 
-        .help-box strong {
-            color: var(--text-primary);
+        .severity-label.warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--severity-warning);
         }
 
-        /* Alert box */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .card-body {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .add-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-muted);
+        }
+
+        .add-card:hover {
+            border-color: var(--color-field);
+            color: var(--color-field);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .add-card-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .add-card-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .preview-panel {
+                position: fixed;
+                right: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .preview-panel.collapsed {
+                transform: translateX(100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 900;
+                transform: translateX(-100%);
+                transition: transform var(--transition-base);
+            }
+
+            .sidebar.mobile-visible {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+
+            .workspace-header {
+                padding: 12px 16px;
+            }
+
+            .page-header {
+                flex-wrap: wrap;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .workspace-content {
+                padding: 16px;
+                padding-bottom: 80px;
+            }
+
+            .validation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile backdrop */
+        .mobile-backdrop {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 850;
         }
 
-        .alert.show {
+        .mobile-backdrop.show {
             display: block;
         }
 
-        .alert-success {
-            background: rgba(72, 187, 120, 0.2);
-            border-left: 4px solid var(--success);
-            color: #9ae6b4;
+        .mobile-menu-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
         }
 
-        .alert-error {
-            background: rgba(245, 101, 101, 0.2);
-            border-left: 4px solid var(--error);
-            color: #feb2b2;
+        .mobile-menu-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
-        .alert-warning {
-            background: rgba(237, 137, 54, 0.2);
-            border-left: 4px solid var(--warning);
-            color: #fbd38d;
-        }
-
-        .alert-info {
-            background: rgba(66, 153, 225, 0.2);
-            border-left: 4px solid var(--info);
-            color: #90cdf4;
-        }
-
-        /* Modal */
+        /* ==================== MODAL ==================== */
         .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 1100;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
         }
 
         .modal.show {
             display: flex;
+            opacity: 1;
         }
 
         .modal-content {
-            background: var(--bg-dark);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border);
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
         }
 
         .modal-title {
-            font-size: 1.5em;
-            color: var(--text-primary);
-            font-weight: bold;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5em;
-            cursor: pointer;
-            padding: 5px;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
+            font-size: 20px;
+            font-weight: 600;
             color: var(--text-primary);
         }
 
-        /* Keyboard shortcuts hint */
-        .shortcuts-hint {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--bg-medium);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            font-size: 0.85em;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-            z-index: 50;
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
         }
 
-        .shortcuts-hint:hover {
-            opacity: 1;
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
         }
 
-        .kbd {
-            background: var(--bg-light);
-            padding: 2px 6px;
-            border-radius: 4px;
+        .validation-categories {
+            display: grid;
+            gap: 16px;
+        }
+
+        .category-section {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 16px;
             border: 1px solid var(--border);
-            font-family: monospace;
-            font-size: 0.9em;
         }
 
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 15px;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .header {
-                padding: 20px 15px;
-            }
-
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .header-left h1 {
-                font-size: 1.4em;
-            }
-
-            .header-left .subtitle {
-                font-size: 0.85em;
-            }
-
-            .version-badge {
-                font-size: 0.7em;
-                padding: 4px 8px;
-            }
-
-            .header-actions {
-                width: 100%;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-                min-height: 44px;
-                padding: 12px 20px;
-                font-size: 1em;
-            }
-
-            .btn-small {
-                min-height: 36px;
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-
-            .mobile-tabs {
-                display: block;
-            }
-
-            .main-content {
-                padding: 15px;
-                gap: 15px;
-            }
-
-            .main-content > .panel:not(.mobile-active) {
-                display: none !important;
-            }
-
-            .section {
-                padding: 15px;
-            }
-
-            .category-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .validation-options {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .shortcuts-hint {
-                display: none;
-            }
-
-            /* Better mobile form inputs */
-            input[type="text"],
-            input[type="number"],
-            select,
-            textarea {
-                font-size: 16px !important; /* Prevent iOS zoom */
-                min-height: 44px;
-                padding: 12px;
-            }
-
-            .form-group {
-                margin-bottom: 18px;
-            }
-
-            .form-group label {
-                margin-bottom: 8px;
-                font-size: 0.95em;
-            }
-
-            .form-group small {
-                margin-top: 6px;
-                font-size: 0.8em;
-            }
-
-            /* Validation item header on mobile */
-            .validation-item-header {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 10px !important;
-            }
-
-            .validation-item-header > div:last-child {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .validation-item {
-                padding: 12px;
-                margin-bottom: 12px;
-            }
-
-            /* File card improvements */
-            .file-card {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-
-            .file-card-header {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 12px;
-            }
-
-            .file-card-title {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 8px;
-                width: 100%;
-                font-size: 1.1em;
-            }
-
-            .file-badge {
-                align-self: flex-start;
-                font-size: 0.8em;
-                padding: 6px 12px;
-            }
-
-            .file-card-header .btn {
-                width: 100%;
-                font-size: 0.95em;
-            }
-
-            /* Section spacing */
-            .section {
-                margin-bottom: 18px;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-
-            .section-title {
-                font-size: 1.1em;
-            }
-
-            .section-header .btn {
-                width: 100%;
-            }
+        .validation-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-
-            .header {
-                padding: 15px 10px;
-            }
-
-            .header-left h1 {
-                font-size: 1.3em;
-            }
-
-            .main-content {
-                padding: 10px;
-            }
-
-            .section {
-                padding: 12px;
-            }
-
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .file-card {
-                padding: 12px;
-            }
+        .validation-type-option {
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid var(--border);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
+        .validation-type-option:hover {
+            border-color: var(--color-field);
+            background: var(--bg-secondary);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .validation-type-option.selected {
+            border-color: var(--color-field);
+            background: rgba(16, 185, 129, 0.1);
         }
 
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
+        .validation-type-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .validation-type-desc {
+            font-size: 12px;
             color: var(--text-muted);
+            line-height: 1.4;
         }
 
-        .empty-state-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-            opacity: 0.5;
+        .severity-selector {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
-        .empty-state-text {
-            font-size: 1.1em;
-            margin-bottom: 10px;
+        .severity-selector label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 14px;
         }
 
-        .empty-state-hint {
-            font-size: 0.9em;
+        .severity-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .severity-option {
+            flex: 1;
+            padding: 10px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all var(--transition-fast);
+        }
+
+        .severity-option:hover {
+            border-color: var(--border-light);
+        }
+
+        .severity-option.selected {
+            border-color: var(--color-field);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-field);
+        }
+
+        .severity-option.error.selected {
+            border-color: var(--severity-error);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--severity-error);
+        }
+
+        .severity-option.warning.selected {
+            border-color: var(--severity-warning);
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--severity-warning);
+        }
+
+        /* Severity button for modal */
+        .severity-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .severity-btn:hover {
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .severity-btn.active {
+            border-width: 2px;
+            font-weight: 600;
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .icon {
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1>⚙️ Validation Config Builder <span class="version-badge">v2.0</span></h1>
-                    <div class="subtitle">Build professional data validation configs with zero coding</div>
+    <!-- Mobile backdrop -->
+    <div class="mobile-backdrop" id="mobileBackdrop" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Add Validation Modal -->
+    <div class="modal" id="validationModal" onclick="if(event.target === this) closeValidationModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Validation</h2>
+                <button class="btn btn-secondary btn-icon" onclick="closeValidationModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Validation types list (dynamically populated) -->
+                <div id="validationTypesList" style="margin-bottom: 20px;">
+                    <!-- Categories and validation types will be rendered here -->
                 </div>
-                <div class="header-actions">
-                    <button class="btn btn-secondary" onclick="showTemplates()">
-                        📋 Templates
-                    </button>
-                    <button class="btn btn-secondary" onclick="showImport()">
-                        📤 Import YAML
-                    </button>
-                    <button class="btn btn-secondary" onclick="saveToLocalStorage()">
-                        💾 Save
-                    </button>
-                    <button class="btn btn-success" onclick="downloadConfig()">
-                        📥 Download
-                    </button>
+
+                <!-- Severity selector -->
+                <div class="severity-selector">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">
+                        Severity Level
+                    </label>
+                    <div id="severitySelector" style="display: flex; gap: 8px;">
+                        <!-- Severity buttons will be rendered here -->
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Alert area -->
-        <div id="alertArea" style="padding: 20px 30px 0;"></div>
-
-        <!-- Mobile tabs -->
-        <div class="mobile-tabs">
-            <div class="mobile-tabs-container">
-                <button class="mobile-tab active" onclick="switchMobileTab('builder')">
-                    ⚙️ Builder
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeValidationModal()">
+                    Cancel
                 </button>
-                <button class="mobile-tab" onclick="switchMobileTab('preview')">
-                    👁️ Preview
+                <button class="btn btn-primary" onclick="confirmAddValidation()" disabled>
+                    Add Validation
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Main content -->
-        <div class="main-content">
-            <!-- Left panel: Builder -->
-            <div id="builder-panel" class="panel mobile-active">
-                <!-- Job Settings -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            📋 Job Settings
-                        </h2>
-                        <button class="collapse-btn" onclick="toggleSection(this)">−</button>
-                    </div>
-                    <div class="section-content">
-                        <div class="form-group">
-                            <label for="jobName" class="required">Job Name</label>
-                            <input type="text" id="jobName" placeholder="My Validation Job" value="My Validation Job">
-                            <small>A descriptive name for this validation job</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="jobDescription">Description</label>
-                            <textarea id="jobDescription" rows="2" placeholder="Optional description"></textarea>
-                        </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚙️</span>
+                    <span>Config Builder</span>
+                </div>
+                <button class="collapse-btn" onclick="toggleSidebar()">
+                    ◀
+                </button>
+            </div>
+
+            <div class="search-box">
+                <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search... (⌘K)"
+                    id="searchInput"
+                    onkeyup="handleSearch(event)">
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active" onclick="showSection('job')">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Job Settings</span>
                     </div>
                 </div>
 
-                <!-- Advanced Settings -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            🔧 Advanced Settings
-                        </h2>
-                        <button class="collapse-btn" onclick="toggleSection(this)">−</button>
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Configuration</span>
                     </div>
-                    <div class="section-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="chunkSize">Chunk Size</label>
-                                <input type="number" id="chunkSize" value="50000" min="1000">
-                                <small>Rows per chunk (default: 50000)</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="maxSampleFailures">Max Sample Failures</label>
-                                <input type="number" id="maxSampleFailures" value="100" min="0">
-                                <small>Samples to collect (default: 100)</small>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="failFast">Fail Fast</label>
-                                <select id="failFast">
-                                    <option value="false">No - Run all validations</option>
-                                    <option value="true">Yes - Stop on first error</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="logLevel">Log Level</label>
-                                <select id="logLevel">
-                                    <option value="INFO">INFO</option>
-                                    <option value="DEBUG">DEBUG</option>
-                                    <option value="WARNING">WARNING</option>
-                                    <option value="ERROR">ERROR</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="nav-item" onclick="showSection('settings')">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Advanced Settings</span>
                     </div>
                 </div>
 
-                <!-- Files -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            📁 Files
-                        </h2>
-                        <button class="btn btn-small btn-success" onclick="addFile()">
-                            ➕ Add File
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Files</span>
+                        <span class="nav-badge" id="filesCount">0</span>
+                    </div>
+                    <div id="filesNav">
+                        <!-- Dynamic file items -->
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-header">
+                        <span>Actions</span>
+                    </div>
+                    <div class="nav-item" onclick="showSection('summary')">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Summary</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-primary btn-full" onclick="downloadConfig()">
+                    <span class="icon">📥</span>
+                    <span>Download</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <div class="workspace-header">
+                <div class="breadcrumbs">
+                    <span class="breadcrumb active" id="breadcrumb">Job Settings</span>
+                </div>
+                <div class="page-header">
+                    <div class="title-section">
+                        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Menu">
+                            <span style="font-size: 20px;">☰</span>
+                        </button>
+                        <h1 class="page-title" id="pageTitle">Job Settings</h1>
+                        <span class="status-badge success" id="statusBadge">Ready</span>
+                    </div>
+                    <div class="header-actions">
+                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.3.0</span>
+                        <button class="btn btn-secondary btn-icon" onclick="togglePreview()" title="Toggle Preview">
+                            <span>👁️</span>
                         </button>
                     </div>
-                    <div class="section-content">
-                        <div id="filesContainer"></div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Right panel: Preview & Dashboard -->
-            <div id="preview-panel" class="panel">
-                <!-- Summary Dashboard -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            📊 Summary
-                        </h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="summary-grid">
-                            <div class="summary-card">
-                                <div class="summary-value" id="totalFiles">0</div>
-                                <div class="summary-label">Files</div>
-                            </div>
-                            <div class="summary-card">
-                                <div class="summary-value" id="totalValidations">0</div>
-                                <div class="summary-label">Validations</div>
-                            </div>
-                            <div class="summary-card">
-                                <div class="summary-value" id="totalErrors">0</div>
-                                <div class="summary-label">Errors</div>
-                            </div>
-                            <div class="summary-card">
-                                <div class="summary-value" id="totalWarnings">0</div>
-                                <div class="summary-label">Warnings</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- YAML Preview -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            👁️ Configuration Preview
-                        </h2>
-                        <div class="section-actions">
-                            <button class="btn btn-small btn-secondary" onclick="copyConfig()">
-                                📋 Copy
-                            </button>
-                            <button class="btn btn-small btn-success" onclick="downloadConfig()">
-                                📥 Download
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-content">
-                        <div class="code-preview">
-                            <pre id="yamlPreview"># Your configuration will appear here</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            🚀 Quick Actions
-                        </h2>
-                    </div>
-                    <div class="section-content">
-                        <div style="display: grid; gap: 10px;">
-                            <button class="btn btn-secondary" onclick="showShare()">
-                                🔗 Share Config
-                            </button>
-                            <button class="btn btn-secondary" onclick="showSaved()">
-                                📂 Load Saved
-                            </button>
-                            <button class="btn btn-danger" onclick="clearAll()">
-                                🗑️ Clear All
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="workspace-content" id="workspaceContent">
+                <!-- Dynamic content -->
             </div>
-        </div>
-    </div>
+        </main>
 
-    <!-- Template Modal -->
-    <div id="templateModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📋 Choose Template</h3>
-                <button class="close-btn" onclick="closeModal('templateModal')">&times;</button>
+        <!-- YAML Preview Panel -->
+        <aside class="preview-panel collapsed" id="previewPanel">
+            <div class="preview-header">
+                <h3 class="preview-title">YAML Preview</h3>
+                <button class="btn btn-secondary btn-icon" onclick="togglePreview()">
+                    <span>✕</span>
+                </button>
             </div>
-            <div id="templateList" class="template-grid"></div>
-        </div>
-    </div>
-
-    <!-- Import Modal -->
-    <div id="importModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📤 Import YAML</h3>
-                <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
+            <div class="preview-body">
+                <pre class="yaml-code" id="yamlPreview"># Your configuration will appear here</pre>
             </div>
-            <div class="form-group">
-                <label>Paste YAML Configuration</label>
-                <textarea id="importYaml" rows="15" placeholder="Paste your YAML configuration here..."></textarea>
+            <div class="preview-footer">
+                <button class="btn btn-secondary btn-full" onclick="copyYAML()">
+                    <span class="icon">📋</span>
+                    Copy
+                </button>
             </div>
-            <button class="btn btn-success" onclick="importYAML()" style="width: 100%;">
-                Import Configuration
-            </button>
-        </div>
-    </div>
-
-    <!-- Share Modal -->
-    <div id="shareModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🔗 Share Configuration</h3>
-                <button class="close-btn" onclick="closeModal('shareModal')">&times;</button>
-            </div>
-            <div class="form-group">
-                <label>Shareable URL</label>
-                <input type="text" id="shareUrl" readonly>
-                <small>Copy this URL to share your configuration</small>
-            </div>
-            <button class="btn btn-secondary" onclick="copyShareUrl()" style="width: 100%;">
-                📋 Copy URL
-            </button>
-        </div>
-    </div>
-
-    <!-- Saved Configs Modal -->
-    <div id="savedModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📂 Saved Configurations</h3>
-                <button class="close-btn" onclick="closeModal('savedModal')">&times;</button>
-            </div>
-            <div id="savedList"></div>
-        </div>
-    </div>
-
-    <!-- Shortcuts hint -->
-    <div class="shortcuts-hint">
-        Press <span class="kbd">?</span> for keyboard shortcuts
+        </aside>
     </div>
 
     <script>
         // Global state
         let state = {
+            currentSection: 'job',
+            jobName: 'Data Validation Job',
             files: [],
-            fileCounter: 0
+            settings: {
+                chunk_size: 10000,
+                max_sample_failures: 100,
+                fail_fast: false,
+                log_level: 'INFO'
+            },
+            fileCounter: 0,
+            modalState: {
+                currentFileId: null,
+                selectedType: null,
+                selectedSeverity: 'ERROR'
+            }
         };
 
-        // Templates
-        const templates = [
-            {
-                name: "Blank",
-                icon: "📄",
-                description: "Start from scratch with no validations",
-                files: 0,
-                validations: 0,
-                config: {
-                    files: []
-                }
-            },
-            {
-                name: "Single File - Basic",
-                icon: "📋",
-                description: "File-level checks only",
-                files: 1,
-                validations: 3,
-                config: {
-                    files: [{
-                        name: "data",
-                        path: "data.csv",
-                        format: "csv",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } },
-                            { type: "FileSizeCheck", severity: "WARNING", params: { min_size_mb: 0.001 } }
-                        ]
-                    }]
-                }
-            },
-            {
-                name: "Single File - Complete",
-                icon: "✅",
-                description: "File, schema, field, and record checks",
-                files: 1,
-                validations: 7,
-                config: {
-                    files: [{
-                        name: "data",
-                        path: "data.csv",
-                        format: "csv",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "RowCountRangeCheck", severity: "WARNING", params: { min_rows: 1 } },
-                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id"] } },
-                            { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
-                            { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } },
-                            { type: "DuplicateRowCheck", severity: "WARNING", params: {} },
-                            { type: "BlankRecordCheck", severity: "WARNING", params: {} }
-                        ]
-                    }]
-                }
-            },
-            {
-                name: "Multiple Files",
-                icon: "📚",
-                description: "Two files with cross-file validation",
-                files: 2,
-                validations: 9,
-                config: {
-                    files: [
-                        {
-                            name: "primary",
-                            path: "primary_data.csv",
-                            format: "csv",
-                            validations: [
-                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id"] } },
-                                { type: "UniqueKeyCheck", severity: "ERROR", params: { fields: ["id"] } }
-                            ]
-                        },
-                        {
-                            name: "secondary",
-                            path: "secondary_data.csv",
-                            format: "csv",
-                            validations: [
-                                { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                                { type: "MandatoryFieldCheck", severity: "ERROR", params: { fields: ["id", "primary_id"] } },
-                                { type: "ReferentialIntegrityCheck", severity: "ERROR", params: { foreign_key: "primary_id", reference_file: "primary_data.csv", reference_key: "id" } }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                name: "Schema Validation",
-                icon: "🔍",
-                description: "Focus on schema and data type checks",
-                files: 1,
-                validations: 5,
-                config: {
-                    files: [{
-                        name: "data",
-                        path: "data.csv",
-                        format: "csv",
-                        validations: [
-                            { type: "EmptyFileCheck", severity: "ERROR", params: {} },
-                            { type: "SchemaMatchCheck", severity: "ERROR", params: { expected_columns: ["id", "name", "value", "date"] } },
-                            { type: "ColumnPresenceCheck", severity: "ERROR", params: { columns: ["id", "name"] } },
-                            { type: "DateFormatCheck", severity: "ERROR", params: { field: "date", format: "%Y-%m-%d" } },
-                            { type: "DataTypeCheck", severity: "ERROR", params: { field: "value", expected_type: "numeric" } }
-                        ]
-                    }]
-                }
-            }
-        ];
-
-        // Validation definitions with parameter hints
-        const validationDefs = {
-            'EmptyFileCheck': {
-                category: 'file',
-                description: 'Ensures the file is not empty',
-                params: [],
-                example: 'Validates that the file contains at least one row'
-            },
-            'RowCountRangeCheck': {
-                category: 'file',
-                description: 'Validates row count within expected range',
-                params: [
-                    { name: 'min_rows', type: 'number', required: false, description: 'Minimum row count', hint: 'e.g., 1000' },
-                    { name: 'max_rows', type: 'number', required: false, description: 'Maximum row count', hint: 'e.g., 100000' }
-                ],
-                example: 'Checks if file has between 1000-100000 rows'
-            },
-            'FileSizeCheck': {
-                category: 'file',
-                description: 'Validates file size within limits',
-                params: [
-                    { name: 'min_size_mb', type: 'number', required: false, description: 'Minimum size (MB)', hint: 'e.g., 0.1' },
-                    { name: 'max_size_mb', type: 'number', required: false, description: 'Maximum size (MB)', hint: 'e.g., 1000' }
-                ],
-                example: 'Ensures file is between 0.1MB and 1GB'
-            },
-            'SchemaMatchCheck': {
-                category: 'schema',
-                description: 'Validates exact schema match',
-                params: [
-                    { name: 'expected_columns', type: 'list', required: true, description: 'Expected column names', hint: 'id, name, email' }
-                ],
-                example: 'Ensures file has exactly these columns'
-            },
-            'ColumnPresenceCheck': {
-                category: 'schema',
-                description: 'Checks required columns exist',
-                params: [
-                    { name: 'columns', type: 'list', required: true, description: 'Required column names', hint: 'id, email' }
-                ],
-                example: 'Validates that specific columns are present'
-            },
-            'MandatoryFieldCheck': {
-                category: 'field',
-                description: 'Validates required fields are not null',
-                params: [
-                    { name: 'fields', type: 'list', required: true, description: 'Required field names', hint: 'id, email, name' }
-                ],
-                example: 'Ensures these fields have no NULL values'
-            },
-            'RegexCheck': {
-                category: 'field',
-                description: 'Pattern matching validation',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'email' },
-                    { name: 'pattern', type: 'text', required: true, description: 'Regex pattern', hint: '^[\\w.-]+@[\\w.-]+\\.\\w+$' }
-                ],
-                example: 'Validates email format using regex'
-            },
-            'ValidValuesCheck': {
-                category: 'field',
-                description: 'Validates values in allowed list',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'status' },
-                    { name: 'valid_values', type: 'list', required: true, description: 'Allowed values', hint: 'active, inactive, pending' }
-                ],
-                example: 'Ensures values are in allowed list'
-            },
-            'RangeCheck': {
-                category: 'field',
-                description: 'Validates numeric range',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'age' },
-                    { name: 'min_value', type: 'number', required: false, description: 'Minimum value', hint: '0' },
-                    { name: 'max_value', type: 'number', required: false, description: 'Maximum value', hint: '120' }
-                ],
-                example: 'Checks if numeric values are within range'
-            },
-            'DateFormatCheck': {
-                category: 'field',
-                description: 'Validates date format',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'birth_date' },
-                    { name: 'format', type: 'select', required: true, description: 'Date format',
-                      options: ['%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', '%Y/%m/%d', '%d-%m-%Y'],
-                      hint: '%Y-%m-%d for 2025-01-13' }
-                ],
-                example: 'Validates dates match specified format'
-            },
-            'DuplicateRowCheck': {
-                category: 'record',
-                description: 'Detects duplicate rows',
-                params: [
-                    { name: 'subset', type: 'list', required: false, description: 'Columns to check (all if empty)', hint: 'id, email' }
-                ],
-                example: 'Finds duplicate records'
-            },
-            'UniqueKeyCheck': {
-                category: 'record',
-                description: 'Validates unique constraint',
-                params: [
-                    { name: 'fields', type: 'list', required: true, description: 'Field(s) that must be unique', hint: 'id' }
-                ],
-                example: 'Ensures field values are unique'
-            },
-            'BlankRecordCheck': {
-                category: 'record',
-                description: 'Finds completely empty rows',
-                params: [],
-                example: 'Detects rows with all NULL values'
-            },
-            'ReferentialIntegrityCheck': {
-                category: 'cross',
-                description: 'Validates foreign key relationships',
-                params: [
-                    { name: 'foreign_key', type: 'text', required: true, description: 'Foreign key field', hint: 'customer_id' },
-                    { name: 'reference_file', type: 'file_picker', required: true, description: 'Reference file', hint: 'customers.csv' },
-                    { name: 'reference_key', type: 'text', required: true, description: 'Reference key field', hint: 'id' },
-                    { name: 'allow_null', type: 'boolean', required: false, description: 'Allow NULL foreign keys', hint: 'false' }
-                ],
-                example: 'Ensures foreign keys exist in reference table'
-            },
-            'CrossFileComparisonCheck': {
-                category: 'cross',
-                description: 'Compares aggregates across files',
-                params: [
-                    { name: 'aggregation', type: 'select', required: true, description: 'Aggregation function',
-                      options: ['count', 'sum', 'mean', 'min', 'max'], hint: 'count' },
-                    { name: 'column', type: 'text', required: false, description: 'Column to aggregate', hint: 'amount' },
-                    { name: 'reference_file', type: 'file_picker', required: true, description: 'Reference file', hint: 'summary.csv' },
-                    { name: 'reference_aggregation', type: 'select', required: true, description: 'Reference aggregation',
-                      options: ['count', 'sum', 'mean', 'min', 'max'], hint: 'sum' },
-                    { name: 'tolerance_pct', type: 'number', required: false, description: 'Tolerance %', hint: '5' }
-                ],
-                example: 'Compares totals between related files'
-            },
-            'StatisticalOutlierCheck': {
-                category: 'statistical',
-                description: 'Detects statistical anomalies',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'amount' },
-                    { name: 'method', type: 'select', required: true, description: 'Detection method',
-                      options: ['iqr', 'zscore', 'isolation_forest'], hint: 'iqr' },
-                    { name: 'threshold', type: 'number', required: false, description: 'Threshold value', hint: '1.5' }
-                ],
-                example: 'Finds outliers using statistical methods'
-            },
-            'DistributionCheck': {
-                category: 'statistical',
-                description: 'Validates statistical distribution',
-                params: [
-                    { name: 'column', type: 'text', required: true, description: 'Column name', hint: 'score' },
-                    { name: 'expected_distribution', type: 'select', required: true, description: 'Expected distribution',
-                      options: ['normal', 'uniform', 'exponential'], hint: 'normal' },
-                    { name: 'significance_level', type: 'number', required: false, description: 'Significance level', hint: '0.05' }
-                ],
-                example: 'Tests if data follows expected distribution'
-            },
-            'CompletenessCheck': {
-                category: 'field',
-                description: 'Validates field completeness percentage',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'phone' },
-                    { name: 'min_completeness_pct', type: 'number', required: true, description: 'Min completeness %', hint: '95' }
-                ],
-                example: 'Ensures field has at least X% non-null values'
-            },
-            'StringLengthCheck': {
-                category: 'field',
-                description: 'Validates string length limits',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'name' },
-                    { name: 'min_length', type: 'number', required: false, description: 'Minimum length', hint: '1' },
-                    { name: 'max_length', type: 'number', required: false, description: 'Maximum length', hint: '100' }
-                ],
-                example: 'Checks string length within limits'
-            },
-            'NumericPrecisionCheck': {
-                category: 'field',
-                description: 'Validates decimal precision',
-                params: [
-                    { name: 'field', type: 'text', required: true, description: 'Field name', hint: 'price' },
-                    { name: 'max_decimals', type: 'number', required: true, description: 'Max decimal places', hint: '2' }
-                ],
-                example: 'Ensures numbers have correct precision'
-            }
+        // Validation Types Catalog
+        const validationTypes = {
+            file: [
+                { type: 'EmptyFileCheck', desc: 'Ensures the file is not empty' },
+                { type: 'RowCountRangeCheck', desc: 'Validates row count within expected range' },
+                { type: 'FileSizeCheck', desc: 'Checks file size limits' }
+            ],
+            schema: [
+                { type: 'SchemaMatchCheck', desc: 'Validates exact schema match' },
+                { type: 'ColumnPresenceCheck', desc: 'Checks required columns exist' },
+                { type: 'DataTypeCheck', desc: 'Validates column data types' }
+            ],
+            field: [
+                { type: 'MandatoryFieldCheck', desc: 'Ensures required fields are not null' },
+                { type: 'RegexCheck', desc: 'Validates field values match pattern' },
+                { type: 'ValidValuesCheck', desc: 'Checks values are in allowed list' },
+                { type: 'RangeCheck', desc: 'Validates numeric values within range' },
+                { type: 'DateFormatCheck', desc: 'Validates date format' },
+                { type: 'StringLengthCheck', desc: 'Checks string length limits' },
+                { type: 'CompletenessCheck', desc: 'Validates field completeness percentage' }
+            ],
+            record: [
+                { type: 'DuplicateRowCheck', desc: 'Detects duplicate rows' },
+                { type: 'BlankRecordCheck', desc: 'Finds completely empty rows' },
+                { type: 'UniqueKeyCheck', desc: 'Validates unique constraints' }
+            ],
+            crossFile: [
+                { type: 'ReferentialIntegrityCheck', desc: 'Validates foreign key relationships' },
+                { type: 'CrossFileComparisonCheck', desc: 'Compares aggregates between files' },
+                { type: 'CrossFileDuplicateCheck', desc: 'Finds duplicates across files' }
+            ],
+            statistical: [
+                { type: 'StatisticalOutlierCheck', desc: 'Detects statistical anomalies' },
+                { type: 'DistributionCheck', desc: 'Validates data distribution' },
+                { type: 'CorrelationCheck', desc: 'Checks column correlations' }
+            ]
         };
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Load from URL hash if present
-            loadFromURLHash();
+            // Version and cache busting check
+            const version = '2.3.0';
+            const buildDate = '2025-01-13';
+            console.log(`%c Data Validation Config Builder v${version} `, 'background: #10B981; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold');
+            console.log(`Build Date: ${buildDate}`);
+            console.log(`Load Time: ${new Date().toISOString()}`);
+            console.log('If you see an old version, clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)');
 
-            // Load from localStorage if present and no URL hash
-            if (!window.location.hash && localStorage.getItem('validationConfig_autosave')) {
-                const saved = JSON.parse(localStorage.getItem('validationConfig_autosave'));
-                if (saved && confirm('Load your last saved configuration?')) {
-                    loadConfig(saved);
-                }
-            }
+            showSection('job');
+            updateYAMLPreview();
+        });
 
-            // Auto-save every 30 seconds
-            setInterval(() => {
-                if (state.files.length > 0) {
-                    saveToLocalStorage(true);
-                }
-            }, 30000);
+        // Modal Functions for Add Validation Wizard
+        /**
+         * Opens the validation selection modal for a specific file
+         * @param {string} fileId - The ID of the file to add validation to
+         */
+        function openValidationModal(fileId) {
+            // Store file ID in modal state
+            state.modalState.fileId = fileId;
+            state.modalState.selectedType = null;
+            state.modalState.severity = 'ERROR';
 
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                // Ctrl/Cmd + S: Save
-                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    saveToLocalStorage();
+            // Render modal content
+            renderValidationModal();
+
+            // Show modal with animation
+            const modal = document.getElementById('validationModal');
+            modal.style.display = 'flex';
+            // Force reflow for animation
+            modal.offsetHeight;
+            modal.style.opacity = '1';
+        }
+
+        /**
+         * Closes the validation modal and resets state
+         */
+        function closeValidationModal() {
+            const modal = document.getElementById('validationModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                state.modalState = { fileId: null, selectedType: null, severity: 'ERROR' };
+            }, 200);
+        }
+
+        /**
+         * Renders the validation type options in the modal grouped by category
+         */
+        function renderValidationModal() {
+            const container = document.getElementById('validationTypesList');
+
+            // Category display configuration with colors and icons
+            const categories = {
+                file: {
+                    label: 'File Validations',
+                    color: 'var(--validation-file)',
+                    icon: '📄'
+                },
+                schema: {
+                    label: 'Schema Validations',
+                    color: 'var(--validation-schema)',
+                    icon: '🏗️'
+                },
+                field: {
+                    label: 'Field Validations',
+                    color: 'var(--validation-field)',
+                    icon: '✏️'
+                },
+                record: {
+                    label: 'Record Validations',
+                    color: 'var(--validation-record)',
+                    icon: '📋'
+                },
+                crossFile: {
+                    label: 'Cross-File Validations',
+                    color: 'var(--validation-cross-file)',
+                    icon: '🔗'
+                },
+                statistical: {
+                    label: 'Statistical Validations',
+                    color: 'var(--validation-statistical)',
+                    icon: '📊'
                 }
-                // Ctrl/Cmd + D: Download
-                if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-                    e.preventDefault();
-                    downloadConfig();
-                }
-                // Ctrl/Cmd + I: Import
-                if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
-                    e.preventDefault();
-                    showImport();
-                }
-                // ?: Show shortcuts
-                if (e.key === '?') {
-                    showShortcuts();
+            };
+
+            let html = '';
+
+            // Render each category
+            Object.keys(validationTypes).forEach(category => {
+                const categoryInfo = categories[category];
+                const validations = validationTypes[category];
+
+                html += `
+                    <div class="validation-category" style="margin-bottom: 20px;">
+                        <h4 style="color: ${categoryInfo.color}; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <span>${categoryInfo.icon}</span>
+                            <span>${categoryInfo.label}</span>
+                        </h4>
+                        <div style="display: grid; gap: 8px;">
+                `;
+
+                // Render each validation in this category
+                validations.forEach(validation => {
+                    const isSelected = state.modalState.selectedType === validation.type;
+                    html += `
+                        <div
+                            class="validation-type-option ${isSelected ? 'selected' : ''}"
+                            onclick="selectValidationType('${validation.type}')"
+                            data-type="${validation.type}"
+                            style="border-color: ${isSelected ? categoryInfo.color : 'var(--border)'}; ${isSelected ? `background: ${categoryInfo.color}15;` : ''}">
+                            <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
+                                ${validation.type}
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted);">
+                                ${validation.desc}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Update severity selector state
+            renderSeveritySelector();
+
+            // Update confirm button state
+            updateConfirmButton();
+        }
+
+        /**
+         * Renders the severity selector buttons with current selection
+         */
+        function renderSeveritySelector() {
+            const container = document.getElementById('severitySelector');
+            const severities = ['ERROR', 'WARNING'];
+
+            container.innerHTML = severities.map(sev => `
+                <button
+                    class="severity-btn ${state.modalState.severity === sev ? 'active' : ''}"
+                    onclick="selectSeverity('${sev}')"
+                    style="${state.modalState.severity === sev ? `background: ${sev === 'ERROR' ? 'var(--status-error)' : 'var(--status-warning)'}; color: white;` : ''}">
+                    ${sev}
+                </button>
+            `).join('');
+        }
+
+        /**
+         * Handles validation type selection
+         * @param {string} type - The validation type selected
+         */
+        function selectValidationType(type) {
+            state.modalState.selectedType = type;
+
+            // Update UI to show selection
+            document.querySelectorAll('.validation-type-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.type === type) {
+                    option.classList.add('selected');
+                    // Get category color for this type
+                    for (const [category, validations] of Object.entries(validationTypes)) {
+                        if (validations.find(v => v.type === type)) {
+                            const categories = {
+                                file: 'var(--validation-file)',
+                                schema: 'var(--validation-schema)',
+                                field: 'var(--validation-field)',
+                                record: 'var(--validation-record)',
+                                crossFile: 'var(--validation-cross-file)',
+                                statistical: 'var(--validation-statistical)'
+                            };
+                            const color = categories[category];
+                            option.style.borderColor = color;
+                            option.style.background = color + '15';
+                            break;
+                        }
+                    }
                 }
             });
 
-            // Initialize with one file if empty
-            if (state.files.length === 0) {
-                addFile();
+            // Enable confirm button
+            updateConfirmButton();
+        }
+
+        /**
+         * Handles severity selection
+         * @param {string} severity - ERROR or WARNING
+         */
+        function selectSeverity(severity) {
+            state.modalState.severity = severity;
+            renderSeveritySelector();
+        }
+
+        /**
+         * Updates the confirm button enabled/disabled state
+         */
+        function updateConfirmButton() {
+            const confirmBtn = document.querySelector('.modal-footer .btn-primary');
+            if (confirmBtn) {
+                confirmBtn.disabled = !state.modalState.selectedType;
+                confirmBtn.style.opacity = state.modalState.selectedType ? '1' : '0.5';
+                confirmBtn.style.cursor = state.modalState.selectedType ? 'pointer' : 'not-allowed';
             }
-
-            updatePreview();
-        });
-
-        // File management
-        function addFile() {
-            const fileId = state.fileCounter++;
-            const file = {
-                id: fileId,
-                name: `file_${fileId + 1}`,
-                path: 'data.csv',
-                format: 'csv',
-                validations: []
-            };
-            state.files.push(file);
-            renderFiles();
-            updatePreview();
-            showAlert('File added successfully', 'success');
         }
 
-        function removeFile(fileId) {
-            if (!confirm('Remove this file and all its validations?')) return;
-            state.files = state.files.filter(f => f.id !== fileId);
-            renderFiles();
-            updatePreview();
-            showAlert('File removed', 'info');
-        }
-
-        function renderFiles() {
-            const container = document.getElementById('filesContainer');
-
-            if (state.files.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📁</div>
-                        <div class="empty-state-text">No files added yet</div>
-                        <div class="empty-state-hint">Click "Add File" to get started</div>
-                    </div>
-                `;
+        /**
+         * Confirms the validation selection and adds it to the file
+         */
+        function confirmAddValidation() {
+            if (!state.modalState.selectedType) {
                 return;
             }
 
-            container.innerHTML = state.files.map(file => `
-                <div class="file-card">
-                    <div class="file-card-header">
-                        <div class="file-card-title">
-                            📄 ${escapeHtml(file.name)}
-                            <span class="file-badge">${file.validations.length} validations</span>
+            const file = state.files.find(f => f.id === state.modalState.fileId);
+            if (file) {
+                // Add the selected validation to the file
+                file.validations.push({
+                    type: state.modalState.selectedType,
+                    severity: state.modalState.severity,
+                    params: {},
+                    enabled: true
+                });
+
+                // Update UI
+                renderContent(state.modalState.fileId);
+                updateYAMLPreview();
+                updateFilesNav();
+
+                // Close modal
+                closeValidationModal();
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            state.currentSection = section;
+
+            // Close mobile sidebar when navigating
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('mobileBackdrop');
+                sidebar.classList.remove('mobile-visible');
+                backdrop.classList.remove('show');
+            }
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event?.currentTarget?.classList.add('active');
+
+            // Update breadcrumb and title
+            const titles = {
+                'job': 'Job Settings',
+                'settings': 'Advanced Settings',
+                'summary': 'Summary'
+            };
+
+            const title = titles[section] || section;
+            document.getElementById('breadcrumb').textContent = title;
+            document.getElementById('pageTitle').textContent = title;
+
+            // Render content
+            renderContent(section);
+            updateYAMLPreview();
+        }
+
+        function renderContent(section) {
+            const content = document.getElementById('workspaceContent');
+
+            if (section === 'job') {
+                content.innerHTML = `
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                Job Name
+                            </label>
+                            <input
+                                type="text"
+                                value="${state.jobName}"
+                                onchange="state.jobName = this.value; updateYAMLPreview();"
+                                style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                            <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                A descriptive name for this validation job
+                            </small>
                         </div>
-                        <button class="btn btn-small btn-danger" onclick="removeFile(${file.id})">
-                            🗑️ Remove
+
+                        <button class="btn btn-primary" onclick="addFile()" style="margin-top: 24px;">
+                            <span class="icon">➕</span>
+                            Add Your First File
                         </button>
                     </div>
+                `;
+            }  else if (section === 'settings') {
+                content.innerHTML = `
+                    <div style="max-width: 600px;">
+                        <div style="display: grid; gap: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                    Chunk Size
+                                </label>
+                                <input
+                                    type="number"
+                                    value="${state.settings.chunk_size}"
+                                    onchange="state.settings.chunk_size = parseInt(this.value); updateYAMLPreview();"
+                                    style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                    Number of rows to process at a time
+                                </small>
+                            </div>
 
-                    <div class="form-group">
-                        <label>File Name</label>
-                        <input type="text" value="${escapeHtml(file.name)}"
-                               onchange="updateFile(${file.id}, 'name', this.value)">
-                        <small>Unique identifier for this file</small>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                    Log Level
+                                </label>
+                                <select
+                                    onchange="state.settings.log_level = this.value; updateYAMLPreview();"
+                                    style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                    <option ${state.settings.log_level === 'DEBUG' ? 'selected' : ''}>DEBUG</option>
+                                    <option ${state.settings.log_level === 'INFO' ? 'selected' : ''}>INFO</option>
+                                    <option ${state.settings.log_level === 'WARNING' ? 'selected' : ''}>WARNING</option>
+                                    <option ${state.settings.log_level === 'ERROR' ? 'selected' : ''}>ERROR</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                    <input
+                                        type="checkbox"
+                                        ${state.settings.fail_fast ? 'checked' : ''}
+                                        onchange="state.settings.fail_fast = this.checked; updateYAMLPreview();"
+                                        style="width: 18px; height: 18px;">
+                                    <span style="color: var(--text-primary); font-weight: 500;">Fail Fast</span>
+                                </label>
+                                <small style="display: block; margin-top: 6px; margin-left: 28px; color: var(--text-muted); font-size: 13px;">
+                                    Stop validation on first error
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section === 'summary') {
+                const totalValidations = state.files.reduce((sum, f) => sum + f.validations.length, 0);
+                const errorCount = state.files.reduce((sum, f) =>
+                    sum + f.validations.filter(v => v.severity === 'ERROR').length, 0);
+                const warningCount = state.files.reduce((sum, f) =>
+                    sum + f.validations.filter(v => v.severity === 'WARNING').length, 0);
+
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                                ${state.files.length}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Files</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                                ${totalValidations}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Validations</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-error); margin-bottom: 4px;">
+                                ${errorCount}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Errors</div>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-warning); margin-bottom: 4px;">
+                                ${warningCount}
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 13px;">Warnings</div>
+                        </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>File Path</label>
-                            <input type="text" value="${escapeHtml(file.path)}"
-                                   onchange="updateFile(${file.id}, 'path', this.value)">
-                        </div>
-                        <div class="form-group">
-                            <label>Format</label>
-                            <select onchange="updateFile(${file.id}, 'format', this.value)">
-                                <option value="csv" ${file.format === 'csv' ? 'selected' : ''}>CSV</option>
-                                <option value="excel" ${file.format === 'excel' ? 'selected' : ''}>Excel</option>
-                                <option value="json" ${file.format === 'json' ? 'selected' : ''}>JSON</option>
-                                <option value="parquet" ${file.format === 'parquet' ? 'selected' : ''}>Parquet</option>
-                            </select>
+                    <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border);">
+                        <h3 style="color: var(--text-primary); margin-bottom: 16px;">Configuration Summary</h3>
+                        <div style="display: grid; gap: 12px; font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Job Name:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.jobName}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Chunk Size:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.chunk_size}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Log Level:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.log_level}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Fail Fast:</span>
+                                <span style="color: var(--text-primary); font-weight: 500;">${state.settings.fail_fast ? 'Yes' : 'No'}</span>
+                            </div>
                         </div>
                     </div>
+                `;
+            } else {
+                // File view
+                const fileId = parseInt(section);
+                const file = state.files.find(f => f.id === fileId);
+                if (!file) return;
 
-                    <div style="margin-top: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <strong style="color: var(--text-primary);">Validations</strong>
-                            <button class="btn btn-small btn-success" onclick="showValidationPicker(${file.id})">
-                                ➕ Add Validation
+                content.innerHTML = `
+                    <div style="max-width: 800px;">
+                        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                            <div style="display: grid; gap: 16px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        File Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${file.name}"
+                                        onchange="updateFile(${fileId}, 'name', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        File Path
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value="${file.path}"
+                                        onchange="updateFile(${fileId}, 'path', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                        Format
+                                    </label>
+                                    <select
+                                        onchange="updateFile(${fileId}, 'format', this.value);"
+                                        style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                        <option ${file.format === 'csv' ? 'selected' : ''}>csv</option>
+                                        <option ${file.format === 'excel' ? 'selected' : ''}>excel</option>
+                                        <option ${file.format === 'json' ? 'selected' : ''}>json</option>
+                                        <option ${file.format === 'parquet' ? 'selected' : ''}>parquet</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="color: var(--text-primary); font-size: 18px;">Validations</h3>
+                            <button class="btn btn-primary" onclick="addValidation(${fileId})">
+                                <span class="icon">➕</span>
+                                Add Validation
                             </button>
                         </div>
-                        <div class="validation-list">
-                            ${file.validations.length === 0 ?
-                                '<div class="help-box">No validations added. Click "Add Validation" to start.</div>' :
-                                file.validations.map((v, idx) => renderValidation(file.id, v, idx)).join('')
-                            }
+
+                        <div class="validation-grid">
+                            ${file.validations.map((v, idx) => renderValidationCard(fileId, v, idx)).join('')}
+                            ${file.validations.length === 0 ? `
+                                <div class="add-card" onclick="addValidation(${fileId})">
+                                    <div class="add-card-icon">➕</div>
+                                    <div class="add-card-text">Add your first validation</div>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
+                `;
+            }
+        }
+
+        function renderValidationCard(fileId, validation, idx) {
+            const categoryClass = getValidationCategory(validation.type);
+            return `
+                <div class="validation-card ${categoryClass}">
+                    <div class="card-header">
+                        <div class="validation-info">
+                            <span class="validation-icon">${getValidationIcon(validation.type)}</span>
+                            <span class="validation-name">${validation.type}</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="severity-label ${validation.severity.toLowerCase()}">${validation.severity}</span>
+                            <button class="btn btn-secondary btn-icon" onclick="removeValidation(${fileId}, ${idx})" title="Remove">
+                                <span>🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        ${getValidationDescription(validation.type)}
+                    </div>
                 </div>
-            `).join('');
+            `;
+        }
+
+        function getValidationCategory(type) {
+            if (type.includes('File')) return 'file-check';
+            if (type.includes('Schema') || type.includes('Column')) return 'schema-check';
+            if (type.includes('Field') || type.includes('Mandatory') || type.includes('Regex') || type.includes('Range') || type.includes('Date')) return 'field-check';
+            if (type.includes('Duplicate') || type.includes('Blank') || type.includes('Unique')) return 'record-check';
+            if (type.includes('Referential') || type.includes('CrossFile')) return 'cross-file-check';
+            if (type.includes('Statistical') || type.includes('Outlier')) return 'statistical-check';
+            return 'field-check';
+        }
+
+        function getValidationIcon(type) {
+            const category = getValidationCategory(type);
+            const icons = {
+                'file-check': '📦',
+                'schema-check': '🔍',
+                'field-check': '✓',
+                'record-check': '📊',
+                'cross-file-check': '🔗',
+                'statistical-check': '📈'
+            };
+            return icons[category] || '✓';
+        }
+
+        function getValidationDescription(type) {
+            const descriptions = {
+                'EmptyFileCheck': 'Ensures the file contains data',
+                'RowCountRangeCheck': 'Validates row count within expected range',
+                'ColumnPresenceCheck': 'Checks required columns exist',
+                'MandatoryFieldCheck': 'Ensures required fields are not null',
+                'UniqueKeyCheck': 'Validates unique constraints',
+                'DuplicateRowCheck': 'Detects duplicate rows'
+            };
+            return descriptions[type] || 'Validates data quality';
+        }
+
+        // File Management
+        function addFile() {
+            const fileId = state.fileCounter++;
+            state.files.push({
+                id: fileId,
+                name: `file_${fileId}`,
+                path: 'data.csv',
+                format: 'csv',
+                validations: []
+            });
+            updateFilesNav();
+            showSection(fileId);
+            updateYAMLPreview();
         }
 
         function updateFile(fileId, field, value) {
             const file = state.files.find(f => f.id === fileId);
             if (file) {
                 file[field] = value;
-                updatePreview();
+                updateFilesNav();
+                updateYAMLPreview();
             }
         }
 
-        function renderValidation(fileId, validation, index) {
-            const def = validationDefs[validation.type];
-            if (!def) return '';
-
-            return `
-                <div class="validation-item">
-                    <div class="validation-item-header">
-                        <div class="validation-type">${validation.type}</div>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <span style="font-size: 0.8em; color: var(--text-muted);">Severity:</span>
-                                <select onchange="updateValidationSeverity(${fileId}, ${index}, this.value)"
-                                        style="padding: 4px 8px; background: var(--bg-dark); border: 1px solid var(--border); color: ${validation.severity === 'ERROR' ? '#feb2b2' : '#fbd38d'}; border-radius: 6px; font-weight: 600; font-size: 0.85em;">
-                                    <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''} style="color: #feb2b2;">🔴 ERROR</option>
-                                    <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''} style="color: #fbd38d;">🟡 WARNING</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-small btn-danger" onclick="removeValidation(${fileId}, ${index})">
-                                ✕
-                            </button>
-                        </div>
-                    </div>
-                    ${def.params && def.params.length > 0 ? `
-                        <div style="margin-top: 12px; display: grid; gap: 12px;">
-                            ${def.params.map(param => renderParameter(fileId, index, param, validation.params[param.name])).join('')}
-                        </div>
-                    ` : ''}
+        function updateFilesNav() {
+            const nav = document.getElementById('filesNav');
+            nav.innerHTML = state.files.map(file => `
+                <div class="nav-item ${state.currentSection === file.id ? 'active' : ''}" onclick="showSection(${file.id})">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-label">${file.name}</span>
+                    ${file.validations.length > 0 ? `<span class="nav-badge">${file.validations.length}</span>` : ''}
                 </div>
-            `;
+            `).join('');
+            document.getElementById('filesCount').textContent = state.files.length;
         }
 
-        function renderParameter(fileId, validationIndex, param, value) {
-            const file = state.files.find(f => f.id === fileId);
-            let input = '';
+        /**
+         * Opens the validation selection wizard for adding a new validation
+         * @param {string} fileId - The ID of the file to add validation to
+         */
+        function addValidation(fileId) {
+            // Open the modal wizard instead of directly adding a validation
+            openValidationModal(fileId);
+        }
 
-            if (param.type === 'boolean') {
-                input = `
-                    <input type="checkbox" ${value ? 'checked' : ''}
-                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.checked)"
-                           style="width: auto;">
-                `;
-            } else if (param.type === 'select') {
-                input = `
-                    <select onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)">
-                        <option value="">Select...</option>
-                        ${param.options.map(opt => `
-                            <option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>
-                        `).join('')}
-                    </select>
-                `;
-            } else if (param.type === 'list') {
-                input = `
-                    <input type="text" value="${value || ''}"
-                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)"
-                           placeholder="${param.hint || 'comma-separated values'}">
-                `;
-            } else if (param.type === 'file_picker') {
-                const otherFiles = state.files.filter(f => f.id !== fileId);
-                input = `
-                    <select onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)">
-                        <option value="">Select file...</option>
-                        ${otherFiles.map(f => `
-                            <option value="${f.path}" ${value === f.path ? 'selected' : ''}>${f.name} (${f.path})</option>
-                        `).join('')}
-                    </select>
-                `;
+        function removeValidation(fileId, idx) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && confirm('Remove this validation?')) {
+                file.validations.splice(idx, 1);
+                renderContent(fileId);
+                updateYAMLPreview();
+                updateFilesNav();
+            }
+        }
+
+        // YAML Generation
+        function updateYAMLPreview() {
+            const yaml = generateYAML();
+            document.getElementById('yamlPreview').textContent = yaml;
+        }
+
+        function generateYAML() {
+            let yaml = `validation_job:
+  name: "${state.jobName}"
+
+settings:
+  chunk_size: ${state.settings.chunk_size}
+  max_sample_failures: ${state.settings.max_sample_failures}
+  fail_fast: ${state.settings.fail_fast}
+  log_level: ${state.settings.log_level}
+
+files:
+`;
+            if (state.files.length === 0) {
+                yaml += '  []';
             } else {
-                input = `
-                    <input type="${param.type === 'number' ? 'number' : 'text'}"
-                           value="${value || ''}"
-                           onchange="updateValidationParam(${fileId}, ${validationIndex}, '${param.name}', this.value)"
-                           placeholder="${param.hint || ''}">
-                `;
-            }
-
-            return `
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <label ${param.required ? 'class="required"' : ''}>${param.name}</label>
-                    ${input}
-                    <small>${param.description}</small>
-                </div>
-            `;
-        }
-
-        function showValidationPicker(fileId) {
-            const modal = createModal('Add Validation', `
-                <div class="category-grid">
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'file')">File Checks</button>
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'schema')">Schema</button>
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'field')">Field Checks</button>
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'record')">Records</button>
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'cross')">Cross-File</button>
-                    <button class="category-btn" onclick="showValidationCategory(${fileId}, 'statistical')">Statistical</button>
-                </div>
-                <div id="validationPickerOptions"></div>
-            `);
-            showModalElement(modal);
-        }
-
-        function showValidationCategory(fileId, category) {
-            const validations = Object.entries(validationDefs).filter(([, def]) => def.category === category);
-            const container = document.getElementById('validationPickerOptions');
-
-            container.innerHTML = `
-                <div class="validation-options active">
-                    ${validations.map(([type, def]) => `
-                        <div class="validation-option" onclick="addValidation(${fileId}, '${type}')">
-                            <div class="tooltip-icon" title="${def.example}">?</div>
-                            <div class="validation-option-name">${type}</div>
-                            <div class="validation-option-desc">${def.description}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function addValidation(fileId, type) {
-            const file = state.files.find(f => f.id === fileId);
-            if (!file) return;
-
-            const validation = {
-                type: type,
-                severity: 'ERROR',
-                params: {}
-            };
-
-            // Initialize params
-            const def = validationDefs[type];
-            if (def && def.params) {
-                def.params.forEach(param => {
-                    if (param.type === 'boolean') {
-                        validation.params[param.name] = false;
+                state.files.forEach(file => {
+                    yaml += `  - name: "${file.name}"
+    path: "${file.path}"
+    format: "${file.format}"
+    validations:
+`;
+                    if (file.validations.length === 0) {
+                        yaml += '      []\n';
                     } else {
-                        validation.params[param.name] = '';
+                        file.validations.forEach(v => {
+                            yaml += `      - type: "${v.type}"
+        severity: "${v.severity}"
+        params: {}
+`;
+                        });
                     }
                 });
             }
-
-            file.validations.push(validation);
-            closeAllModals();
-            renderFiles();
-            updatePreview();
-            showAlert(`${type} added`, 'success');
-        }
-
-        function removeValidation(fileId, index) {
-            const file = state.files.find(f => f.id === fileId);
-            if (!file) return;
-            file.validations.splice(index, 1);
-            renderFiles();
-            updatePreview();
-        }
-
-        function updateValidationSeverity(fileId, index, severity) {
-            const file = state.files.find(f => f.id === fileId);
-            if (!file || !file.validations[index]) return;
-            file.validations[index].severity = severity;
-            updatePreview();
-        }
-
-        function updateValidationParam(fileId, index, paramName, value) {
-            const file = state.files.find(f => f.id === fileId);
-            if (!file || !file.validations[index]) return;
-            file.validations[index].params[paramName] = value;
-            updatePreview();
-        }
-
-        // YAML generation with syntax highlighting
-        function generateYAML() {
-            const jobName = document.getElementById('jobName').value || 'My Validation Job';
-            const jobDesc = document.getElementById('jobDescription').value;
-            const chunkSize = document.getElementById('chunkSize').value || '50000';
-            const maxSamples = document.getElementById('maxSampleFailures').value || '100';
-            const failFast = document.getElementById('failFast').value;
-
-            let yaml = `# Auto-generated validation configuration\n`;
-            yaml += `# Generated: ${new Date().toISOString()}\n\n`;
-            yaml += `validation_job:\n`;
-            yaml += `  name: "${jobName}"\n`;
-            if (jobDesc) yaml += `  description: "${jobDesc}"\n`;
-            yaml += `\n`;
-            yaml += `settings:\n`;
-            yaml += `  chunk_size: ${chunkSize}\n`;
-            yaml += `  max_sample_failures: ${maxSamples}\n`;
-            if (failFast === 'true') yaml += `  fail_fast: true\n`;
-            yaml += `\n`;
-            yaml += `files:\n`;
-
-            state.files.forEach(file => {
-                yaml += `  - name: "${file.name}"\n`;
-                yaml += `    path: "${file.path}"\n`;
-                yaml += `    format: "${file.format}"\n`;
-                yaml += `\n`;
-                yaml += `    validations:\n`;
-
-                if (file.validations.length === 0) {
-                    yaml += `      # No validations configured\n`;
-                } else {
-                    file.validations.forEach(validation => {
-                        yaml += `      - type: "${validation.type}"\n`;
-                        yaml += `        severity: "${validation.severity}"\n`;
-
-                        const def = validationDefs[validation.type];
-                        if (def && def.params && def.params.length > 0) {
-                            const hasParams = def.params.some(p => {
-                                const value = validation.params[p.name];
-                                return value !== '' && value !== false && value !== null && value !== undefined;
-                            });
-
-                            if (hasParams) {
-                                yaml += `        params:\n`;
-                                def.params.forEach(param => {
-                                    const value = validation.params[param.name];
-                                    if (value !== '' && value !== null && value !== undefined) {
-                                        if (param.type === 'list') {
-                                            const items = String(value).split(',').map(s => s.trim()).filter(s => s);
-                                            if (items.length > 0) {
-                                                yaml += `          ${param.name}:\n`;
-                                                items.forEach(item => {
-                                                    const numValue = parseFloat(item);
-                                                    yaml += `            - ${!isNaN(numValue) && numValue.toString() === item ? numValue : `"${item}"`}\n`;
-                                                });
-                                            }
-                                        } else if (param.type === 'boolean') {
-                                            if (value) yaml += `          ${param.name}: ${value}\n`;
-                                        } else if (param.type === 'number') {
-                                            yaml += `          ${param.name}: ${value}\n`;
-                                        } else {
-                                            yaml += `          ${param.name}: "${value}"\n`;
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        yaml += `\n`;
-                    });
-                }
-            });
-
             return yaml;
         }
 
-        function highlightYAML(yaml) {
-            return yaml
-                .replace(/(^|\n)(#.*)/g, '$1<span class="yaml-comment">$2</span>')
-                .replace(/^(\s*)([\w_]+):/gm, '$1<span class="yaml-key">$2</span>:')
-                .replace(/:\s+"([^"]+)"/g, ': <span class="yaml-string">"$1"</span>')
-                .replace(/:\s+(\d+)/g, ': <span class="yaml-number">$1</span>')
-                .replace(/:\s+(true|false)/g, ': <span class="yaml-boolean">$1</span>')
-                .replace(/^(\s*)-/gm, '$1<span class="yaml-dash">-</span>');
+        // UI Controls
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
         }
 
-        function updatePreview() {
-            const yaml = generateYAML();
-            const highlighted = highlightYAML(yaml);
-            document.getElementById('yamlPreview').innerHTML = highlighted;
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobileBackdrop');
+            sidebar.classList.toggle('mobile-visible');
+            backdrop.classList.toggle('show');
+        }
 
-            // Update summary
-            let totalValidations = 0;
-            let totalErrors = 0;
-            let totalWarnings = 0;
+        function togglePreview() {
+            document.getElementById('previewPanel').classList.toggle('collapsed');
+        }
 
-            state.files.forEach(file => {
-                totalValidations += file.validations.length;
-                file.validations.forEach(v => {
-                    if (v.severity === 'ERROR') totalErrors++;
-                    else totalWarnings++;
-                });
+        function copyYAML() {
+            const yaml = document.getElementById('yamlPreview').textContent;
+            navigator.clipboard.writeText(yaml).then(() => {
+                alert('YAML copied to clipboard!');
             });
-
-            document.getElementById('totalFiles').textContent = state.files.length;
-            document.getElementById('totalValidations').textContent = totalValidations;
-            document.getElementById('totalErrors').textContent = totalErrors;
-            document.getElementById('totalWarnings').textContent = totalWarnings;
-        }
-
-        // Templates
-        function showTemplates() {
-            const modal = createModal('Choose Template', `
-                <div class="template-grid">
-                    ${templates.map((t, idx) => `
-                        <div class="template-card" onclick="applyTemplate(${idx})">
-                            <div class="template-card-header">
-                                <div class="template-name">${t.icon} ${t.name}</div>
-                            </div>
-                            <div class="template-desc">${t.description}</div>
-                            <div class="template-stats">
-                                <span>📁 ${t.files} file${t.files > 1 ? 's' : ''}</span>
-                                <span>✓ ${t.validations} validations</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                    <div class="template-card" onclick="closeAllModals()">
-                        <div class="template-card-header">
-                            <div class="template-name">➕ Blank</div>
-                        </div>
-                        <div class="template-desc">Start from scratch</div>
-                        <div class="template-stats">
-                            <span>Build your own</span>
-                        </div>
-                    </div>
-                </div>
-            `);
-            showModalElement(modal);
-        }
-
-        function applyTemplate(index) {
-            const template = templates[index];
-            if (!confirm(`Load "${template.name}" template? This will replace your current configuration.`)) {
-                return;
-            }
-
-            state.files = template.config.files.map((f, idx) => ({
-                id: state.fileCounter++,
-                ...f
-            }));
-
-            closeAllModals();
-            renderFiles();
-            updatePreview();
-            showAlert(`Template "${template.name}" loaded`, 'success');
-        }
-
-        // Import/Export
-        function showImport() {
-            document.getElementById('importModal').classList.add('show');
-        }
-
-        function importYAML() {
-            const yaml = document.getElementById('importYaml').value;
-            if (!yaml.trim()) {
-                showAlert('Please paste a YAML configuration', 'error');
-                return;
-            }
-
-            try {
-                // Simple YAML parser (for demo - in production use js-yaml library)
-                const config = parseYAML(yaml);
-                loadConfig(config);
-                closeModal('importModal');
-                showAlert('Configuration imported successfully', 'success');
-            } catch (e) {
-                showAlert('Error parsing YAML: ' + e.message, 'error');
-            }
-        }
-
-        function parseYAML(yaml) {
-            // Simplified parser - in production use js-yaml
-            // This is a basic implementation for demonstration
-            const lines = yaml.split('\n');
-            const config = { files: [] };
-            let currentFile = null;
-            let currentValidation = null;
-            let inParams = false;
-
-            lines.forEach(line => {
-                line = line.replace(/^  /, '').replace(/^    /, '');
-
-                if (line.includes('- name:')) {
-                    if (currentFile) config.files.push(currentFile);
-                    currentFile = {
-                        name: line.match(/name:\s*"?([^"]+)"?/)[1],
-                        validations: []
-                    };
-                } else if (currentFile && line.includes('path:')) {
-                    currentFile.path = line.match(/path:\s*"?([^"]+)"?/)[1];
-                } else if (currentFile && line.includes('format:')) {
-                    currentFile.format = line.match(/format:\s*"?([^"]+)"?/)[1];
-                } else if (line.includes('- type:')) {
-                    if (currentValidation) currentFile.validations.push(currentValidation);
-                    currentValidation = {
-                        type: line.match(/type:\s*"?([^"]+)"?/)[1],
-                        params: {}
-                    };
-                    inParams = false;
-                } else if (currentValidation && line.includes('severity:')) {
-                    currentValidation.severity = line.match(/severity:\s*"?([^"]+)"?/)[1];
-                } else if (line.includes('params:')) {
-                    inParams = true;
-                }
-            });
-
-            if (currentValidation) currentFile.validations.push(currentValidation);
-            if (currentFile) config.files.push(currentFile);
-
-            return config;
-        }
-
-        function loadConfig(config) {
-            state.files = config.files.map((f, idx) => ({
-                id: state.fileCounter++,
-                name: f.name || `file_${idx + 1}`,
-                path: f.path || 'data.csv',
-                format: f.format || 'csv',
-                validations: f.validations || []
-            }));
-
-            renderFiles();
-            updatePreview();
         }
 
         function downloadConfig() {
@@ -2093,222 +1776,13 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = 'validation_config.yaml';
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showAlert('Configuration downloaded', 'success');
         }
 
-        function copyConfig() {
-            const yaml = generateYAML();
-            navigator.clipboard.writeText(yaml).then(() => {
-                showAlert('Configuration copied to clipboard', 'success');
-            }).catch(() => {
-                showAlert('Failed to copy to clipboard', 'error');
-            });
-        }
-
-        // LocalStorage
-        function saveToLocalStorage(auto = false) {
-            const config = {
-                files: state.files,
-                settings: {
-                    jobName: document.getElementById('jobName').value,
-                    jobDescription: document.getElementById('jobDescription').value,
-                    chunkSize: document.getElementById('chunkSize').value,
-                    maxSampleFailures: document.getElementById('maxSampleFailures').value,
-                    failFast: document.getElementById('failFast').value
-                },
-                savedAt: new Date().toISOString()
-            };
-
-            localStorage.setItem('validationConfig_autosave', JSON.stringify(config));
-
-            if (!auto) {
-                showAlert('Configuration saved locally', 'success');
-            }
-        }
-
-        function showSaved() {
-            const modal = createModal('Saved Configurations', `
-                <div class="help-box">
-                    <strong>Auto-saved configuration</strong><br>
-                    Your work is automatically saved every 30 seconds.
-                </div>
-                <button class="btn btn-success" onclick="loadSaved(); closeAllModals();" style="width: 100%;">
-                    Load Last Saved Configuration
-                </button>
-                <button class="btn btn-danger" onclick="clearSaved(); closeAllModals();" style="width: 100%; margin-top: 10px;">
-                    Clear Saved Data
-                </button>
-            `);
-            showModalElement(modal);
-        }
-
-        function loadSaved() {
-            const saved = localStorage.getItem('validationConfig_autosave');
-            if (!saved) {
-                showAlert('No saved configuration found', 'warning');
-                return;
-            }
-
-            const config = JSON.parse(saved);
-            loadConfig(config);
-
-            if (config.settings) {
-                document.getElementById('jobName').value = config.settings.jobName || '';
-                document.getElementById('jobDescription').value = config.settings.jobDescription || '';
-                document.getElementById('chunkSize').value = config.settings.chunkSize || '50000';
-                document.getElementById('maxSampleFailures').value = config.settings.maxSampleFailures || '100';
-                document.getElementById('failFast').value = config.settings.failFast || 'false';
-            }
-
-            showAlert('Configuration loaded', 'success');
-        }
-
-        function clearSaved() {
-            if (!confirm('Clear all saved data?')) return;
-            localStorage.removeItem('validationConfig_autosave');
-            showAlert('Saved data cleared', 'info');
-        }
-
-        // Sharing
-        function showShare() {
-            const yaml = generateYAML();
-            const encoded = btoa(encodeURIComponent(yaml));
-            const url = window.location.origin + window.location.pathname + '#config=' + encoded;
-
-            document.getElementById('shareUrl').value = url;
-            document.getElementById('shareModal').classList.add('show');
-        }
-
-        function copyShareUrl() {
-            const input = document.getElementById('shareUrl');
-            input.select();
-            navigator.clipboard.writeText(input.value).then(() => {
-                showAlert('Share URL copied', 'success');
-            });
-        }
-
-        function loadFromURLHash() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#config=')) {
-                try {
-                    const encoded = hash.substring(8);
-                    const yaml = decodeURIComponent(atob(encoded));
-                    const config = parseYAML(yaml);
-                    loadConfig(config);
-                    showAlert('Configuration loaded from URL', 'success');
-                } catch (e) {
-                    console.error('Error loading from URL:', e);
-                }
-            }
-        }
-
-        // UI helpers
-        function toggleSection(btn) {
-            const content = btn.parentElement.nextElementSibling;
-            content.classList.toggle('collapsed');
-            btn.textContent = content.classList.contains('collapsed') ? '+' : '−';
-        }
-
-        function switchMobileTab(tab) {
-            const builderPanel = document.getElementById('builder-panel');
-            const previewPanel = document.getElementById('preview-panel');
-            const tabs = document.querySelectorAll('.mobile-tab');
-
-            builderPanel.classList.remove('mobile-active');
-            previewPanel.classList.remove('mobile-active');
-            tabs.forEach(t => t.classList.remove('active'));
-
-            if (tab === 'builder') {
-                builderPanel.classList.add('mobile-active');
-                tabs[0].classList.add('active');
-            } else {
-                previewPanel.classList.add('mobile-active');
-                tabs[1].classList.add('active');
-            }
-        }
-
-        function showAlert(message, type = 'info') {
-            const alertArea = document.getElementById('alertArea');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type} show`;
-            alert.textContent = message;
-            alertArea.appendChild(alert);
-
-            setTimeout(() => {
-                alert.classList.remove('show');
-                setTimeout(() => alert.remove(), 300);
-            }, 3000);
-        }
-
-        function createModal(title, content) {
-            return `
-                <div class="modal-header">
-                    <h3 class="modal-title">${title}</h3>
-                    <button class="close-btn" onclick="closeAllModals()">&times;</button>
-                </div>
-                ${content}
-            `;
-        }
-
-        function showModalElement(html) {
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `<div class="modal-content">${html}</div>`;
-            modal.onclick = (e) => {
-                if (e.target === modal) closeAllModals();
-            };
-            document.body.appendChild(modal);
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        function closeAllModals() {
-            document.querySelectorAll('.modal').forEach(m => m.remove());
-            document.querySelectorAll('.modal.show').forEach(m => m.classList.remove('show'));
-        }
-
-        function clearAll() {
-            if (!confirm('Clear all files and validations?')) return;
-            state.files = [];
-            state.fileCounter = 0;
-            addFile();
-            showAlert('Configuration cleared', 'info');
-        }
-
-        function showShortcuts() {
-            const modal = createModal('⌨️ Keyboard Shortcuts', `
-                <div style="display: grid; gap: 15px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Save configuration</span>
-                        <span class="kbd">Ctrl/Cmd + S</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Download configuration</span>
-                        <span class="kbd">Ctrl/Cmd + D</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Import YAML</span>
-                        <span class="kbd">Ctrl/Cmd + I</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Show this help</span>
-                        <span class="kbd">?</span>
-                    </div>
-                </div>
-            `);
-            showModalElement(modal);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        function handleSearch(event) {
+            // TODO: Implement search functionality
+            console.log('Search:', event.target.value);
         }
     </script>
 </body>
