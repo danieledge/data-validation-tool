@@ -121,6 +121,7 @@ See the profiler in action with these interactive example reports:
 - **[Validation Catalog](docs/VALIDATION_CATALOG.md)** - All 35+ validation types documented
 - **[Data Profiling Guide](docs/DATA_PROFILING.md)** - Analyze data before validation
 - **⭐ [Best Practices](docs/BEST_PRACTICES.md)** - ERROR vs WARNING, essential validations, production tips
+- **💡 [No-Code Custom Validations](docs/NO_CODE_CUSTOM_VALIDATIONS.md)** - Build custom rules without programming
 
 ### Advanced Usage
 - **[Advanced Guide](docs/ADVANCED_GUIDE.md)** - Complex scenarios, performance tuning
