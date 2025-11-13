@@ -421,6 +421,147 @@
             background: #667eea;
         }
 
+        .toc {
+            background: #2d2d44;
+            padding: 25px 40px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        .toc h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .toc-list li {
+            padding: 0;
+        }
+
+        .toc-list a {
+            color: #a0aec0;
+            text-decoration: none;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 6px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .toc-list a:hover {
+            background: #1a1a2e;
+            color: #667eea;
+        }
+
+        .toc-list a::before {
+            content: "▸ ";
+            color: #667eea;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header .subtitle {
+                font-size: 0.9em;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 1.5em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.4em;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            .column-content {
+                grid-template-columns: 1fr;
+            }
+
+            .column-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .config-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .top-values-table {
+                font-size: 0.85em;
+            }
+
+            .top-values-table th,
+            .top-values-table td {
+                padding: 6px 8px;
+            }
+
+            /* Make tables scrollable on mobile */
+            .config-code {
+                font-size: 0.75em;
+                overflow-x: auto;
+            }
+
+            .command-box {
+                font-size: 0.8em;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+
         @media print {
             body {
                 background: white;
@@ -437,16 +578,30 @@
             <h1>📊 Data Profile Report</h1>
             <div class="subtitle">example_data.csv</div>
             <div class="subtitle" style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
-                Profiled on 2025-11-13 09:43:53 •
+                Profiled on 2025-11-13 09:51:45 •
                 Processing time: 0.03s
             </div>
         </div>
 
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📋 Report Sections</h3>
+            <ul class="toc-list">
+                <li><a href="#summary">Summary</a></li>
+                <li><a href="#quality-overview">Quality Overview</a></li>
+                <li><a href="#column-profiles">Column Profiles</a></li>
+                
+                <li><a href="#suggestions">Suggested Validations</a></li>
+                <li><a href="#config">Generated Configuration</a></li>
+            </ul>
+        </div>
+
         <!-- Summary Section -->
+        <div id="summary"></div>
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="label">File Size</div>
-                <div class="value">0.00 MB</div>
+                <div class="value">2.51 KB</div>
             </div>
             <div class="summary-card">
                 <div class="label">Format</div>
@@ -471,7 +626,7 @@
         </div>
 
         <!-- Quality Overview Charts -->
-        <div class="section">
+        <div id="quality-overview" class="section">
             <h2 class="section-title">📈 Quality Overview</h2>
 
             <div class="chart-container">
@@ -490,7 +645,7 @@
         </div>
 
         <!-- Column Profiles Section -->
-        <div class="section">
+        <div id="column-profiles" class="section">
             <h2 class="section-title">🔍 Column Profiles</h2>
             <div class="column-grid">
                 
@@ -1889,7 +2044,7 @@
         
 
         <!-- Suggested Validations Section -->
-        <div class="section">
+        <div id="suggestions" class="section">
             <h2 class="section-title">💡 Suggested Validations</h2>
             <p style="color: #cbd5e0; margin-bottom: 20px;">
                 Based on the data profile, here are 8 recommended validations
@@ -2013,7 +2168,7 @@
         </div>
 
         <!-- Generated Configuration Section -->
-        <div class="section">
+        <div id="config" class="section">
             <h2 class="section-title">⚙️ Generated Validation Configuration</h2>
             <p style="color: #cbd5e0; margin-bottom: 20px;">
                 A validation configuration file has been auto-generated based on this profile.
@@ -2028,7 +2183,7 @@
                 <div class="config-code">
                     <pre id="configYaml"># Auto-generated validation configuration
 # Generated from profile of: example_data.csv
-# Generated at: 2025-11-13 09:43:53
+# Generated at: 2025-11-13 09:51:45
 
 validation_job:
   name: &quot;Validation for example_data.csv&quot;

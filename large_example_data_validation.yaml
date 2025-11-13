@@ -1,0 +1,128 @@
+# Auto-generated validation configuration
+# Generated from profile of: large_example_data.csv
+# Generated at: 2025-11-13 09:51:47
+
+validation_job:
+  name: "Validation for large_example_data.csv"
+  description: "Auto-generated from data profile"
+
+settings:
+  chunk_size: 50000
+  max_sample_failures: 100
+
+files:
+  - name: "large_example_data"
+    path: "large_example_data.csv"
+    format: "csv"
+
+    validations:
+      - type: "EmptyFileCheck"
+        severity: "ERROR"
+        # Prevent empty file loads
+
+      - type: "UniqueKeyCheck"
+        severity: "ERROR"
+        params:
+          fields:
+            - "order_id"
+        # Field appears to be a unique identifier
+
+      - type: "MandatoryFieldCheck"
+        severity: "ERROR"
+        params:
+          fields:
+            - "order_id"
+            - "customer_name"
+            - "order_date"
+            - "amount"
+            - "status"
+            - "quantity"
+            - "product_category"
+            - "shipping_country"
+            - "discount_pct"
+        # 9 fields have >95% completeness
+
+      - type: "RangeCheck"
+        severity: "WARNING"
+        params:
+          field: "order_id"
+          min_value: 100001.0
+          max_value: 105000.0
+        # Values range from 100001.0 to 105000.0
+
+      - type: "RangeCheck"
+        severity: "WARNING"
+        params:
+          field: "amount"
+          min_value: 10.16
+          max_value: 4985.29
+        # Values range from 10.16 to 4985.29
+
+      - type: "RangeCheck"
+        severity: "WARNING"
+        params:
+          field: "quantity"
+          min_value: 1.0
+          max_value: 20.0
+        # Values range from 1.0 to 20.0
+
+      - type: "RangeCheck"
+        severity: "WARNING"
+        params:
+          field: "discount_pct"
+          min_value: 0.0
+          max_value: 25.0
+        # Values range from 0.0 to 25.0
+
+      - type: "ValidValuesCheck"
+        severity: "ERROR"
+        params:
+          field: "status"
+          valid_values:
+            - "SHIPPED"
+            - "CANCELLED"
+            - "COMPLETED"
+            - "PENDING"
+        # Low cardinality field with 4 unique values
+
+      - type: "ValidValuesCheck"
+        severity: "ERROR"
+        params:
+          field: "product_category"
+          valid_values:
+            - "Sports"
+            - "Clothing"
+            - "Books"
+            - "Electronics"
+            - "Home"
+            - "Beauty"
+        # Low cardinality field with 6 unique values
+
+      - type: "ValidValuesCheck"
+        severity: "ERROR"
+        params:
+          field: "shipping_country"
+          valid_values:
+            - "DE"
+            - "CA"
+            - "UK"
+            - "AU"
+            - "USA"
+            - "IT"
+            - "ES"
+            - "FR"
+        # Low cardinality field with 8 unique values
+
+      - type: "RowCountRangeCheck"
+        severity: "WARNING"
+        params:
+          min_rows: 2500
+          max_rows: 10000
+        # Expect approximately 5000 rows based on profile
+
+      - type: "DateFormatCheck"
+        severity: "ERROR"
+        params:
+          field: "order_date"
+          format: "%Y-%m-%d"
+        # Detected date format: %Y-%m-%d

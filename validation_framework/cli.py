@@ -363,9 +363,20 @@ def profile(file_path, format, html_output, json_output, config_output, chunk_si
             file_format=format
         )
 
+        # Format file size
+        size_bytes = profile_result.file_size_bytes
+        if size_bytes < 1024:
+            size_str = f"{size_bytes} B"
+        elif size_bytes < 1024 * 1024:
+            size_str = f"{size_bytes / 1024:.2f} KB"
+        elif size_bytes < 1024 * 1024 * 1024:
+            size_str = f"{size_bytes / (1024 * 1024):.2f} MB"
+        else:
+            size_str = f"{size_bytes / (1024 * 1024 * 1024):.2f} GB"
+
         click.echo(f"\n📊 Profile Summary:")
         click.echo(f"  • File: {profile_result.file_name}")
-        click.echo(f"  • Size: {profile_result.file_size_bytes / (1024*1024):.2f} MB")
+        click.echo(f"  • Size: {size_str}")
         click.echo(f"  • Rows: {profile_result.row_count:,}")
         click.echo(f"  • Columns: {profile_result.column_count}")
         click.echo(f"  • Overall Quality Score: {profile_result.overall_quality_score:.1f}%")

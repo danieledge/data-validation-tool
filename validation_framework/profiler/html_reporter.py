@@ -485,6 +485,147 @@ class ProfileHTMLReporter:
             background: #667eea;
         }}
 
+        .toc {{
+            background: #2d2d44;
+            padding: 25px 40px;
+            border-bottom: 2px solid #2d3748;
+        }}
+
+        .toc h3 {{
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }}
+
+        .toc-list {{
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }}
+
+        .toc-list li {{
+            padding: 0;
+        }}
+
+        .toc-list a {{
+            color: #a0aec0;
+            text-decoration: none;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 6px;
+            transition: background 0.3s, color 0.3s;
+        }}
+
+        .toc-list a:hover {{
+            background: #1a1a2e;
+            color: #667eea;
+        }}
+
+        .toc-list a::before {{
+            content: "▸ ";
+            color: #667eea;
+        }}
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {{
+            body {{
+                padding: 10px;
+            }}
+
+            .header h1 {{
+                font-size: 1.8em;
+            }}
+
+            .header .subtitle {{
+                font-size: 0.9em;
+            }}
+
+            .summary-grid {{
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                padding: 20px;
+                gap: 15px;
+            }}
+
+            .summary-card .value {{
+                font-size: 1.5em;
+            }}
+
+            .section {{
+                padding: 20px;
+            }}
+
+            .section-title {{
+                font-size: 1.4em;
+            }}
+
+            .chart-container {{
+                padding: 15px;
+            }}
+
+            .chart-wrapper {{
+                height: 300px;
+            }}
+
+            .column-content {{
+                grid-template-columns: 1fr;
+            }}
+
+            .column-header {{
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }}
+
+            .config-header {{
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }}
+
+            .top-values-table {{
+                font-size: 0.85em;
+            }}
+
+            .top-values-table th,
+            .top-values-table td {{
+                padding: 6px 8px;
+            }}
+
+            /* Make tables scrollable on mobile */
+            .config-code {{
+                font-size: 0.75em;
+                overflow-x: auto;
+            }}
+
+            .command-box {{
+                font-size: 0.8em;
+                overflow-x: auto;
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            .header {{
+                padding: 20px;
+            }}
+
+            .header h1 {{
+                font-size: 1.5em;
+            }}
+
+            .summary-grid {{
+                grid-template-columns: 1fr;
+            }}
+
+            .section {{
+                padding: 15px;
+            }}
+
+            .chart-wrapper {{
+                height: 250px;
+            }}
+        }}
+
         @media print {{
             body {{
                 background: white;
@@ -506,11 +647,25 @@ class ProfileHTMLReporter:
             </div>
         </div>
 
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📋 Report Sections</h3>
+            <ul class="toc-list">
+                <li><a href="#summary">Summary</a></li>
+                <li><a href="#quality-overview">Quality Overview</a></li>
+                <li><a href="#column-profiles">Column Profiles</a></li>
+                {f'<li><a href="#correlations">Correlations</a></li>' if profile.correlations else ''}
+                <li><a href="#suggestions">Suggested Validations</a></li>
+                <li><a href="#config">Generated Configuration</a></li>
+            </ul>
+        </div>
+
         <!-- Summary Section -->
+        <div id="summary"></div>
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="label">File Size</div>
-                <div class="value">{profile.file_size_bytes / (1024 * 1024):.2f} MB</div>
+                <div class="value">{self._format_file_size(profile.file_size_bytes)}</div>
             </div>
             <div class="summary-card">
                 <div class="label">Format</div>
@@ -535,7 +690,7 @@ class ProfileHTMLReporter:
         </div>
 
         <!-- Quality Overview Charts -->
-        <div class="section">
+        <div id="quality-overview" class="section">
             <h2 class="section-title">📈 Quality Overview</h2>
 
             <div class="chart-container">
@@ -554,7 +709,7 @@ class ProfileHTMLReporter:
         </div>
 
         <!-- Column Profiles Section -->
-        <div class="section">
+        <div id="column-profiles" class="section">
             <h2 class="section-title">🔍 Column Profiles</h2>
             <div class="column-grid">
                 {self._generate_column_profiles(profile.columns)}
@@ -565,7 +720,7 @@ class ProfileHTMLReporter:
         {self._generate_correlations_section(profile.correlations)}
 
         <!-- Suggested Validations Section -->
-        <div class="section">
+        <div id="suggestions" class="section">
             <h2 class="section-title">💡 Suggested Validations</h2>
             <p style="color: #cbd5e0; margin-bottom: 20px;">
                 Based on the data profile, here are {len(profile.suggested_validations)} recommended validations
@@ -577,7 +732,7 @@ class ProfileHTMLReporter:
         </div>
 
         <!-- Generated Configuration Section -->
-        <div class="section">
+        <div id="config" class="section">
             <h2 class="section-title">⚙️ Generated Validation Configuration</h2>
             <p style="color: #cbd5e0; margin-bottom: 20px;">
                 A validation configuration file has been auto-generated based on this profile.
@@ -712,6 +867,17 @@ class ProfileHTMLReporter:
 </html>'''
 
         return html
+
+    def _format_file_size(self, size_bytes: int) -> str:
+        """Format file size with appropriate units."""
+        if size_bytes < 1024:
+            return f"{size_bytes} B"
+        elif size_bytes < 1024 * 1024:
+            return f"{size_bytes / 1024:.2f} KB"
+        elif size_bytes < 1024 * 1024 * 1024:
+            return f"{size_bytes / (1024 * 1024):.2f} MB"
+        else:
+            return f"{size_bytes / (1024 * 1024 * 1024):.2f} GB"
 
     def _get_quality_class(self, score: float) -> str:
         """Get CSS class for quality score."""
@@ -867,7 +1033,7 @@ class ProfileHTMLReporter:
             """)
 
         return f"""
-            <div class="section">
+            <div id="correlations" class="section">
                 <h2 class="section-title">🔗 Correlations</h2>
                 <p style="color: #cbd5e0; margin-bottom: 20px;">
                     Detected {len(correlations)} significant correlations between numeric columns:

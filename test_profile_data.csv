@@ -1,0 +1,11 @@
+customer_id,name,email,balance,account_type,created_date,is_active
+1001,John Smith,john.smith@email.com,15000.50,PREMIUM,2023-01-15,true
+1002,Jane Doe,jane.doe@email.com,8500.25,STANDARD,2023-02-20,true
+1003,Bob Johnson,bob.johnson@email.com,22000.00,PREMIUM,2023-01-10,true
+1004,Alice Brown,,5000.00,STANDARD,2023-03-05,false
+1005,Charlie Wilson,charlie.w@email.com,12500.75,PREMIUM,2023-01-22,true
+1006,Diana Miller,diana.miller@email.com,3500.00,BASIC,2023-04-01,true
+1007,Eve Davis,eve.davis@email.com,18000.00,PREMIUM,2023-02-14,true
+1008,Frank Moore,,9500.50,STANDARD,2023-03-10,true
+1009,Grace Lee,grace.lee@email.com,25000.00,PREMIUM,2023-01-05,true
+1010,Henry Taylor,henry.t@email.com,7500.25,STANDARD,2023-02-28,false
