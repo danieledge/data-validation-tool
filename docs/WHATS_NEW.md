@@ -4,7 +4,70 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.2.0 (Current) - January 2025
+## Version 2.3.0 (Current) - January 2025
+
+### 🎨 Visual Config Builder v3 - Complete UI/UX Redesign
+
+**Major redesign with three-panel layout and validation wizard!** Professional, modern interface inspired by leading open-source config builders.
+
+**NEW in v3 - Complete Interface Overhaul:**
+
+**Three-Panel Layout:**
+- **Sidebar Navigation** (260px) - Job settings, files list with badges, advanced settings
+- **Main Workspace** (fluid) - Form-based configuration with clear sections
+- **Live Preview Panel** (400px) - Real-time YAML preview with syntax highlighting
+- **Mobile-First Design** - Hidden sidebar with hamburger menu, collapsible preview panel
+
+**Validation Type Selection Wizard:**
+- **21 Validation Types** organized into 6 color-coded categories:
+  - 📄 **File Validations** (Blue) - EmptyFileCheck, RowCountRangeCheck, FileSizeCheck
+  - 🏗️ **Schema Validations** (Purple) - SchemaMatchCheck, ColumnPresenceCheck, DataTypeCheck
+  - ✏️ **Field Validations** (Green) - MandatoryFieldCheck, RegexCheck, ValidValuesCheck, RangeCheck, DateFormatCheck, StringLengthCheck, CompletenessCheck
+  - 📋 **Record Validations** (Orange) - DuplicateRowCheck, BlankRecordCheck, UniqueKeyCheck
+  - 🔗 **Cross-File Validations** (Pink) - ReferentialIntegrityCheck, CrossFileComparisonCheck, CrossFileDuplicateCheck
+  - 📊 **Statistical Validations** (Teal) - StatisticalOutlierCheck, DistributionCheck, CorrelationCheck
+- **Interactive Modal** - Visual selection with descriptions, severity picker (ERROR/WARNING)
+- **Smart Selection** - Disabled confirm button until validation type selected
+- **Hover States** - Clear visual feedback on hover and selection
+
+**Design Improvements:**
+- **Modern Card-Based UI** - Validation cards with color-coded left borders
+- **Hierarchical Navigation** - Collapsible sidebar with nested items
+- **Responsive Breakpoints** - Mobile (<768px), Tablet (768-1024px), Desktop (>1024px)
+- **Professional Color Palette** - Dark theme with distinct category colors
+- **Smooth Animations** - Fade-in modals, hover transitions, mobile sidebar slide
+- **Touch-Friendly** - 44px minimum touch targets on mobile
+
+**UX Research Foundation:**
+Analyzed 6 leading open-source projects (n8n.io, OpenAPI-GUI, Grafana, Google YAML Editor, HeyForm, GrapesJS) to identify best UX patterns and implement proven design solutions.
+
+**How to Use:**
+```bash
+# Open the new v3 config builder
+open docs/config-builder-v3.html
+
+# Features:
+# 1. Click "Add Your First File" in Job Settings
+# 2. Click "Add Validation" to open the wizard
+# 3. Select validation type from organized categories
+# 4. Choose severity level (ERROR/WARNING)
+# 5. Configure parameters in form fields
+# 6. See real-time YAML preview in right panel
+# 7. Download generated YAML configuration
+```
+
+**Benefits:**
+- ✅ **Intuitive Navigation** - Three-panel layout matches industry standards
+- ✅ **Visual Organization** - Color-coded validation categories
+- ✅ **Clear Workflows** - Wizard-based validation selection
+- ✅ **Professional Design** - Modern, polished interface
+- ✅ **Mobile Optimized** - Full responsive design with proper mobile UX
+- ✅ **Real-Time Feedback** - Live YAML preview updates as you configure
+- ✅ **Research-Backed** - UX patterns from leading open-source projects
+
+---
+
+## Version 2.2.0 - January 2025
 
 ### 🎨 Visual Config Builder v2 - Complete Overhaul
 
