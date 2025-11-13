@@ -4,9 +4,12 @@
 
 A robust, extensible Python framework for validating data quality before loading to databases, data warehouses, or analytics platforms. Designed to handle enterprise-scale datasets (200GB+) with memory-efficient chunked processing.
 
+[![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg)](docs/WHATS_NEW.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Tests: 102 passing](https://img.shields.io/badge/tests-102%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
+
+**🎉 NEW in v2.0:** [Data Profiling](docs/DATA_PROFILING.md) • [Enhanced Empty File Detection](docs/WHATS_NEW.md#enhanced-empty-file-detection) • [Mobile-Responsive Reports](docs/WHATS_NEW.md#mobile-responsive-html-reports) • **[See What's New →](docs/WHATS_NEW.md)**
 
 ---
 
@@ -112,6 +115,7 @@ See the profiler in action with these interactive example reports:
 ## 📚 Documentation
 
 ### Getting Started
+- **🎉 [What's New](docs/WHATS_NEW.md)** - Latest features and changes (v2.0.0)
 - **[Quick Start (5 minutes)](docs/GETTING_STARTED.md)** - Installation to first validation
 - **[User Guide](docs/USER_GUIDE.md)** - Complete configuration reference
 - **[Validation Catalog](docs/VALIDATION_CATALOG.md)** - All 23 validation types documented
@@ -441,9 +445,11 @@ Contributions welcome! See **[Developer Guide](docs/DEVELOPER_GUIDE.md)** for:
 ## 📖 Additional Resources
 
 ### Documentation
+- [What's New](docs/WHATS_NEW.md) - Latest features and changes
 - [Getting Started](docs/GETTING_STARTED.md)
 - [User Guide](docs/USER_GUIDE.md)
 - [Validation Catalog](docs/VALIDATION_CATALOG.md)
+- [Data Profiling Guide](docs/DATA_PROFILING.md)
 - [Advanced Guide](docs/ADVANCED_GUIDE.md)
 - [Examples](docs/EXAMPLES.md)
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
