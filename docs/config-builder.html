@@ -294,19 +294,195 @@
             font-size: 1.1em;
         }
 
+        /* Tablet and below */
         @media (max-width: 1200px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
         }
 
+        /* Mobile optimizations */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
             .header h1 {
-                font-size: 1.8em;
+                font-size: 1.6em;
+                line-height: 1.2;
+            }
+
+            .header .subtitle {
+                font-size: 0.9em;
+            }
+
+            .main-content {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .section-title {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+            }
+
+            /* Make all buttons touch-friendly (min 44px) */
+            .button {
+                padding: 14px 20px;
+                font-size: 0.95em;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .category-btn {
+                padding: 14px 10px;
+                font-size: 0.9em;
+                min-height: 44px;
+            }
+
+            .validation-categories {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .validation-options {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .validation-option {
+                padding: 14px;
+                min-height: 60px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
             }
 
             .param-row {
                 grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .remove-btn {
+                width: 100%;
+                padding: 12px;
+                margin-top: 8px;
+            }
+
+            .validation-item {
+                padding: 12px;
+            }
+
+            .validation-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .validation-item-header select {
+                width: 100%;
+            }
+
+            .code-preview {
+                font-size: 0.75em;
+                padding: 12px;
+                max-height: 400px;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 14px 12px;
+            }
+
+            .help-text {
+                padding: 12px;
+                font-size: 0.85em;
+            }
+
+            .file-section {
+                padding: 15px;
+            }
+        }
+
+        /* Extra small mobile phones */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .header .subtitle {
+                font-size: 0.8em;
+            }
+
+            .validation-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .category-btn {
+                font-size: 0.85em;
+            }
+
+            .section {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .code-preview {
+                font-size: 0.7em;
+                padding: 10px;
+            }
+
+            .validation-option-name {
+                font-size: 0.95em;
+            }
+
+            .validation-option-desc {
+                font-size: 0.75em;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.4em;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .code-preview {
+                max-height: 250px;
+            }
+        }
+
+        /* Improve touch targets across all sizes */
+        @media (hover: none) and (pointer: coarse) {
+            .button,
+            .category-btn,
+            .validation-option,
+            .remove-btn,
+            select {
+                min-height: 44px;
+            }
+
+            .form-group input,
+            .form-group select {
+                min-height: 48px;
             }
         }
 
@@ -371,6 +547,62 @@
             font-size: 0.85em;
             color: #a0aec0;
         }
+
+        /* Mobile tab switcher */
+        .mobile-tabs {
+            display: none;
+            background: #2d2d44;
+            border-bottom: 2px solid #4a5568;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mobile-tabs-container {
+            display: flex;
+            gap: 0;
+        }
+
+        .mobile-tab {
+            flex: 1;
+            padding: 16px;
+            background: #1a1a2e;
+            border: none;
+            color: #cbd5e0;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .mobile-tab.active {
+            background: #2d2d44;
+            color: #ffffff;
+            border-bottom-color: #667eea;
+        }
+
+        .mobile-tab:active {
+            background: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: block;
+            }
+
+            .main-content > div:not(.mobile-active) {
+                display: none !important;
+            }
+
+            .main-content > div {
+                display: block;
+            }
+
+            .main-content > div.mobile-active {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -380,9 +612,21 @@
             <div class="subtitle">Build validation configurations visually - no coding required</div>
         </div>
 
+        <!-- Mobile tab switcher -->
+        <div class="mobile-tabs">
+            <div class="mobile-tabs-container">
+                <button class="mobile-tab active" onclick="switchMobileTab('builder')">
+                    ⚙️ Builder
+                </button>
+                <button class="mobile-tab" onclick="switchMobileTab('preview')">
+                    👁️ Preview
+                </button>
+            </div>
+        </div>
+
         <div class="main-content">
             <!-- Left Panel: Configuration Builder -->
-            <div>
+            <div id="builder-panel" class="mobile-active">
                 <!-- Job Settings -->
                 <div class="section">
                     <h2 class="section-title">📋 Job Settings</h2>
@@ -540,7 +784,7 @@
             </div>
 
             <!-- Right Panel: Preview and Actions -->
-            <div>
+            <div id="preview-panel">
                 <!-- YAML Preview -->
                 <div class="section full-width">
                     <h2 class="section-title">👁️ Configuration Preview</h2>
@@ -952,6 +1196,29 @@
                 validations = [];
                 renderValidations();
                 updatePreview();
+            }
+        }
+
+        // Mobile tab switching
+        function switchMobileTab(tab) {
+            const builderPanel = document.getElementById('builder-panel');
+            const previewPanel = document.getElementById('preview-panel');
+            const tabs = document.querySelectorAll('.mobile-tab');
+
+            // Remove active class from all panels
+            builderPanel.classList.remove('mobile-active');
+            previewPanel.classList.remove('mobile-active');
+
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+
+            // Add active class to selected panel and tab
+            if (tab === 'builder') {
+                builderPanel.classList.add('mobile-active');
+                tabs[0].classList.add('active');
+            } else {
+                previewPanel.classList.add('mobile-active');
+                tabs[1].classList.add('active');
             }
         }
 
