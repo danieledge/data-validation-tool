@@ -125,6 +125,7 @@ See the profiler in action with these interactive example reports:
 
 ### Advanced Usage
 - **[Advanced Guide](docs/ADVANCED_GUIDE.md)** - Complex scenarios, performance tuning
+- **[Handling Large Reports](docs/HANDLING_LARGE_REPORTS.md)** - Strategies for millions of rows
 - **[Examples & Recipes](docs/EXAMPLES.md)** - 10 real-world validation scenarios
 - **[AutoSys Integration](docs/EXAMPLES.md#autosys-job-integration)** - Block jobs on validation failures
 
