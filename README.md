@@ -4,12 +4,12 @@
 
 A robust, extensible Python framework for validating data quality before loading to databases, data warehouses, or analytics platforms. Designed to handle enterprise-scale datasets (200GB+) with memory-efficient chunked processing.
 
-[![Version 2.1.0](https://img.shields.io/badge/version-2.1.0-blue.svg)](docs/WHATS_NEW.md)
+[![Version 2.2.0](https://img.shields.io/badge/version-2.2.0-blue.svg)](docs/WHATS_NEW.md)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Tests: 102 passing](https://img.shields.io/badge/tests-102%20passing-brightgreen.svg)](tests/)
+[![Tests: 115+ passing](https://img.shields.io/badge/tests-115%2B%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
 
-**🎉 NEW in v2.1:** [Cross-File Validations](docs/WHATS_NEW.md#-cross-file-validations) • [Database Connectivity](docs/WHATS_NEW.md#-database-connectivity) • [Temporal Validations](docs/WHATS_NEW.md#-temporalhistorical-validations) • [Statistical Tests](docs/WHATS_NEW.md#-advanced-statistical-validations) • **[See What's New →](docs/WHATS_NEW.md)**
+**🎉 NEW in v2.2:** [Visual Config Builder](docs/WHATS_NEW.md#-visual-config-builder) • [Testing Suite (115+ tests)](docs/WHATS_NEW.md#-comprehensive-testing-suite) • [Testing Guide](docs/TESTING.md) • **[See What's New →](docs/WHATS_NEW.md)**
 
 ---
 
@@ -23,6 +23,10 @@ cd data-validation-tool
 pip install -r requirements.txt
 
 # 2. Create configuration
+# Option A: Use the visual config builder (no coding!)
+open docs/config-builder.html
+
+# Option B: Create YAML manually
 cat > validation.yaml <<EOF
 validation_job:
   name: "My First Validation"
@@ -49,6 +53,8 @@ python3 -m validation_framework.cli validate validation.yaml --html report.html
 # 4. View results
 open report.html
 ```
+
+**🎨 NEW: [Visual Config Builder →](docs/config-builder.html)** - Build validation configs with an intuitive web interface!
 
 **New to the framework?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
 

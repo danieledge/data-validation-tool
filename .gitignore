@@ -58,6 +58,11 @@ examples/sample_data/*.csv
 examples/sample_data/*.xlsx
 examples/sample_data/*.parquet
 
+# But DO track documentation HTML files and example configs
+!docs/*.html
+!docs/**/*.html
+!examples/sample_config.yaml
+
 # Generated reports
 examples/validation_report.html
 examples/validation_summary.json
@@ -65,9 +70,6 @@ validation_report.html
 validation_summary.json
 *.html
 *.json
-
-# But DO track example config
-!examples/sample_config.yaml
 
 # Logs
 *.log

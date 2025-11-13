@@ -4,7 +4,124 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.1.0 (Current) - November 2025
+## Version 2.2.0 (Current) - January 2025
+
+### 🎨 Visual Config Builder
+
+**No-code validation configuration!** Build validation configs with an intuitive web interface.
+
+**Features:**
+- **Visual Validation Selection** - Browse validations by category (File, Schema, Field, Record, Cross-File, Statistical)
+- **Interactive Parameter Forms** - Configure validation parameters with helpful descriptions
+- **Live YAML Preview** - See your configuration in real-time as you build
+- **Download & Copy** - Export your config as YAML file or copy to clipboard
+- **Zero Installation** - Standalone HTML file runs in any modern browser
+
+**How to Use:**
+```bash
+# Open the config builder in your browser
+open docs/config-builder.html
+
+# Build your validation config visually
+# Download the generated YAML file
+# Run validation
+python3 -m validation_framework.cli validate config.yaml --html report.html
+```
+
+**Benefits:**
+- ✅ No YAML knowledge required
+- ✅ No typing errors or syntax mistakes
+- ✅ Guided parameter configuration
+- ✅ 35+ validation types at your fingertips
+- ✅ Perfect for business users and beginners
+
+---
+
+### 🧪 Comprehensive Testing Suite
+
+**115+ tests with 48% code coverage** across all framework components.
+
+**New Test Modules:**
+- **Profiler Tests** (49 tests) - Type detection, statistics, quality metrics, HTML reports
+- **Testing Documentation** - Complete guide for running tests and writing new ones
+
+**Test Coverage:**
+- Profiler engine: 94%
+- HTML reporter: 82%
+- Profile results: 90%
+- Validation registry: 100%
+
+**Features:**
+- Unit, integration, and end-to-end tests
+- Parameterized testing with pytest
+- Fixture-based test data management
+- CI/CD integration examples
+- Comprehensive troubleshooting guide
+
+**Documentation:**
+- **[Testing Guide](TESTING.md)** - Complete testing documentation
+  - How to run tests (all, specific files, with coverage)
+  - Test organization and structure
+  - Writing new tests (AAA pattern, fixtures, mocking)
+  - CI/CD integration
+  - Best practices
+
+**Running Tests:**
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=validation_framework --cov-report=html
+
+# Run specific test module
+pytest tests/test_profiler.py -v
+
+# Run in parallel
+pytest -n 4
+```
+
+---
+
+### 📚 Enhanced Documentation
+
+**New Documentation:**
+- **[Testing Guide](TESTING.md)** - 700+ lines covering test suite, writing tests, CI/CD
+- Visual Config Builder documentation in README
+
+**Improvements:**
+- Updated README with config builder quick start
+- Updated test counts (102 → 115+ tests)
+- Added config builder to quick start section
+
+---
+
+### 🔧 Improvements
+
+**Code Quality:**
+- All 49 profiler tests passing
+- Improved type detection accuracy
+- Better error handling in statistical calculations
+
+**Developer Experience:**
+- Comprehensive test fixtures
+- Clear test naming conventions
+- Documented test patterns and best practices
+
+---
+
+### 📈 Statistics
+
+- **Total Validations**: 35+ validation types
+- **Total Tests**: 115+ (up from 102)
+- **Code Coverage**: 48% (above 43% target)
+- **Documentation Pages**: 12 comprehensive guides
+- **Test Modules**: 4 main test files
+- **New Features**: Visual config builder, comprehensive testing
+
+---
+
+## Version 2.1.0 - November 2025
 
 ### 🎉 Major New Features
 
