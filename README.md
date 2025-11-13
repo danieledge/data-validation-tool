@@ -73,12 +73,49 @@ open report.html
 
 ---
 
+## 📊 Data Profiling
+
+**NEW!** Analyze your data files to understand structure, quality, and patterns before creating validations.
+
+```bash
+# Profile any data file
+python3 -m validation_framework.cli profile data.csv
+
+# Generates:
+# - Interactive HTML report with charts
+# - Auto-generated validation config
+# - Quality metrics and suggestions
+```
+
+### 🎨 View Live Examples
+
+See the profiler in action with these interactive example reports:
+
+| Example | Rows | Size | Preview |
+|---------|------|------|---------|
+| **Simple Customer Data** | 10 | 728 B | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/example_profile_report.html) |
+| **E-Commerce Orders** | 30 | 2.51 KB | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/comprehensive_profile_report.html) |
+| **Large Dataset** | 5,000 | 428 KB | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/large_profile_report.html) |
+
+**Features:**
+- 📈 Interactive charts with quality metrics
+- 🔍 Type inference (known vs inferred)
+- 📊 Statistical distributions and correlations
+- 💡 Auto-generated validation suggestions
+- 📱 Mobile-responsive design
+- 🗂️ Table of contents for easy navigation
+
+**Learn More:** [Data Profiling Guide →](docs/DATA_PROFILING.md)
+
+---
+
 ## 📚 Documentation
 
 ### Getting Started
 - **[Quick Start (5 minutes)](docs/GETTING_STARTED.md)** - Installation to first validation
 - **[User Guide](docs/USER_GUIDE.md)** - Complete configuration reference
 - **[Validation Catalog](docs/VALIDATION_CATALOG.md)** - All 23 validation types documented
+- **[Data Profiling Guide](docs/DATA_PROFILING.md)** - Analyze data before validation
 
 ### Advanced Usage
 - **[Advanced Guide](docs/ADVANCED_GUIDE.md)** - Complex scenarios, performance tuning

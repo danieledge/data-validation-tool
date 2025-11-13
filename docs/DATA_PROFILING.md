@@ -44,6 +44,18 @@ Data profiling provides a comprehensive analysis of your data including:
 
 ## Quick Start
 
+### 🎨 View Live Examples First!
+
+Before diving in, check out these interactive example reports to see what profiling produces:
+
+| Example | Dataset | Rows | Size | View Report |
+|---------|---------|------|------|-------------|
+| **Simple** | Customer Data | 10 | 728 B | [View →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/example_profile_report.html) |
+| **Medium** | E-Commerce Orders | 30 | 2.51 KB | [View →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/comprehensive_profile_report.html) |
+| **Large** | 5K Orders | 5,000 | 428 KB | [View →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/large_profile_report.html) |
+
+> **Note:** For best experience with interactive charts, download the HTML file and open it locally. GitHub's HTML preview may have limitations with external JavaScript libraries.
+
 ### Basic Usage
 
 ```bash
