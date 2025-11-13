@@ -153,29 +153,31 @@ class ReferentialIntegrityCheck(DataValidationRule):
                 fk_values = chunk_to_check[foreign_key]
 
                 # Handle nulls
-                if not allow_null:
-                    null_mask = fk_values.isnull()
-                    if null_mask.any():
-                        null_violations = chunk_to_check[null_mask]
-                        total_violations += len(null_violations)
+                null_mask = fk_values.isnull()
+                if not allow_null and null_mask.any():
+                    null_violations = chunk_to_check[null_mask]
+                    total_violations += len(null_violations)
 
-                        # Collect samples
-                        if len(sample_violations) < max_samples:
-                            for idx, row in null_violations.head(max_samples - len(sample_violations)).iterrows():
-                                sample_violations.append({
-                                    "row_index": int(idx),
-                                    "foreign_key": foreign_key,
-                                    "value": None,
-                                    "reason": "NULL value in foreign key (not allowed)"
-                                })
+                    # Collect samples
+                    if len(sample_violations) < max_samples:
+                        for idx, row in null_violations.head(max_samples - len(sample_violations)).iterrows():
+                            sample_violations.append({
+                                "row_index": int(idx),
+                                "foreign_key": foreign_key,
+                                "value": None,
+                                "reason": "NULL value in foreign key (not allowed)"
+                            })
 
-                    # Check non-null values
-                    fk_values = fk_values.dropna()
+                # Always drop nulls before checking against reference
+                # (nulls are either already reported as violations, or are allowed and should be skipped)
+                fk_values = fk_values.dropna()
 
                 # Check which values are not in reference
                 invalid_mask = ~fk_values.isin(valid_values)
                 if invalid_mask.any():
-                    invalid_values = chunk_to_check[fk_values.index[invalid_mask]]
+                    # Get rows with invalid foreign keys using .loc with the index
+                    invalid_indices = fk_values.index[invalid_mask]
+                    invalid_values = chunk_to_check.loc[invalid_indices]
                     total_violations += len(invalid_values)
 
                     # Collect samples
