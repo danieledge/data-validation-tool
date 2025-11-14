@@ -4,7 +4,60 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.4.0 (Current) - January 2025
+## Version 2.5.0 (Current) - January 2025
+
+### 📋 Validation Templates & EmptyFileCheck Clarification
+
+**One-click validation setup!** Pre-configured templates let you add complete validation suites instantly, plus clarified how EmptyFileCheck handles headers.
+
+**Validation Templates:**
+- **🛡️ Essential File Checks** - Minimum validations every file needs (2 checks)
+  - `EmptyFileCheck` - Prevents processing files with no data
+  - `RowCountRangeCheck` - Ensures expected data volume
+- **✅ Data Quality Basics** - Common integrity checks (4 checks)
+  - `MandatoryFieldCheck` - Ensures critical fields populated
+  - `UniqueKeyCheck` - Validates primary key uniqueness
+  - `DuplicateRowCheck` - Detects duplicate records
+  - `BlankRecordCheck` - Finds completely empty rows
+- **🏗️ Schema Validation Suite** - Complete structure checks (3 checks)
+  - `ColumnPresenceCheck` - Verifies required columns exist
+  - `DataTypeCheck` - Validates column data types
+  - `SchemaMatchCheck` - Enforces exact schema compliance
+- **🚀 Production Ready** - Comprehensive suite (9 checks total)
+  - Combines all Essential + Quality + Schema validations
+  - Pre-configured with sensible defaults and severity levels
+
+**How to Use Templates:**
+1. Navigate to any file configuration
+2. Click "Use Template" button (next to "Add Validation")
+3. Select from 4 pre-configured templates
+4. All validations added instantly with proper defaults
+5. Customize parameters as needed
+
+**EmptyFileCheck Clarification:**
+- Enhanced description now explains header detection logic
+- **CSV files**: If `has_header: true` in config, first row excluded from count
+- **CSV files**: If `has_header: false`, all rows counted as data
+- **Excel files**: First row treated as header by default
+- Check fails if zero data rows remain after excluding headers
+- Saves processing time by failing immediately on empty files
+
+**Template Modal Design:**
+- Clean card-based layout with emoji icons
+- Color-coded borders matching validation categories
+- Shows all included validations for each template
+- One-click application with success confirmation
+- Hover states for better interactivity
+
+**Benefits:**
+- ⚡ **Quick Setup** - Add 9 validations with one click
+- 📚 **Best Practices** - Templates based on common patterns
+- 🎯 **Consistent Standards** - Ensures minimum validation coverage
+- 🚀 **Production Ready** - Complete suite for production use
+
+---
+
+## Version 2.4.0 - January 2025
 
 ### 📚 Comprehensive Helper Text & Guidance System
 
