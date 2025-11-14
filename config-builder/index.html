@@ -1386,6 +1386,126 @@
         </div>
     </div>
 
+    <!-- Project Templates Modal -->
+    <div class="modal" id="projectTemplatesModal" onclick="if(event.target === this) closeProjectTemplatesModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Project Templates</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Scaffold multiple files at once for common data validation scenarios
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeProjectTemplatesModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; gap: 16px;">
+                    <!-- E-commerce Template -->
+                    <div class="validation-type-option" onclick="applyProjectTemplate('ecommerce')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🛒</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    E-commerce System
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Standard e-commerce data structure with orders, customers, products, and order details.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-field);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Creates 4 files:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>customers.csv - Customer master data</li>
+                                <li>products.csv - Product catalog</li>
+                                <li>orders.csv - Order headers</li>
+                                <li>order_details.csv - Order line items</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- CRM Template -->
+                    <div class="validation-type-option" onclick="applyProjectTemplate('crm')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">👥</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    CRM System
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Customer relationship management with contacts, accounts, opportunities, and activities.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-record);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Creates 4 files:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>contacts.csv - Individual contacts</li>
+                                <li>accounts.csv - Company accounts</li>
+                                <li>opportunities.csv - Sales opportunities</li>
+                                <li>activities.csv - Interaction history</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Data Warehouse Template -->
+                    <div class="validation-type-option" onclick="applyProjectTemplate('warehouse')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🏢</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Data Warehouse
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Star schema with fact table and dimension tables for analytics.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-statistical);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Creates 5 files:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>fact_sales.csv - Sales transactions (fact)</li>
+                                <li>dim_date.csv - Date dimension</li>
+                                <li>dim_product.csv - Product dimension</li>
+                                <li>dim_customer.csv - Customer dimension</li>
+                                <li>dim_location.csv - Location dimension</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Master-Reference Template -->
+                    <div class="validation-type-option" onclick="applyProjectTemplate('master-reference')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">📚</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Master-Reference
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Simple two-file setup with transactional data and lookup reference data.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-cross-file);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Creates 2 files:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>transactions.csv - Main transactional data</li>
+                                <li>reference_data.csv - Lookup tables and codes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProjectTemplatesModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1463,6 +1583,10 @@
                     <div class="nav-item" onclick="showKeyboardShortcutsHelp()">
                         <span class="nav-icon">⌨️</span>
                         <span class="nav-label">Keyboard Shortcuts</span>
+                    </div>
+                    <div class="nav-item" onclick="openProjectTemplatesModal()">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-label">Project Templates</span>
                     </div>
                     <div class="nav-item" onclick="clearLocalStorage()">
                         <span class="nav-icon">🗑️</span>
@@ -2098,6 +2222,165 @@
                 production: 'Production Ready (9 validations)'
             };
             showNotification(`✅ Applied template: ${templateNames[templateName]}`);
+        }
+
+        // Project Templates Functions
+        /**
+         * Opens the project templates modal
+         */
+        function openProjectTemplatesModal() {
+            const modal = document.getElementById('projectTemplatesModal');
+            modal.style.display = 'flex';
+            modal.offsetHeight; // Force reflow
+            modal.style.opacity = '1';
+        }
+
+        /**
+         * Closes the project templates modal
+         */
+        function closeProjectTemplatesModal() {
+            const modal = document.getElementById('projectTemplatesModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 200);
+        }
+
+        /**
+         * Applies a project template, creating multiple files with preconfigured validations
+         * @param {string} templateName - The template to apply
+         */
+        function applyProjectTemplate(templateName) {
+            // Save state for undo
+            saveStateToUndoStack();
+
+            const templates = {
+                'ecommerce': [
+                    { name: 'customers', path: 'data/customers.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['customer_id', 'email', 'name'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['customer_id'] }, enabled: true }
+                    ]},
+                    { name: 'products', path: 'data/products.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['product_id', 'name', 'price'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['product_id'] }, enabled: true }
+                    ]},
+                    { name: 'orders', path: 'data/orders.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['order_id', 'customer_id', 'order_date'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['order_id'] }, enabled: true }
+                    ]},
+                    { name: 'order_details', path: 'data/order_details.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['order_id', 'product_id', 'quantity'] }, enabled: true }
+                    ]}
+                ],
+                'crm': [
+                    { name: 'contacts', path: 'data/contacts.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['contact_id', 'name', 'email'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['contact_id'] }, enabled: true }
+                    ]},
+                    { name: 'accounts', path: 'data/accounts.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['account_id', 'company_name'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['account_id'] }, enabled: true }
+                    ]},
+                    { name: 'opportunities', path: 'data/opportunities.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['opportunity_id', 'account_id', 'amount'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['opportunity_id'] }, enabled: true }
+                    ]},
+                    { name: 'activities', path: 'data/activities.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['activity_id', 'contact_id', 'date'] }, enabled: true }
+                    ]}
+                ],
+                'warehouse': [
+                    { name: 'fact_sales', path: 'data/fact_sales.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['date_id', 'product_id', 'customer_id', 'amount'] }, enabled: true }
+                    ]},
+                    { name: 'dim_date', path: 'data/dim_date.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['date_id', 'date', 'year', 'month', 'day'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['date_id'] }, enabled: true }
+                    ]},
+                    { name: 'dim_product', path: 'data/dim_product.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['product_id', 'product_name', 'category'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['product_id'] }, enabled: true }
+                    ]},
+                    { name: 'dim_customer', path: 'data/dim_customer.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['customer_id', 'customer_name'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['customer_id'] }, enabled: true }
+                    ]},
+                    { name: 'dim_location', path: 'data/dim_location.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['location_id', 'city', 'country'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['location_id'] }, enabled: true }
+                    ]}
+                ],
+                'master-reference': [
+                    { name: 'transactions', path: 'data/transactions.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['transaction_id', 'date', 'amount'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['transaction_id'] }, enabled: true },
+                        { type: 'DuplicateRowCheck', severity: 'WARNING', params: {}, enabled: true }
+                    ]},
+                    { name: 'reference_data', path: 'data/reference_data.csv', format: 'csv', validations: [
+                        { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
+                        { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['code', 'description'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['code'] }, enabled: true }
+                    ]}
+                ]
+            };
+
+            const fileTemplates = templates[templateName];
+            if (!fileTemplates) return;
+
+            // Clear existing files if user confirms
+            if (state.files.length > 0) {
+                if (!confirm(`This will replace all existing files (${state.files.length}) with the ${templateName} template. Continue?`)) {
+                    return;
+                }
+            }
+
+            // Clear existing files
+            state.files = [];
+
+            // Create all files from template
+            fileTemplates.forEach(fileTemplate => {
+                const fileId = state.fileCounter++;
+                state.files.push({
+                    id: fileId,
+                    name: fileTemplate.name,
+                    path: fileTemplate.path,
+                    format: fileTemplate.format,
+                    validations: fileTemplate.validations
+                });
+            });
+
+            // Update UI
+            updateFilesNav();
+            updateYAMLPreview();
+            if (state.files.length > 0) {
+                showSection(state.files[0].id);
+            }
+
+            // Close modal
+            closeProjectTemplatesModal();
+
+            // Show success message
+            const templateInfo = {
+                'ecommerce': 'E-commerce System (4 files)',
+                'crm': 'CRM System (4 files)',
+                'warehouse': 'Data Warehouse (5 files)',
+                'master-reference': 'Master-Reference (2 files)'
+            };
+            showNotification(`🎯 Applied project template: ${templateInfo[templateName]}`);
         }
 
         // Import/Export Functions
@@ -3421,23 +3704,71 @@
                                 </div>
                             `;
                         } else {
+                            // Check if this is a field name parameter (for autocomplete)
+                            const isFieldParam = config.name.toLowerCase().includes('field') ||
+                                               config.name.toLowerCase().includes('column');
+                            const datalistId = isFieldParam ? `field-names-${fileId}-${validationIdx}` : '';
+
                             return `
                                 <div style="margin-bottom: 12px;">
                                     <label style="display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 12px;">
-                                        ${config.label}
+                                        ${config.label}${isFieldParam ? ' <span style="color: var(--md-sys-color-primary); font-size: 11px;">⚡ Autocomplete</span>' : ''}
                                     </label>
                                     <input
                                         type="text"
                                         value="${displayValue}"
                                         placeholder="${config.placeholder}"
+                                        ${isFieldParam ? `list="${datalistId}"` : ''}
                                         onchange="updateValidationParam(${fileId}, ${validationIdx}, '${config.name}', this.value)"
                                         style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                                    ${isFieldParam ? `
+                                    <datalist id="${datalistId}">
+                                        ${getAllFieldNames().map(fieldName => `<option value="${fieldName}">`).join('')}
+                                    </datalist>
+                                    ` : ''}
                                 </div>
                             `;
                         }
                     }).join('')}
                 </div>
             `;
+        }
+
+        /**
+         * Extracts all unique field names used across all validations
+         * Used for field name autocomplete suggestions
+         * @returns {Array<string>} Array of unique field names
+         */
+        function getAllFieldNames() {
+            const fieldNames = new Set();
+
+            state.files.forEach(file => {
+                file.validations.forEach(validation => {
+                    const params = validation.params || {};
+
+                    // Extract field names from various parameter types
+                    if (params.field) fieldNames.add(params.field);
+                    if (params.fields && Array.isArray(params.fields)) {
+                        params.fields.forEach(f => fieldNames.add(f));
+                    }
+                    if (params.key_fields && Array.isArray(params.key_fields)) {
+                        params.key_fields.forEach(f => fieldNames.add(f));
+                    }
+                    if (params.required_columns && Array.isArray(params.required_columns)) {
+                        params.required_columns.forEach(f => fieldNames.add(f));
+                    }
+                    if (params.group_by_columns && Array.isArray(params.group_by_columns)) {
+                        params.group_by_columns.forEach(f => fieldNames.add(f));
+                    }
+                });
+            });
+
+            // Add common field names as suggestions
+            const commonFields = ['id', 'name', 'email', 'date', 'status', 'created_at', 'updated_at',
+                                 'customer_id', 'order_id', 'amount', 'quantity', 'price', 'total'];
+            commonFields.forEach(f => fieldNames.add(f));
+
+            return Array.from(fieldNames).sort();
         }
 
         /**
