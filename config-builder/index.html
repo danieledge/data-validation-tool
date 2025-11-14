@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <!-- Version: 2.5.0 - Build: 2025-01-14 -->
+    <!-- Version: 3.0.0 - Build: 2025-01-14 -->
 
     <!-- Material Design 3 - Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1109,6 +1109,39 @@
         .btn-danger span {
             color: var(--md-sys-color-on-error-container);
         }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutDown {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -1279,6 +1312,68 @@
         </div>
     </div>
 
+    <!-- Import YAML Modal -->
+    <div class="modal" id="importModal" onclick="if(event.target === this) closeImportModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Import YAML Configuration</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Load an existing validation configuration for editing
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeImportModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                        Choose Import Method
+                    </label>
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <button class="btn btn-secondary" id="uploadTabBtn" onclick="switchImportTab('upload')" style="flex: 1;">
+                            📁 Upload File
+                        </button>
+                        <button class="btn btn-secondary" id="pasteTabBtn" onclick="switchImportTab('paste')" style="flex: 1;">
+                            📋 Paste YAML
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Tab -->
+                <div id="uploadTab" style="display: none;">
+                    <input type="file" id="yamlFileInput" accept=".yaml,.yml" style="display: none;" onchange="handleFileUpload(event)">
+                    <div style="border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('yamlFileInput').click()">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
+                        <div style="color: var(--text-primary); font-weight: 500; margin-bottom: 8px;">
+                            Click to upload YAML file
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 13px;">
+                            Supports .yaml and .yml files
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paste Tab -->
+                <div id="pasteTab" style="display: none;">
+                    <textarea
+                        id="yamlPasteArea"
+                        placeholder="Paste your YAML configuration here..."
+                        style="width: 100%; height: 300px; padding: 16px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'Roboto Mono', monospace; font-size: 13px; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeImportModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" onclick="processImport()">
+                    Import Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1337,6 +1432,22 @@
                         <span class="nav-icon">📊</span>
                         <span class="nav-label">Summary</span>
                     </div>
+                    <div class="nav-item" onclick="openImportModal()">
+                        <span class="nav-icon">📂</span>
+                        <span class="nav-label">Import YAML</span>
+                    </div>
+                    <div class="nav-item" onclick="exportDocumentation()">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-label">Export Docs</span>
+                    </div>
+                    <div class="nav-item" onclick="shareViaURL()">
+                        <span class="nav-icon">🔗</span>
+                        <span class="nav-label">Share URL</span>
+                    </div>
+                    <div class="nav-item" onclick="clearLocalStorage()">
+                        <span class="nav-icon">🗑️</span>
+                        <span class="nav-label">Clear Storage</span>
+                    </div>
                 </div>
             </nav>
 
@@ -1363,7 +1474,7 @@
                         <span class="status-badge success" id="statusBadge">Ready</span>
                     </div>
                     <div class="header-actions">
-                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.5.0</span>
+                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v3.0.0</span>
                         <button class="btn btn-primary" onclick="downloadConfig()" title="Download YAML Configuration" style="margin-right: 8px;">
                             <span class="icon">📥</span>
                             <span>Download</span>
@@ -1461,7 +1572,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Version and cache busting check
-            const version = '2.5.0';
+            const version = '3.0.0';
             const buildDate = '2025-01-14';
             console.log(`%c Data Validation Config Builder v${version} `, 'background: #10B981; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold');
             console.log(`Build Date: ${buildDate}`);
@@ -1484,7 +1595,155 @@
             }
 
             updateYAMLPreview();
+
+            // Load from URL hash if present (takes precedence)
+            loadFromURLHash();
+
+            // Load saved state from localStorage
+            if (!window.location.hash.startsWith('#config=')) {
+                loadFromLocalStorage();
+            }
+
+            // Auto-save every 30 seconds
+            setInterval(saveToLocalStorage, 30000);
+
+            // Save before page unload
+            window.addEventListener('beforeunload', saveToLocalStorage);
+
+            // Update last saved indicator every minute
+            setInterval(updateLastSavedIndicator, 60000);
         });
+
+        // Auto-Save Functions
+        /**
+         * Saves current state to browser localStorage
+         */
+        function saveToLocalStorage() {
+            try {
+                const stateToSave = {
+                    jobName: state.jobName,
+                    files: state.files,
+                    settings: state.settings,
+                    fileCounter: state.fileCounter,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('validationConfigBuilder', JSON.stringify(stateToSave));
+                updateLastSavedIndicator();
+                console.log('✅ Auto-saved to browser storage');
+            } catch (error) {
+                console.error('Failed to save to localStorage:', error);
+            }
+        }
+
+        /**
+         * Loads state from browser localStorage
+         */
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('validationConfigBuilder');
+                if (saved) {
+                    const savedState = JSON.parse(saved);
+
+                    // Restore state
+                    state.jobName = savedState.jobName || state.jobName;
+                    state.files = savedState.files || state.files;
+                    state.settings = savedState.settings || state.settings;
+                    state.fileCounter = savedState.fileCounter || state.fileCounter;
+
+                    // Update UI
+                    updateFilesNav();
+                    updateYAMLPreview();
+                    updateLastSavedIndicator();
+
+                    console.log('✅ Loaded saved configuration from', savedState.timestamp);
+
+                    // Show notification
+                    if (savedState.files.length > 0) {
+                        showNotification('Restored previous session with ' + savedState.files.length + ' file(s)');
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load from localStorage:', error);
+            }
+        }
+
+        /**
+         * Clears saved state from localStorage
+         */
+        function clearLocalStorage() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('validationConfigBuilder');
+                showNotification('Saved data cleared');
+                updateLastSavedIndicator();
+            }
+        }
+
+        /**
+         * Updates the last saved timestamp indicator
+         */
+        function updateLastSavedIndicator() {
+            const saved = localStorage.getItem('validationConfigBuilder');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                const timestamp = new Date(savedState.timestamp);
+                const timeAgo = getTimeAgo(timestamp);
+
+                // Update status badge if it exists
+                const statusBadge = document.getElementById('statusBadge');
+                if (statusBadge) {
+                    statusBadge.textContent = 'Saved ' + timeAgo;
+                    statusBadge.title = 'Last saved: ' + timestamp.toLocaleString();
+                }
+            }
+        }
+
+        /**
+         * Gets human-readable time ago string
+         * @param {Date} timestamp - The timestamp
+         * @returns {string} Human-readable time ago
+         */
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((new Date() - timestamp) / 1000);
+
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+            return Math.floor(seconds / 86400) + 'd ago';
+        }
+
+        /**
+         * Shows a temporary notification message
+         * @param {string} message - The notification message
+         */
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                background: var(--md-sys-color-surface-container-high);
+                color: var(--md-sys-color-on-surface);
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: var(--md-sys-elevation-3);
+                border: 1px solid var(--md-sys-color-outline-variant);
+                z-index: 9999;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideInUp 0.3s ease-out;
+            `;
+            notification.textContent = message;
+
+            // Add to page
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutDown 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
 
         // Modal Functions for Add Validation Wizard
         /**
@@ -1799,7 +2058,463 @@
                 schema: 'Schema Validation Suite (3 validations)',
                 production: 'Production Ready (9 validations)'
             };
-            alert(`✅ Applied template: ${templateNames[templateName]}`);
+            showNotification(`✅ Applied template: ${templateNames[templateName]}`);
+        }
+
+        // Import/Export Functions
+        /**
+         * Opens the import YAML modal
+         */
+        function openImportModal() {
+            const modal = document.getElementById('importModal');
+            modal.style.display = 'flex';
+            modal.offsetHeight;
+            modal.style.opacity = '1';
+            switchImportTab('upload'); // Default to upload tab
+        }
+
+        /**
+         * Closes the import modal
+         */
+        function closeImportModal() {
+            const modal = document.getElementById('importModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('yamlPasteArea').value = '';
+            }, 200);
+        }
+
+        /**
+         * Switches between import tabs
+         * @param {string} tab - The tab to switch to ('upload' or 'paste')
+         */
+        function switchImportTab(tab) {
+            const uploadTab = document.getElementById('uploadTab');
+            const pasteTab = document.getElementById('pasteTab');
+            const uploadBtn = document.getElementById('uploadTabBtn');
+            const pasteBtn = document.getElementById('pasteTabBtn');
+
+            if (tab === 'upload') {
+                uploadTab.style.display = 'block';
+                pasteTab.style.display = 'none';
+                uploadBtn.classList.add('btn-primary');
+                uploadBtn.classList.remove('btn-secondary');
+                pasteBtn.classList.remove('btn-primary');
+                pasteBtn.classList.add('btn-secondary');
+            } else {
+                uploadTab.style.display = 'none';
+                pasteTab.style.display = 'block';
+                uploadBtn.classList.remove('btn-primary');
+                uploadBtn.classList.add('btn-secondary');
+                pasteBtn.classList.add('btn-primary');
+                pasteBtn.classList.remove('btn-secondary');
+            }
+        }
+
+        /**
+         * Handles file upload for YAML import
+         * @param {Event} event - The file input change event
+         */
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('yamlPasteArea').value = e.target.result;
+                    switchImportTab('paste');
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        /**
+         * Processes the import and loads configuration into builder
+         */
+        function processImport() {
+            const yamlText = document.getElementById('yamlPasteArea').value.trim();
+            if (!yamlText) {
+                alert('Please provide YAML configuration to import');
+                return;
+            }
+
+            try {
+                // Parse YAML (basic parser - handles common cases)
+                const config = parseYAML(yamlText);
+
+                // Extract job name
+                state.jobName = config.job_name || 'Imported Validation Job';
+
+                // Extract settings
+                if (config.settings) {
+                    state.settings.chunk_size = config.settings.chunk_size || 10000;
+                    state.settings.max_sample_failures = config.settings.max_sample_failures || 100;
+                    state.settings.fail_fast = config.settings.fail_fast || false;
+                    state.settings.log_level = config.settings.log_level || 'INFO';
+                }
+
+                // Extract files and validations
+                state.files = [];
+                state.fileCounter = 0;
+
+                if (config.files && Array.isArray(config.files)) {
+                    config.files.forEach(file => {
+                        const fileId = state.fileCounter++;
+                        const newFile = {
+                            id: fileId,
+                            name: file.name || 'Unnamed File',
+                            path: file.path || '',
+                            format: file.format || 'csv',
+                            validations: []
+                        };
+
+                        // Extract validations
+                        if (file.validations && Array.isArray(file.validations)) {
+                            file.validations.forEach(val => {
+                                newFile.validations.push({
+                                    type: val.type || 'EmptyFileCheck',
+                                    severity: val.severity || 'ERROR',
+                                    params: val.params || {},
+                                    enabled: val.enabled !== false
+                                });
+                            });
+                        }
+
+                        state.files.push(newFile);
+                    });
+                }
+
+                // Update UI
+                updateFilesNav();
+                updateYAMLPreview();
+                closeImportModal();
+                showNotification(`✅ Imported configuration with ${state.files.length} file(s)`);
+
+                // Navigate to first file if exists
+                if (state.files.length > 0) {
+                    showSection(state.files[0].id);
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                alert('Failed to parse YAML configuration. Please check the format and try again.\n\nError: ' + error.message);
+            }
+        }
+
+        /**
+         * Basic YAML parser for validation configs
+         * @param {string} yaml - YAML text
+         * @returns {object} Parsed configuration
+         */
+        function parseYAML(yaml) {
+            // This is a simplified YAML parser for our specific use case
+            // For production, consider using a proper YAML library
+            const lines = yaml.split('\n');
+            const config = {
+                job_name: '',
+                settings: {},
+                files: []
+            };
+
+            let currentFile = null;
+            let currentValidation = null;
+            let inSettings = false;
+            let inFiles = false;
+            let inValidations = false;
+
+            for (let line of lines) {
+                const trimmed = line.trim();
+
+                // Skip empty lines and comments
+                if (!trimmed || trimmed.startsWith('#')) continue;
+
+                // Parse job_name
+                if (trimmed.startsWith('job_name:')) {
+                    config.job_name = trimmed.split('job_name:')[1].trim().replace(/['"]/g, '');
+                    continue;
+                }
+
+                // Settings section
+                if (trimmed === 'settings:') {
+                    inSettings = true;
+                    inFiles = false;
+                    continue;
+                }
+
+                // Files section
+                if (trimmed === 'files:') {
+                    inFiles = true;
+                    inSettings = false;
+                    continue;
+                }
+
+                // Parse settings
+                if (inSettings && trimmed.includes(':')) {
+                    const [key, value] = trimmed.split(':').map(s => s.trim());
+                    if (key === 'chunk_size' || key === 'max_sample_failures') {
+                        config.settings[key] = parseInt(value);
+                    } else if (key === 'fail_fast') {
+                        config.settings[key] = value === 'true';
+                    } else {
+                        config.settings[key] = value.replace(/['"]/g, '');
+                    }
+                    continue;
+                }
+
+                // Parse files
+                if (inFiles && trimmed.startsWith('- name:')) {
+                    if (currentFile) config.files.push(currentFile);
+                    currentFile = { name: trimmed.split('name:')[1].trim().replace(/['"]/g, ''), validations: [] };
+                    inValidations = false;
+                    continue;
+                }
+
+                if (currentFile) {
+                    if (trimmed.startsWith('path:')) {
+                        currentFile.path = trimmed.split('path:')[1].trim().replace(/['"]/g, '');
+                    } else if (trimmed.startsWith('format:')) {
+                        currentFile.format = trimmed.split('format:')[1].trim().replace(/['"]/g, '');
+                    } else if (trimmed === 'validations:') {
+                        inValidations = true;
+                    } else if (inValidations && trimmed.startsWith('- type:')) {
+                        if (currentValidation) currentFile.validations.push(currentValidation);
+                        currentValidation = { type: trimmed.split('type:')[1].trim().replace(/['"]/g, ''), params: {} };
+                    } else if (currentValidation) {
+                        if (trimmed.startsWith('severity:')) {
+                            currentValidation.severity = trimmed.split('severity:')[1].trim().replace(/['"]/g, '');
+                        } else if (trimmed.startsWith('enabled:')) {
+                            currentValidation.enabled = trimmed.split('enabled:')[1].trim() === 'true';
+                        } else if (trimmed.includes(':') && !trimmed.startsWith('params:')) {
+                            const [key, value] = trimmed.split(':').map(s => s.trim());
+                            currentValidation.params[key] = value.replace(/['"]/g, '');
+                        }
+                    }
+                }
+            }
+
+            // Push last file and validation
+            if (currentValidation && currentFile) currentFile.validations.push(currentValidation);
+            if (currentFile) config.files.push(currentFile);
+
+            return config;
+        }
+
+        /**
+         * Shares configuration via URL (encodes in hash)
+         */
+        function shareViaURL() {
+            try {
+                const configData = {
+                    jobName: state.jobName,
+                    files: state.files,
+                    settings: state.settings
+                };
+
+                const encoded = btoa(JSON.stringify(configData));
+                const shareURL = window.location.origin + window.location.pathname + '#config=' + encoded;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareURL).then(() => {
+                    showNotification('✅ Share URL copied to clipboard!');
+                }).catch(() => {
+                    // Fallback: show prompt
+                    prompt('Copy this URL to share your configuration:', shareURL);
+                });
+            } catch (error) {
+                console.error('Share error:', error);
+                alert('Failed to generate share URL');
+            }
+        }
+
+        /**
+         * Loads configuration from URL hash if present
+         */
+        function loadFromURLHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#config=')) {
+                try {
+                    const encoded = hash.substring(8);
+                    const configData = JSON.parse(atob(encoded));
+
+                    state.jobName = configData.jobName;
+                    state.files = configData.files;
+                    state.settings = configData.settings;
+                    state.fileCounter = Math.max(...state.files.map(f => f.id)) + 1;
+
+                    updateFilesNav();
+                    updateYAMLPreview();
+                    showNotification('✅ Configuration loaded from shared URL');
+
+                    // Clear hash
+                    history.replaceState(null, '', window.location.pathname);
+                } catch (error) {
+                    console.error('Failed to load from URL:', error);
+                }
+            }
+        }
+
+        /**
+         * Exports configuration as HTML documentation
+         */
+        function exportDocumentation() {
+            const html = generateDocumentationHTML();
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${state.jobName.replace(/\s+/g, '_')}_Documentation.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('✅ Documentation exported successfully');
+        }
+
+        /**
+         * Generates HTML documentation from current configuration
+         * @returns {string} HTML documentation
+         */
+        function generateDocumentationHTML() {
+            const totalValidations = state.files.reduce((sum, f) => sum + f.validations.length, 0);
+            const errorCount = state.files.reduce((sum, f) => sum + f.validations.filter(v => v.severity === 'ERROR').length, 0);
+            const warningCount = totalValidations - errorCount;
+
+            let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${state.jobName} - Validation Documentation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 1200px; margin: 0 auto; padding: 40px 20px; background: #f5f5f5; color: #333; }
+        h1 { color: #1a1a1a; border-bottom: 3px solid #2563eb; padding-bottom: 16px; }
+        h2 { color: #2563eb; margin-top: 40px; }
+        h3 { color: #374151; margin-top: 24px; }
+        .summary { background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 32px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric { text-align: center; padding: 16px; background: #f9fafb; border-radius: 6px; }
+        .metric-value { font-size: 32px; font-weight: bold; color: #2563eb; }
+        .metric-label { font-size: 14px; color: #6b7280; margin-top: 4px; }
+        .file-card { background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        .validation-item { padding: 16px; margin: 12px 0; background: #f9fafb; border-radius: 6px; border-left: 4px solid #2563eb; }
+        .error-badge { display: inline-block; padding: 4px 12px; background: #dc2626; color: white; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .warning-badge { display: inline-block; padding: 4px 12px; background: #f59e0b; color: white; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .param-list { margin: 8px 0; padding-left: 20px; }
+        .param-list li { margin: 4px 0; }
+        code { background: #e5e7eb; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body>
+    <h1>📋 ${state.jobName}</h1>
+    <div class="summary">
+        <h2>Configuration Summary</h2>
+        <div class="summary-grid">
+            <div class="metric">
+                <div class="metric-value">${state.files.length}</div>
+                <div class="metric-label">Files</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">${totalValidations}</div>
+                <div class="metric-label">Total Validations</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">${errorCount}</div>
+                <div class="metric-label">Error Checks</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">${warningCount}</div>
+                <div class="metric-label">Warning Checks</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>⚙️ Settings</h2>
+    <div class="file-card">
+        <ul class="param-list">
+            <li><strong>Chunk Size:</strong> ${state.settings.chunk_size.toLocaleString()} rows</li>
+            <li><strong>Max Sample Failures:</strong> ${state.settings.max_sample_failures}</li>
+            <li><strong>Fail Fast:</strong> ${state.settings.fail_fast ? 'Yes' : 'No'}</li>
+            <li><strong>Log Level:</strong> ${state.settings.log_level}</li>
+        </ul>
+    </div>
+
+    <h2>📁 Files and Validations</h2>
+`;
+
+            state.files.forEach(file => {
+                html += `
+    <div class="file-card">
+        <h3>📄 ${file.name}</h3>
+        <ul class="param-list">
+            <li><strong>Path:</strong> <code>${file.path}</code></li>
+            <li><strong>Format:</strong> ${file.format}</li>
+            <li><strong>Validations:</strong> ${file.validations.length}</li>
+        </ul>`;
+
+                if (file.validations.length > 0) {
+                    html += '<h4 style="margin-top: 24px;">Validation Rules:</h4>';
+                    file.validations.forEach((val, idx) => {
+                        const badge = val.severity === 'ERROR' ?
+                            '<span class="error-badge">ERROR</span>' :
+                            '<span class="warning-badge">WARNING</span>';
+                        html += `
+        <div class="validation-item">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong>${idx + 1}. ${val.type}</strong>
+                ${badge}
+            </div>
+            <div style="color: #6b7280; font-size: 14px;">
+                ${getValidationDescription(val.type).replace(/<[^>]*>/g, '')}
+            </div>
+            ${Object.keys(val.params).length > 0 ? `
+            <div style="margin-top: 12px;">
+                <strong style="font-size: 13px;">Parameters:</strong>
+                <ul class="param-list">
+                    ${Object.entries(val.params).map(([key, value]) => `<li><code>${key}</code>: ${value}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+        </div>`;
+                    });
+                }
+
+                html += `
+    </div>`;
+            });
+
+            html += `
+    <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 14px;">
+        <p>Generated by Data Validation Config Builder v3.0.0 on ${new Date().toLocaleString()}</p>
+    </footer>
+</body>
+</html>`;
+
+            return html;
+        }
+
+        /**
+         * Duplicates a validation
+         * @param {number} fileId - The file ID
+         * @param {number} validationIdx - The validation index to duplicate
+         */
+        function duplicateValidation(fileId, validationIdx) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && file.validations[validationIdx]) {
+                const original = file.validations[validationIdx];
+                const duplicate = {
+                    type: original.type,
+                    severity: original.severity,
+                    params: JSON.parse(JSON.stringify(original.params)), // Deep copy
+                    enabled: original.enabled
+                };
+
+                // Insert duplicate right after original
+                file.validations.splice(validationIdx + 1, 0, duplicate);
+
+                // Update UI
+                renderContent(fileId);
+                updateYAMLPreview();
+                showNotification('✅ Validation duplicated');
+            }
         }
 
         // Navigation
@@ -2127,6 +2842,9 @@
                                 title="Move Down"
                                 ${isLast ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
                                 <span>⬇️</span>
+                            </button>
+                            <button class="btn btn-secondary btn-icon" onclick="duplicateValidation(${fileId}, ${idx})" title="Duplicate">
+                                <span>📋</span>
                             </button>
                             <button class="btn btn-secondary btn-icon" onclick="removeValidation(${fileId}, ${idx})" title="Remove">
                                 <span>🗑️</span>
