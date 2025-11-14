@@ -4,13 +4,56 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.3.0 (Current) - January 2025
+## Version 2.4.0 (Current) - January 2025
+
+### 📚 Comprehensive Helper Text & Guidance System
+
+**Every setting and validation now includes detailed, contextual help!** Clean, crisp explanations throughout the entire config builder, making it easier than ever to configure complex validation rules.
+
+**Advanced Settings Guidance:**
+- **Chunk Size Recommendations** - Visual guide with specific values by file size:
+  - 💾 Small files (<100K rows): 5,000-10,000
+  - 📊 Medium files (100K-1M rows): 10,000-50,000
+  - 🗄️ Large files (>1M rows): 50,000-100,000
+  - ⚡ Low memory systems: 1,000-5,000
+  - Explains memory/performance tradeoffs clearly
+- **Max Sample Failures** - How to prevent overwhelming logs with thousands of errors
+- **Log Levels** - Detailed descriptions: DEBUG (verbose), INFO (recommended), WARNING, ERROR
+- **Fail Fast** - When to use immediate stopping vs complete validation reports
+
+**Enhanced Validation Descriptions:**
+- **21 Comprehensive Descriptions** - Every validation type now includes:
+  - **Bold Purpose Statement** - What the validation does in one sentence
+  - **Detailed Functionality** - How it works and what it checks
+  - **Use Case Guidance** - When and why to use this validation
+  - **Real-World Examples** - Practical scenarios and sample values
+- **Advanced Validations** - Extra detail for complex types:
+  - `StatisticalOutlierCheck`: Explains 3 standard deviation threshold (±3σ)
+  - `ReferentialIntegrityCheck`: Foreign key relationship validation details
+  - `DistributionCheck`: Statistical distribution pattern validation
+  - `CorrelationCheck`: Field relationship consistency monitoring
+
+**Field-Level Help Throughout:**
+- **File Format Details** - CSV, Excel, JSON, Parquet format explanations
+- **Severity Guidance** - Clear ERROR vs WARNING use cases in both modal and cards
+- **Parameter Context** - Specific guidance for each validation type's parameters
+- **Modal Catalog** - Improved short descriptions with technical precision
+
+**Visual Enhancements:**
+- Consistent helper text styling across all sections
+- Color-coded info boxes for critical guidance (chunk size)
+- Important terms highlighted with `<strong>` tags
+- Proper line-height and spacing for multi-line helpers
+
+---
+
+## Version 2.3.0 - January 2025
 
 ### 🎨 Visual Config Builder v3 - Complete UI/UX Redesign
 
 **Major redesign with three-panel layout and validation wizard!** Professional, modern interface inspired by leading open-source config builders.
 
-**🆕 LATEST UPDATE - Clarity-Focused Theme & Multi-Selection (January 2025):**
+**Clarity-Focused Theme & Multi-Selection:**
 
 **Multiple Validation Selection:**
 - **Multi-Select Modal** - Click to toggle multiple validations at once
