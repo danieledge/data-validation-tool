@@ -4,7 +4,58 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 3.1.0 (Current) - January 2025
+## Version 3.2.0 (Current) - January 2025
+
+### 🔍 Search, Documentation & Duplication
+
+**Find validations instantly, document your decisions, and duplicate configurations effortlessly!** This release focuses on making large configurations manageable and well-documented.
+
+**🔍 Validation Search/Filter:**
+- Real-time search across all validation properties
+- Searches in validation type, severity, parameters, category, and notes
+- Visual highlighting of search results with pulse animation
+- Results counter showing filtered vs total validations
+- Clear search button for quick resets
+- Empty state with helpful messaging when no results found
+- Per-file search state (independent searches for each file)
+- Smooth, responsive UI with keyboard-friendly design
+
+**📝 Validation Notes/Comments:**
+- Add documentation notes to any validation
+- Explain business context, edge cases, or configuration decisions
+- Multi-line support for detailed documentation
+- Notes exported as YAML comments above validations
+- Searchable through main search functionality
+- Integrated with undo/redo system
+- Resizable textarea for flexible entry
+- Perfect for team knowledge sharing
+
+**📋 Duplicate Validation:**
+- One-click duplication of any validation
+- Deep copy ensures complete independence
+- Duplicates all parameters and settings
+- Inserted immediately after original
+- Integrated with undo/redo system
+- Visual feedback notification
+- Great for creating variations of similar validations
+
+**Technical Improvements:**
+- Enhanced YAML generation to include actual parameter values
+- Proper handling of arrays, strings, and numbers in YAML
+- Multi-line comment support in YAML export
+- Search optimization with multi-field matching
+- Highlight pulse animation for search results
+- Deep copy utilities prevent reference issues
+
+**How to Use:**
+- Use the search bar above validations to filter by any property
+- Add notes in the "📝 Notes" section of each validation card
+- Click the 📋 button on any validation to duplicate it
+- Notes automatically appear as comments in exported YAML
+
+---
+
+## Version 3.1.0 - January 2025
 
 ### ⚡ Power User Features - Batch 2
 
