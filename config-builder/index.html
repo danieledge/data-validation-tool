@@ -2470,7 +2470,7 @@
                 ],
                 quality: [
                     { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: [] } },
-                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: [] } },
+                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: [] } },
                     { type: 'DuplicateRowCheck', severity: 'WARNING', params: {} },
                     { type: 'BlankRecordCheck', severity: 'WARNING', params: {} }
                 ],
@@ -2485,7 +2485,7 @@
                     { type: 'RowCountRangeCheck', severity: 'ERROR', params: { min_rows: 1, max_rows: 1000000 } },
                     // Quality checks
                     { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: [] } },
-                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: [] } },
+                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: [] } },
                     { type: 'DuplicateRowCheck', severity: 'WARNING', params: {} },
                     { type: 'BlankRecordCheck', severity: 'WARNING', params: {} },
                     // Schema checks
@@ -2561,17 +2561,17 @@
                     { name: 'customers', path: 'data/customers.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['customer_id', 'email', 'name'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['customer_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['customer_id'] }, enabled: true }
                     ]},
                     { name: 'products', path: 'data/products.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['product_id', 'name', 'price'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['product_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['product_id'] }, enabled: true }
                     ]},
                     { name: 'orders', path: 'data/orders.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['order_id', 'customer_id', 'order_date'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['order_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['order_id'] }, enabled: true }
                     ]},
                     { name: 'order_details', path: 'data/order_details.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
@@ -2582,17 +2582,17 @@
                     { name: 'contacts', path: 'data/contacts.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['contact_id', 'name', 'email'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['contact_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['contact_id'] }, enabled: true }
                     ]},
                     { name: 'accounts', path: 'data/accounts.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['account_id', 'company_name'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['account_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['account_id'] }, enabled: true }
                     ]},
                     { name: 'opportunities', path: 'data/opportunities.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['opportunity_id', 'account_id', 'amount'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['opportunity_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['opportunity_id'] }, enabled: true }
                     ]},
                     { name: 'activities', path: 'data/activities.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
@@ -2607,35 +2607,35 @@
                     { name: 'dim_date', path: 'data/dim_date.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['date_id', 'date', 'year', 'month', 'day'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['date_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['date_id'] }, enabled: true }
                     ]},
                     { name: 'dim_product', path: 'data/dim_product.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['product_id', 'product_name', 'category'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['product_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['product_id'] }, enabled: true }
                     ]},
                     { name: 'dim_customer', path: 'data/dim_customer.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['customer_id', 'customer_name'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['customer_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['customer_id'] }, enabled: true }
                     ]},
                     { name: 'dim_location', path: 'data/dim_location.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['location_id', 'city', 'country'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['location_id'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['location_id'] }, enabled: true }
                     ]}
                 ],
                 'master-reference': [
                     { name: 'transactions', path: 'data/transactions.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['transaction_id', 'date', 'amount'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['transaction_id'] }, enabled: true },
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['transaction_id'] }, enabled: true },
                         { type: 'DuplicateRowCheck', severity: 'WARNING', params: {}, enabled: true }
                     ]},
                     { name: 'reference_data', path: 'data/reference_data.csv', format: 'csv', validations: [
                         { type: 'EmptyFileCheck', severity: 'ERROR', params: {}, enabled: true },
                         { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: ['code', 'description'] }, enabled: true },
-                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: ['code'] }, enabled: true }
+                        { type: 'UniqueKeyCheck', severity: 'ERROR', params: { fields: ['code'] }, enabled: true }
                     ]}
                 ]
             };
@@ -4175,7 +4175,7 @@
                     { name: 'required_columns', label: 'Required Columns', type: 'list', placeholder: 'id, name, email' }
                 ],
                 'UniqueKeyCheck': [
-                    { name: 'key_fields', label: 'Key Fields', type: 'list', placeholder: 'customer_id' }
+                    { name: 'fields', label: 'Key Fields', type: 'list', placeholder: 'customer_id' }
                 ],
                 'RowCountRangeCheck': [
                     { name: 'min_rows', label: 'Minimum Rows', type: 'number', placeholder: '1' },
@@ -4330,10 +4330,10 @@
 
                 // Detect UniqueKeyCheck without fields
                 const uniqueKeyCheck = file.validations.find(v => v.type === 'UniqueKeyCheck');
-                if (uniqueKeyCheck && (!uniqueKeyCheck.params?.key_fields || uniqueKeyCheck.params.key_fields.length === 0)) {
+                if (uniqueKeyCheck && (!uniqueKeyCheck.params?.fields || uniqueKeyCheck.params.fields.length === 0)) {
                     conflicts.push({
                         title: `UniqueKeyCheck missing parameters in "${file.name}"`,
-                        description: 'UniqueKeyCheck requires key_fields to be specified. Add the fields that should be unique.',
+                        description: 'UniqueKeyCheck requires fields to be specified. Add the fields that should be unique.',
                         type: 'warning',
                         fileId: file.id
                     });
@@ -4567,7 +4567,7 @@
 
                 // Check for incomplete parameters
                 file.validations.forEach(v => {
-                    if (v.type === 'UniqueKeyCheck' && (!v.params?.key_fields || v.params.key_fields.length === 0)) {
+                    if (v.type === 'UniqueKeyCheck' && (!v.params?.fields || v.params.fields.length === 0)) {
                         score -= 5;
                         issues.push(`${file.name}: UniqueKeyCheck missing parameters`);
                     }
@@ -5011,10 +5011,10 @@
                     totalChecks++;
                     const incomplete = [];
 
-                    // Check UniqueKeyCheck has key_fields
+                    // Check UniqueKeyCheck has fields
                     if (v.type === 'UniqueKeyCheck') {
-                        if (!v.params?.key_fields || v.params.key_fields.length === 0) {
-                            incomplete.push('key_fields');
+                        if (!v.params?.fields || v.params.fields.length === 0) {
+                            incomplete.push('fields');
                         }
                     }
 
@@ -5489,7 +5489,7 @@
                         break;
 
                     case 'UniqueKeyCheck':
-                        const keyFields = validation.params?.key_fields || [];
+                        const keyFields = validation.params?.fields || [];
                         if (keyFields.length === 0) {
                             result.passed = null;
                             result.message = '⚠️ UniqueKeyCheck - No key fields configured';
@@ -5770,8 +5770,8 @@ DETAILED RESULTS
                     if (params.fields && Array.isArray(params.fields)) {
                         params.fields.forEach(f => fieldNames.add(f));
                     }
-                    if (params.key_fields && Array.isArray(params.key_fields)) {
-                        params.key_fields.forEach(f => fieldNames.add(f));
+                    if (params.fields && Array.isArray(params.fields)) {
+                        params.fields.forEach(f => fieldNames.add(f));
                     }
                     if (params.required_columns && Array.isArray(params.required_columns)) {
                         params.required_columns.forEach(f => fieldNames.add(f));
