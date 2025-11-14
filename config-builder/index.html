@@ -3306,16 +3306,26 @@
                             <div style="color: var(--text-muted); font-size: 13px;">Validations</div>
                         </div>
                         <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
-                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-error); margin-bottom: 4px;">
-                                ${metrics.errorCount}
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span style="font-size: 20px;">🔴</span>
+                                <div>
+                                    <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">
+                                        ${metrics.errorCount}
+                                    </div>
+                                    <div style="color: var(--text-muted); font-size: 12px;">ERROR Severity</div>
+                                </div>
                             </div>
-                            <div style="color: var(--text-muted); font-size: 13px;">Errors</div>
                         </div>
                         <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
-                            <div style="font-size: 32px; font-weight: 700; color: var(--severity-warning); margin-bottom: 4px;">
-                                ${metrics.warningCount}
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span style="font-size: 20px;">🟡</span>
+                                <div>
+                                    <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">
+                                        ${metrics.warningCount}
+                                    </div>
+                                    <div style="color: var(--text-muted); font-size: 12px;">WARNING Severity</div>
+                                </div>
                             </div>
-                            <div style="color: var(--text-muted); font-size: 13px;">Warnings</div>
                         </div>
                     </div>
 
