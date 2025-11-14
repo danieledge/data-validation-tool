@@ -6,11 +6,7 @@ validation_job:
   name: "Validation for example_data.csv"
   description: "Auto-generated from data profile"
 
-settings:
-  chunk_size: 50000
-  max_sample_failures: 100
-
-files:
+  files:
   - name: "example_data"
     path: "example_data.csv"
     format: "csv"
@@ -80,3 +76,7 @@ files:
           field: "order_date"
           format: "%Y-%m-%d"
         # Detected date format: %Y-%m-%d
+
+  processing:
+    chunk_size: 50000
+    max_sample_failures: 100

@@ -5264,6 +5264,7 @@
             if (results.canDownload) {
                 downloadBtn.textContent = 'Download Configuration';
                 downloadBtn.className = 'btn btn-primary';
+                downloadBtn.disabled = false;
             } else {
                 downloadBtn.textContent = 'Fix Errors First';
                 downloadBtn.className = 'btn btn-secondary';
@@ -5365,11 +5366,15 @@
 
         /**
          * Parses CSV content into array of objects
+         * NOTE: This is a simple CSV parser that handles basic comma-delimited files.
+         * It does NOT handle commas inside quoted fields or complex CSV edge cases.
+         * For production use with complex CSVs, consider using a proper CSV parsing library.
+         *
          * @param {string} csv - CSV content
          * @returns {Array<object>} Array of row objects
          */
         function parseCSV(csv) {
-            const lines = csv.trim().split('\n');
+            const lines = csv.trim().split('\n').filter(line => line.trim().length > 0);
             if (lines.length === 0) return [];
 
             // Parse header
@@ -5378,7 +5383,10 @@
             // Parse rows
             const data = [];
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                const line = lines[i].trim();
+                if (line.length === 0) continue; // Skip empty lines
+
+                const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
                 const row = {};
                 headers.forEach((header, idx) => {
                     row[header] = values[idx] || '';
@@ -5442,20 +5450,28 @@
 
                     case 'ColumnCountCheck':
                         const expectedCount = validation.params?.expected_count;
-                        if (expectedCount !== undefined) {
-                            const actualCount = data.length > 0 ? Object.keys(data[0]).length : 0;
-                            result.passed = actualCount === expectedCount;
-                            result.message = result.passed
-                                ? `✅ Column count matches (${actualCount} columns)`
-                                : `❌ Expected ${expectedCount} columns, found ${actualCount}`;
+                        if (expectedCount === undefined || expectedCount === null) {
+                            result.passed = null;
+                            result.message = '⚠️ ColumnCountCheck - No expected_count configured';
+                            break;
                         }
+                        const actualCount = data.length > 0 ? Object.keys(data[0]).length : 0;
+                        result.passed = actualCount === expectedCount;
+                        result.message = result.passed
+                            ? `✅ Column count matches (${actualCount} columns)`
+                            : `❌ Expected ${expectedCount} columns, found ${actualCount}`;
                         break;
 
                     case 'MandatoryFieldCheck':
                         const requiredFields = validation.params?.fields || [];
+                        if (requiredFields.length === 0) {
+                            result.passed = null;
+                            result.message = '⚠️ MandatoryFieldCheck - No fields configured';
+                            break;
+                        }
                         let missingCount = 0;
                         data.forEach((row, idx) => {
-                            const missing = requiredFields.filter(field => !row[field] || row[field].trim() === '');
+                            const missing = requiredFields.filter(field => !row[field] || String(row[field]).trim() === '');
                             if (missing.length > 0) {
                                 missingCount++;
                                 if (result.failedRows.length < 10) {
@@ -5474,10 +5490,15 @@
 
                     case 'UniqueKeyCheck':
                         const keyFields = validation.params?.key_fields || [];
+                        if (keyFields.length === 0) {
+                            result.passed = null;
+                            result.message = '⚠️ UniqueKeyCheck - No key fields configured';
+                            break;
+                        }
                         const seen = new Set();
                         let duplicateCount = 0;
                         data.forEach((row, idx) => {
-                            const key = keyFields.map(f => row[f]).join('|');
+                            const key = keyFields.map(f => row[f] || '').join('|');
                             if (seen.has(key)) {
                                 duplicateCount++;
                                 if (result.failedRows.length < 10) {
@@ -5498,7 +5519,12 @@
                     case 'PatternMatchCheck':
                         const pattern = validation.params?.pattern;
                         const field = validation.params?.field;
-                        if (pattern && field) {
+                        if (!pattern || !field) {
+                            result.passed = null;
+                            result.message = '⚠️ PatternMatchCheck - Missing pattern or field parameter';
+                            break;
+                        }
+                        try {
                             const regex = new RegExp(pattern, 'i');
                             let mismatchCount = 0;
                             data.forEach((row, idx) => {
@@ -5507,7 +5533,7 @@
                                     if (result.failedRows.length < 10) {
                                         result.failedRows.push({
                                             row: idx + 1,
-                                            issue: `Value doesn't match pattern: "${row[field]}"`
+                                            issue: `Value doesn't match pattern: "${row[field] || ''}"`
                                         });
                                     }
                                 }
@@ -5516,6 +5542,9 @@
                             result.message = result.passed
                                 ? `✅ All values match pattern`
                                 : `❌ ${mismatchCount} value(s) don't match pattern`;
+                        } catch (regexError) {
+                            result.passed = false;
+                            result.message = `❌ Invalid regex pattern: ${regexError.message}`;
                         }
                         break;
 
@@ -5523,28 +5552,39 @@
                         const rangeField = validation.params?.field;
                         const min = validation.params?.min;
                         const max = validation.params?.max;
-                        if (rangeField) {
-                            let outOfRangeCount = 0;
-                            data.forEach((row, idx) => {
-                                const value = parseFloat(row[rangeField]);
-                                if (!isNaN(value)) {
-                                    const outOfRange = (min !== undefined && value < min) || (max !== undefined && value > max);
-                                    if (outOfRange) {
-                                        outOfRangeCount++;
-                                        if (result.failedRows.length < 10) {
-                                            result.failedRows.push({
-                                                row: idx + 1,
-                                                issue: `Value ${value} out of range [${min ?? '-∞'}, ${max ?? '∞'}]`
-                                            });
-                                        }
+                        if (!rangeField) {
+                            result.passed = null;
+                            result.message = '⚠️ RangeCheck - Missing field parameter';
+                            break;
+                        }
+                        if (min === undefined && max === undefined) {
+                            result.passed = null;
+                            result.message = '⚠️ RangeCheck - No min or max defined';
+                            break;
+                        }
+                        let outOfRangeCount = 0;
+                        let nonNumericCount = 0;
+                        data.forEach((row, idx) => {
+                            const value = parseFloat(row[rangeField]);
+                            if (isNaN(value)) {
+                                nonNumericCount++;
+                            } else {
+                                const outOfRange = (min !== undefined && value < min) || (max !== undefined && value > max);
+                                if (outOfRange) {
+                                    outOfRangeCount++;
+                                    if (result.failedRows.length < 10) {
+                                        result.failedRows.push({
+                                            row: idx + 1,
+                                            issue: `Value ${value} out of range [${min ?? '-∞'}, ${max ?? '∞'}]`
+                                        });
                                     }
                                 }
-                            });
-                            result.passed = outOfRangeCount === 0;
-                            result.message = result.passed
-                                ? `✅ All values within range`
-                                : `❌ ${outOfRangeCount} value(s) out of range`;
-                        }
+                            }
+                        });
+                        result.passed = outOfRangeCount === 0;
+                        result.message = result.passed
+                            ? `✅ All values within range${nonNumericCount > 0 ? ` (${nonNumericCount} non-numeric skipped)` : ''}`
+                            : `❌ ${outOfRangeCount} value(s) out of range${nonNumericCount > 0 ? ` (${nonNumericCount} non-numeric skipped)` : ''}`;
                         break;
 
                     default:
