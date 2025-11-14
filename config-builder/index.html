@@ -1143,6 +1143,28 @@
             to { opacity: 0; }
         }
 
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
         @keyframes highlight-pulse {
             0% {
                 box-shadow: 0 0 0 2px var(--md-sys-color-primary);
@@ -1506,6 +1528,143 @@
         </div>
     </div>
 
+    <!-- Live Validation Preview Modal -->
+    <div class="modal" id="livePreviewModal" onclick="if(event.target === this) closeLivePreviewModal()">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Live Validation Preview</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Test your validations against sample data
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeLivePreviewModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="livePreviewContent" style="display: grid; gap: 16px;">
+                    <!-- File Upload Section -->
+                    <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 2px dashed var(--border); text-align: center;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📤</div>
+                        <h4 style="color: var(--text-primary); margin: 0 0 8px 0;">Upload Sample Data</h4>
+                        <p style="color: var(--text-muted); margin: 0 0 16px 0; font-size: 13px;">
+                            Upload a CSV or JSON file to test your validations
+                        </p>
+                        <input
+                            type="file"
+                            id="livePreviewFileInput"
+                            accept=".csv,.json"
+                            style="display: none;"
+                            onchange="handleLivePreviewFileUpload(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('livePreviewFileInput').click()">
+                            Choose File
+                        </button>
+                        <div id="livePreviewFileName" style="margin-top: 12px; color: var(--text-muted); font-size: 12px;">
+                            No file selected
+                        </div>
+                    </div>
+
+                    <!-- Results Section (initially hidden) -->
+                    <div id="livePreviewResults" style="display: none;">
+                        <!-- Dynamic results will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeLivePreviewModal()">
+                    Close
+                </button>
+                <button class="btn btn-primary" id="exportTestReport" onclick="exportTestReport()" style="display: none;">
+                    Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Validator Modal -->
+    <div class="modal" id="validatorModal" onclick="if(event.target === this) closeValidatorModal()">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Configuration Validator</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Pre-flight checks for your validation configuration
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeValidatorModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="validatorResults" style="display: grid; gap: 16px;">
+                    <!-- Dynamic validation results -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeValidatorModal()">
+                    Close
+                </button>
+                <button class="btn btn-primary" id="validatorDownloadBtn" onclick="downloadConfigAfterValidation()">
+                    Download Anyway
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Preset Modal -->
+    <div class="modal" id="savePresetModal" onclick="if(event.target === this) closeSavePresetModal()">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Save Validation Preset</h2>
+                <button class="btn btn-secondary btn-icon" onclick="closeSavePresetModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; gap: 16px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                            Preset Name
+                        </label>
+                        <input
+                            type="text"
+                            id="presetName"
+                            placeholder="E.g., Common CSV Checks, Standard File Validation"
+                            style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                        <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px;">
+                            Give your preset a descriptive name for easy identification
+                        </small>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                            Description (Optional)
+                        </label>
+                        <textarea
+                            id="presetDescription"
+                            placeholder="Describe when to use this preset..."
+                            rows="3"
+                            style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    <div id="presetPreview" style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border);">
+                        <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px;">Validations to Save</h4>
+                        <div id="presetPreviewContent" style="font-size: 13px; color: var(--text-muted);">
+                            <!-- Dynamic preview -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSavePresetModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" onclick="confirmSavePreset()">
+                    Save Preset
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Regex Tester Modal -->
     <div class="modal" id="regexTesterModal" onclick="if(event.target === this) closeRegexTesterModal()">
         <div class="modal-content" style="max-width: 700px;">
@@ -1616,6 +1775,46 @@
                     onkeyup="handleSearch(event)">
             </div>
 
+            <!-- Quick Stats -->
+            <div id="quickStats" style="padding: 12px 20px; background: var(--bg-secondary); margin: 0 12px 12px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="display: grid; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted); font-size: 12px;">Files</span>
+                        <span id="statsFiles" style="color: var(--text-primary); font-weight: 600; font-size: 14px;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted); font-size: 12px;">Validations</span>
+                        <span id="statsValidations" style="color: var(--text-primary); font-weight: 600; font-size: 14px;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border);">
+                        <span style="color: var(--text-muted); font-size: 12px;">Health</span>
+                        <span id="statsHealth" style="color: var(--md-sys-color-primary); font-weight: 600; font-size: 14px;">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Presets -->
+            <div id="presetsSection" style="margin: 0 12px 12px 12px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border); overflow: hidden;">
+                <div style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="togglePresetsCollapse()">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="presetsCollapseIcon" style="transition: transform 0.2s; font-size: 12px;">▼</span>
+                        <span style="color: var(--text-primary); font-weight: 600; font-size: 13px;">⭐ Presets</span>
+                    </div>
+                    <button
+                        class="md-button-text"
+                        onclick="event.stopPropagation(); openSavePresetModal()"
+                        style="padding: 4px 12px; font-size: 12px;"
+                        title="Save current validations as preset">
+                        + Save
+                    </button>
+                </div>
+                <div id="presetsContent" style="border-top: 1px solid var(--border);">
+                    <div id="presetsList" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Dynamic presets list -->
+                    </div>
+                </div>
+            </div>
+
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-item active" onclick="showSection('job')">
@@ -1710,7 +1909,15 @@
                         <span class="status-badge success" id="statusBadge">Ready</span>
                     </div>
                     <div class="header-actions">
-                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v3.0.0</span>
+                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v3.5.0</span>
+                        <button class="btn btn-secondary" onclick="openLivePreviewModal()" title="Test with Sample Data" style="margin-right: 8px;">
+                            <span class="icon">🧪</span>
+                            <span>Test</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="openValidatorModal()" title="Validate Configuration" style="margin-right: 8px;">
+                            <span class="icon">✓</span>
+                            <span>Validate</span>
+                        </button>
                         <button class="btn btn-primary" onclick="downloadConfig()" title="Download YAML Configuration" style="margin-right: 8px;">
                             <span class="icon">📥</span>
                             <span>Download</span>
@@ -1858,6 +2065,9 @@
 
             // Initialize keyboard shortcuts
             initKeyboardShortcuts();
+
+            // Load and render validation presets
+            renderPresets();
 
             // Apply saved theme
             applyTheme(state.theme);
@@ -4324,6 +4534,1186 @@
         }
 
         /**
+         * Calculates configuration health score (0-100%)
+         * Based on completeness, best practices, and absence of issues
+         * @returns {object} Health score and grade
+         */
+        function calculateConfigurationHealth() {
+            let score = 100;
+            let issues = [];
+
+            // Deduct points for missing files
+            if (state.files.length === 0) {
+                score -= 50;
+                issues.push('No files configured');
+            }
+
+            // Check each file
+            state.files.forEach(file => {
+                // Deduct for files without validations
+                if (file.validations.length === 0) {
+                    score -= 10;
+                    issues.push(`${file.name} has no validations`);
+                }
+
+                const hasEmptyFileCheck = file.validations.some(v => v.type === 'EmptyFileCheck');
+                const hasMandatoryFieldCheck = file.validations.some(v => v.type === 'MandatoryFieldCheck');
+
+                // Deduct for missing essential validations
+                if (file.validations.length > 0 && !hasEmptyFileCheck) {
+                    score -= 5;
+                    issues.push(`${file.name} missing EmptyFileCheck`);
+                }
+
+                // Check for incomplete parameters
+                file.validations.forEach(v => {
+                    if (v.type === 'UniqueKeyCheck' && (!v.params?.key_fields || v.params.key_fields.length === 0)) {
+                        score -= 5;
+                        issues.push(`${file.name}: UniqueKeyCheck missing parameters`);
+                    }
+                    if (v.type === 'MandatoryFieldCheck' && (!v.params?.fields || v.params.fields.length === 0)) {
+                        score -= 5;
+                        issues.push(`${file.name}: MandatoryFieldCheck missing parameters`);
+                    }
+                });
+            });
+
+            // Check for conflicts
+            const conflicts = detectValidationConflicts();
+            score -= conflicts.length * 3;
+
+            // Ensure score doesn't go below 0
+            score = Math.max(0, score);
+
+            // Determine grade
+            let grade = 'F';
+            let color = 'var(--severity-error)';
+            if (score >= 90) { grade = 'A'; color = 'var(--md-sys-color-primary)'; }
+            else if (score >= 80) { grade = 'B'; color = 'var(--md-sys-color-primary)'; }
+            else if (score >= 70) { grade = 'C'; color = 'var(--severity-warning)'; }
+            else if (score >= 60) { grade = 'D'; color = 'var(--severity-warning)'; }
+            else { color = 'var(--severity-error)'; }
+
+            return { score, grade, color, issues };
+        }
+
+        /**
+         * Updates the quick stats display in the sidebar
+         * Shows file count, validation count, and health score
+         */
+        function updateQuickStats() {
+            const filesCount = state.files.length;
+            const validationsCount = state.files.reduce((sum, f) => sum + f.validations.length, 0);
+            const health = calculateConfigurationHealth();
+
+            document.getElementById('statsFiles').textContent = filesCount;
+            document.getElementById('statsValidations').textContent = validationsCount;
+            document.getElementById('statsHealth').textContent = `${health.score}% (${health.grade})`;
+            document.getElementById('statsHealth').style.color = health.color;
+        }
+
+        // ========================================
+        // VALIDATION PRESETS
+        // ========================================
+
+        /**
+         * Toggles the collapse state of the presets section in sidebar
+         */
+        function togglePresetsCollapse() {
+            const content = document.getElementById('presetsContent');
+            const icon = document.getElementById('presetsCollapseIcon');
+            const isCollapsed = content.style.display === 'none';
+
+            content.style.display = isCollapsed ? 'block' : 'none';
+            icon.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
+        /**
+         * Opens the Save Preset modal and populates preview
+         */
+        function openSavePresetModal() {
+            // Check if current file has validations to save
+            const currentFile = state.files[state.currentFileIndex];
+            if (!currentFile || currentFile.validations.length === 0) {
+                alert('Current file has no validations to save as a preset.');
+                return;
+            }
+
+            // Populate preview
+            const previewContent = document.getElementById('presetPreviewContent');
+            const validationsList = currentFile.validations.map(v => {
+                const paramCount = v.params ? Object.keys(v.params).length : 0;
+                return `<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
+                    <span style="color: var(--md-sys-color-primary);">✓</span>
+                    <span style="color: var(--text-primary);">${v.type}</span>
+                    <span style="color: var(--text-muted); font-size: 11px;">(${paramCount} param${paramCount !== 1 ? 's' : ''})</span>
+                </div>`;
+            }).join('');
+
+            previewContent.innerHTML = validationsList || '<span style="color: var(--text-muted);">No validations</span>';
+
+            // Clear form inputs
+            document.getElementById('presetName').value = '';
+            document.getElementById('presetDescription').value = '';
+
+            // Show modal
+            document.getElementById('savePresetModal').style.display = 'flex';
+        }
+
+        /**
+         * Closes the Save Preset modal
+         */
+        function closeSavePresetModal() {
+            document.getElementById('savePresetModal').style.display = 'none';
+        }
+
+        /**
+         * Saves the current validations as a preset to localStorage
+         */
+        function confirmSavePreset() {
+            const name = document.getElementById('presetName').value.trim();
+            const description = document.getElementById('presetDescription').value.trim();
+
+            // Validate input
+            if (!name) {
+                alert('Please enter a preset name.');
+                return;
+            }
+
+            const currentFile = state.files[state.currentFileIndex];
+            if (!currentFile || currentFile.validations.length === 0) {
+                alert('No validations to save.');
+                return;
+            }
+
+            // Create preset object (deep copy validations)
+            const preset = {
+                id: Date.now().toString(),
+                name: name,
+                description: description,
+                validations: JSON.parse(JSON.stringify(currentFile.validations)),
+                createdAt: new Date().toISOString()
+            };
+
+            // Load existing presets
+            let presets = [];
+            try {
+                const stored = localStorage.getItem('validationPresets');
+                if (stored) {
+                    presets = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Error loading presets:', e);
+            }
+
+            // Add new preset
+            presets.push(preset);
+
+            // Save to localStorage
+            try {
+                localStorage.setItem('validationPresets', JSON.stringify(presets));
+                console.log('Preset saved:', preset.name);
+            } catch (e) {
+                console.error('Error saving preset:', e);
+                alert('Failed to save preset. Storage quota may be exceeded.');
+                return;
+            }
+
+            // Close modal and refresh presets display
+            closeSavePresetModal();
+            renderPresets();
+
+            // Show success feedback
+            showNotification(`Preset "${name}" saved successfully!`, 'success');
+        }
+
+        /**
+         * Loads and renders all presets in the sidebar
+         */
+        function renderPresets() {
+            const presetsList = document.getElementById('presetsList');
+
+            // Load presets from localStorage
+            let presets = [];
+            try {
+                const stored = localStorage.getItem('validationPresets');
+                if (stored) {
+                    presets = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Error loading presets:', e);
+            }
+
+            // Render presets
+            if (presets.length === 0) {
+                presetsList.innerHTML = `
+                    <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                        No presets saved yet.<br>
+                        Save your current validations to create a preset.
+                    </div>
+                `;
+                return;
+            }
+
+            presetsList.innerHTML = presets.map(preset => {
+                const validationCount = preset.validations.length;
+                return `
+                    <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); hover: background: var(--bg-tertiary);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="color: var(--text-primary); font-weight: 500; font-size: 13px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                     title="${preset.name}">
+                                    ${preset.name}
+                                </div>
+                                ${preset.description ? `
+                                    <div style="color: var(--text-muted); font-size: 11px; margin-bottom: 6px; line-height: 1.4;">
+                                        ${preset.description}
+                                    </div>
+                                ` : ''}
+                                <div style="color: var(--text-muted); font-size: 11px;">
+                                    ${validationCount} validation${validationCount !== 1 ? 's' : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <button
+                                    onclick="applyPreset('${preset.id}')"
+                                    class="md-button-text"
+                                    style="padding: 4px 8px; font-size: 11px; white-space: nowrap;"
+                                    title="Apply this preset to current file">
+                                    Apply
+                                </button>
+                                <button
+                                    onclick="deletePreset('${preset.id}')"
+                                    class="md-button-text"
+                                    style="padding: 4px 8px; font-size: 11px; color: var(--severity-error);"
+                                    title="Delete this preset">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Applies a preset to the current file
+         * @param {string} presetId - ID of the preset to apply
+         */
+        function applyPreset(presetId) {
+            // Check if a file is selected
+            if (state.currentFileIndex === -1) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            // Load presets
+            let presets = [];
+            try {
+                const stored = localStorage.getItem('validationPresets');
+                if (stored) {
+                    presets = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Error loading presets:', e);
+                alert('Failed to load presets.');
+                return;
+            }
+
+            // Find the preset
+            const preset = presets.find(p => p.id === presetId);
+            if (!preset) {
+                alert('Preset not found.');
+                return;
+            }
+
+            // Confirm if current file has validations
+            const currentFile = state.files[state.currentFileIndex];
+            if (currentFile.validations.length > 0) {
+                if (!confirm(`This will replace ${currentFile.validations.length} existing validation(s) in "${currentFile.name}". Continue?`)) {
+                    return;
+                }
+            }
+
+            // Save state for undo
+            saveStateToUndoStack();
+
+            // Apply preset (deep copy validations)
+            currentFile.validations = JSON.parse(JSON.stringify(preset.validations));
+
+            // Update UI
+            renderValidations();
+            updateYAMLPreview();
+            autoSave();
+
+            // Show success feedback
+            showNotification(`Preset "${preset.name}" applied successfully!`, 'success');
+        }
+
+        /**
+         * Deletes a preset from localStorage
+         * @param {string} presetId - ID of the preset to delete
+         */
+        function deletePreset(presetId) {
+            if (!confirm('Are you sure you want to delete this preset?')) {
+                return;
+            }
+
+            // Load presets
+            let presets = [];
+            try {
+                const stored = localStorage.getItem('validationPresets');
+                if (stored) {
+                    presets = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Error loading presets:', e);
+                return;
+            }
+
+            // Filter out the deleted preset
+            const filteredPresets = presets.filter(p => p.id !== presetId);
+
+            // Save back to localStorage
+            try {
+                localStorage.setItem('validationPresets', JSON.stringify(filteredPresets));
+                console.log('Preset deleted');
+            } catch (e) {
+                console.error('Error saving presets:', e);
+                alert('Failed to delete preset.');
+                return;
+            }
+
+            // Refresh display
+            renderPresets();
+
+            // Show success feedback
+            showNotification('Preset deleted successfully!', 'success');
+        }
+
+        /**
+         * Shows a temporary notification message
+         * @param {string} message - Message to display
+         * @param {string} type - Type of notification (success, error, info)
+         */
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? 'var(--md-sys-color-primary)' : type === 'error' ? 'var(--severity-error)' : 'var(--bg-secondary)'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // CONFIGURATION VALIDATOR
+        // ========================================
+
+        /**
+         * Opens the Configuration Validator modal and runs validation checks
+         */
+        function openValidatorModal() {
+            // Run comprehensive validation
+            const results = validateConfiguration();
+
+            // Render results in modal
+            renderValidationResults(results);
+
+            // Show modal
+            document.getElementById('validatorModal').style.display = 'flex';
+        }
+
+        /**
+         * Closes the Configuration Validator modal
+         */
+        function closeValidatorModal() {
+            document.getElementById('validatorModal').style.display = 'none';
+        }
+
+        /**
+         * Performs comprehensive validation checks on the configuration
+         * @returns {object} Validation results with errors, warnings, and info
+         */
+        function validateConfiguration() {
+            const errors = [];
+            const warnings = [];
+            const info = [];
+            let passedChecks = 0;
+            let totalChecks = 0;
+
+            // Check 1: Configuration has files
+            totalChecks++;
+            if (state.files.length === 0) {
+                errors.push({
+                    check: 'Files Configured',
+                    message: 'No files have been configured. Add at least one file.',
+                    severity: 'error'
+                });
+            } else {
+                passedChecks++;
+                info.push({
+                    check: 'Files Configured',
+                    message: `${state.files.length} file${state.files.length !== 1 ? 's' : ''} configured`,
+                    severity: 'info'
+                });
+            }
+
+            // Check each file
+            state.files.forEach((file, idx) => {
+                // Check 2: File has validations
+                totalChecks++;
+                if (file.validations.length === 0) {
+                    warnings.push({
+                        check: `File: ${file.name}`,
+                        message: 'File has no validations configured',
+                        severity: 'warning'
+                    });
+                } else {
+                    passedChecks++;
+                }
+
+                // Check 3: EmptyFileCheck present
+                totalChecks++;
+                const hasEmptyFileCheck = file.validations.some(v => v.type === 'EmptyFileCheck');
+                if (file.validations.length > 0 && !hasEmptyFileCheck) {
+                    warnings.push({
+                        check: `File: ${file.name}`,
+                        message: 'Missing recommended EmptyFileCheck validation',
+                        severity: 'warning'
+                    });
+                } else if (hasEmptyFileCheck) {
+                    passedChecks++;
+                } else {
+                    totalChecks--; // Don't count if no validations
+                }
+
+                // Check 4: Validation parameters complete
+                file.validations.forEach((v, vIdx) => {
+                    totalChecks++;
+                    const incomplete = [];
+
+                    // Check UniqueKeyCheck has key_fields
+                    if (v.type === 'UniqueKeyCheck') {
+                        if (!v.params?.key_fields || v.params.key_fields.length === 0) {
+                            incomplete.push('key_fields');
+                        }
+                    }
+
+                    // Check MandatoryFieldCheck has fields
+                    if (v.type === 'MandatoryFieldCheck') {
+                        if (!v.params?.fields || v.params.fields.length === 0) {
+                            incomplete.push('fields');
+                        }
+                    }
+
+                    // Check PatternMatchCheck has pattern and field
+                    if (v.type === 'PatternMatchCheck') {
+                        if (!v.params?.pattern) {
+                            incomplete.push('pattern');
+                        }
+                        if (!v.params?.field) {
+                            incomplete.push('field');
+                        }
+                    }
+
+                    // Check ColumnCountCheck has expected_count
+                    if (v.type === 'ColumnCountCheck') {
+                        if (!v.params?.expected_count && v.params?.expected_count !== 0) {
+                            incomplete.push('expected_count');
+                        }
+                    }
+
+                    // Check CustomSQLCheck has query
+                    if (v.type === 'CustomSQLCheck') {
+                        if (!v.params?.query) {
+                            incomplete.push('query');
+                        }
+                    }
+
+                    // Check RangeCheck has field, min, max
+                    if (v.type === 'RangeCheck') {
+                        if (!v.params?.field) {
+                            incomplete.push('field');
+                        }
+                        if (v.params?.min === undefined && v.params?.max === undefined) {
+                            incomplete.push('min/max');
+                        }
+                    }
+
+                    if (incomplete.length > 0) {
+                        errors.push({
+                            check: `${file.name} - ${v.type}`,
+                            message: `Missing required parameter${incomplete.length > 1 ? 's' : ''}: ${incomplete.join(', ')}`,
+                            severity: 'error'
+                        });
+                    } else {
+                        passedChecks++;
+                    }
+                });
+            });
+
+            // Check 5: Detect validation conflicts
+            const conflicts = detectValidationConflicts();
+            if (conflicts.length > 0) {
+                conflicts.forEach(conflict => {
+                    warnings.push({
+                        check: 'Validation Conflict',
+                        message: conflict,
+                        severity: 'warning'
+                    });
+                });
+            }
+
+            // Check 6: YAML generation
+            totalChecks++;
+            try {
+                const yaml = generateYAML();
+                if (yaml && yaml.length > 0) {
+                    passedChecks++;
+                    info.push({
+                        check: 'YAML Generation',
+                        message: 'YAML configuration generated successfully',
+                        severity: 'info'
+                    });
+                } else {
+                    errors.push({
+                        check: 'YAML Generation',
+                        message: 'Generated YAML is empty',
+                        severity: 'error'
+                    });
+                }
+            } catch (e) {
+                errors.push({
+                    check: 'YAML Generation',
+                    message: `Failed to generate YAML: ${e.message}`,
+                    severity: 'error'
+                });
+            }
+
+            // Calculate health
+            const health = calculateConfigurationHealth();
+
+            return {
+                errors,
+                warnings,
+                info,
+                passedChecks,
+                totalChecks,
+                health,
+                canDownload: errors.length === 0
+            };
+        }
+
+        /**
+         * Renders validation results in the validator modal
+         * @param {object} results - Validation results from validateConfiguration()
+         */
+        function renderValidationResults(results) {
+            const container = document.getElementById('validatorResults');
+            const downloadBtn = document.getElementById('validatorDownloadBtn');
+
+            // Overall status card
+            const statusColor = results.errors.length === 0
+                ? (results.warnings.length === 0 ? 'var(--md-sys-color-primary)' : 'var(--severity-warning)')
+                : 'var(--severity-error)';
+
+            const statusIcon = results.errors.length === 0
+                ? (results.warnings.length === 0 ? '✅' : '⚠️')
+                : '❌';
+
+            const statusText = results.errors.length === 0
+                ? (results.warnings.length === 0 ? 'Configuration Valid' : 'Configuration Valid (with warnings)')
+                : 'Configuration Has Errors';
+
+            let html = `
+                <!-- Overall Status -->
+                <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 2px solid ${statusColor};">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 32px;">${statusIcon}</span>
+                        <div style="flex: 1;">
+                            <h3 style="color: var(--text-primary); margin: 0 0 4px 0; font-size: 18px;">${statusText}</h3>
+                            <p style="color: var(--text-muted); margin: 0; font-size: 13px;">
+                                ${results.passedChecks} of ${results.totalChecks} checks passed
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 28px; font-weight: 700; color: ${results.health.color};">
+                                ${results.health.score}%
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted);">
+                                Health: ${results.health.grade}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Badges -->
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        ${results.errors.length > 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--severity-error);">
+                                <span style="color: var(--severity-error); font-weight: 600;">${results.errors.length}</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">Error${results.errors.length !== 1 ? 's' : ''}</span>
+                            </div>
+                        ` : ''}
+                        ${results.warnings.length > 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--severity-warning);">
+                                <span style="color: var(--severity-warning); font-weight: 600;">${results.warnings.length}</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">Warning${results.warnings.length !== 1 ? 's' : ''}</span>
+                            </div>
+                        ` : ''}
+                        ${results.errors.length === 0 && results.warnings.length === 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--md-sys-color-primary);">
+                                <span style="color: var(--md-sys-color-primary); font-weight: 600;">✓</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">All Checks Passed</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Errors section
+            if (results.errors.length > 0) {
+                html += `
+                    <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--severity-error);">
+                        <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <span>❌</span>
+                            <span>Errors (must be fixed)</span>
+                        </h4>
+                        <div style="display: grid; gap: 8px;">
+                            ${results.errors.map(err => `
+                                <div style="padding: 10px 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border);">
+                                    <div style="color: var(--text-primary); font-weight: 500; font-size: 13px; margin-bottom: 2px;">
+                                        ${err.check}
+                                    </div>
+                                    <div style="color: var(--text-muted); font-size: 12px;">
+                                        ${err.message}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Warnings section
+            if (results.warnings.length > 0) {
+                html += `
+                    <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--severity-warning);">
+                        <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <span>⚠️</span>
+                            <span>Warnings (recommended fixes)</span>
+                        </h4>
+                        <div style="display: grid; gap: 8px;">
+                            ${results.warnings.map(warn => `
+                                <div style="padding: 10px 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border);">
+                                    <div style="color: var(--text-primary); font-weight: 500; font-size: 13px; margin-bottom: 2px;">
+                                        ${warn.check}
+                                    </div>
+                                    <div style="color: var(--text-muted); font-size: 12px;">
+                                        ${warn.message}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Info section
+            if (results.info.length > 0 && results.errors.length === 0 && results.warnings.length === 0) {
+                html += `
+                    <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--md-sys-color-primary);">
+                        <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <span>ℹ️</span>
+                            <span>Configuration Details</span>
+                        </h4>
+                        <div style="display: grid; gap: 8px;">
+                            ${results.info.map(inf => `
+                                <div style="padding: 10px 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border);">
+                                    <div style="color: var(--text-muted); font-size: 12px;">
+                                        ✓ ${inf.message}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            // Update download button state
+            if (results.canDownload) {
+                downloadBtn.textContent = 'Download Configuration';
+                downloadBtn.className = 'btn btn-primary';
+            } else {
+                downloadBtn.textContent = 'Fix Errors First';
+                downloadBtn.className = 'btn btn-secondary';
+                downloadBtn.disabled = true;
+            }
+        }
+
+        /**
+         * Downloads configuration after validation (from validator modal)
+         */
+        function downloadConfigAfterValidation() {
+            closeValidatorModal();
+            downloadConfig();
+        }
+
+        // ========================================
+        // LIVE VALIDATION PREVIEW
+        // ========================================
+
+        let livePreviewData = null;
+        let livePreviewTestResults = null;
+
+        /**
+         * Opens the Live Validation Preview modal
+         */
+        function openLivePreviewModal() {
+            // Check if current file has validations
+            if (state.currentFileIndex === -1 || !state.files[state.currentFileIndex]) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            const currentFile = state.files[state.currentFileIndex];
+            if (currentFile.validations.length === 0) {
+                alert('Current file has no validations to test.');
+                return;
+            }
+
+            // Reset state
+            livePreviewData = null;
+            livePreviewTestResults = null;
+            document.getElementById('livePreviewFileName').textContent = 'No file selected';
+            document.getElementById('livePreviewResults').style.display = 'none';
+            document.getElementById('exportTestReport').style.display = 'none';
+            document.getElementById('livePreviewFileInput').value = '';
+
+            // Show modal
+            document.getElementById('livePreviewModal').style.display = 'flex';
+        }
+
+        /**
+         * Closes the Live Validation Preview modal
+         */
+        function closeLivePreviewModal() {
+            document.getElementById('livePreviewModal').style.display = 'none';
+        }
+
+        /**
+         * Handles file upload for live preview
+         * @param {Event} event - File input change event
+         */
+        function handleLivePreviewFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Update file name display
+            document.getElementById('livePreviewFileName').textContent = `Selected: ${file.name}`;
+
+            // Read and parse file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                    if (fileExtension === 'csv') {
+                        livePreviewData = parseCSV(content);
+                    } else if (fileExtension === 'json') {
+                        livePreviewData = JSON.parse(content);
+                        // Ensure data is array of objects
+                        if (!Array.isArray(livePreviewData)) {
+                            livePreviewData = [livePreviewData];
+                        }
+                    } else {
+                        alert('Unsupported file type. Please upload CSV or JSON.');
+                        return;
+                    }
+
+                    // Run validations
+                    runLivePreviewValidations();
+
+                } catch (error) {
+                    console.error('Error parsing file:', error);
+                    alert(`Failed to parse file: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /**
+         * Parses CSV content into array of objects
+         * @param {string} csv - CSV content
+         * @returns {Array<object>} Array of row objects
+         */
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            if (lines.length === 0) return [];
+
+            // Parse header
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+
+            // Parse rows
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                const row = {};
+                headers.forEach((header, idx) => {
+                    row[header] = values[idx] || '';
+                });
+                data.push(row);
+            }
+
+            return data;
+        }
+
+        /**
+         * Runs validation checks against the uploaded sample data
+         */
+        function runLivePreviewValidations() {
+            if (!livePreviewData || livePreviewData.length === 0) {
+                alert('No data to validate.');
+                return;
+            }
+
+            const currentFile = state.files[state.currentFileIndex];
+            const results = [];
+
+            // Run each validation
+            currentFile.validations.forEach(validation => {
+                const result = runSingleValidation(validation, livePreviewData);
+                results.push(result);
+            });
+
+            livePreviewTestResults = results;
+
+            // Render results
+            renderLivePreviewResults();
+
+            // Show export button
+            document.getElementById('exportTestReport').style.display = 'block';
+        }
+
+        /**
+         * Runs a single validation check against the data
+         * @param {object} validation - Validation configuration
+         * @param {Array<object>} data - Sample data rows
+         * @returns {object} Validation result
+         */
+        function runSingleValidation(validation, data) {
+            const result = {
+                type: validation.type,
+                passed: false,
+                message: '',
+                details: [],
+                failedRows: []
+            };
+
+            try {
+                switch (validation.type) {
+                    case 'EmptyFileCheck':
+                        result.passed = data.length > 0;
+                        result.message = result.passed
+                            ? `✅ File is not empty (${data.length} rows)`
+                            : '❌ File is empty';
+                        break;
+
+                    case 'ColumnCountCheck':
+                        const expectedCount = validation.params?.expected_count;
+                        if (expectedCount !== undefined) {
+                            const actualCount = data.length > 0 ? Object.keys(data[0]).length : 0;
+                            result.passed = actualCount === expectedCount;
+                            result.message = result.passed
+                                ? `✅ Column count matches (${actualCount} columns)`
+                                : `❌ Expected ${expectedCount} columns, found ${actualCount}`;
+                        }
+                        break;
+
+                    case 'MandatoryFieldCheck':
+                        const requiredFields = validation.params?.fields || [];
+                        let missingCount = 0;
+                        data.forEach((row, idx) => {
+                            const missing = requiredFields.filter(field => !row[field] || row[field].trim() === '');
+                            if (missing.length > 0) {
+                                missingCount++;
+                                if (result.failedRows.length < 10) {
+                                    result.failedRows.push({
+                                        row: idx + 1,
+                                        issue: `Missing: ${missing.join(', ')}`
+                                    });
+                                }
+                            }
+                        });
+                        result.passed = missingCount === 0;
+                        result.message = result.passed
+                            ? `✅ All mandatory fields present`
+                            : `❌ ${missingCount} row(s) missing required fields`;
+                        break;
+
+                    case 'UniqueKeyCheck':
+                        const keyFields = validation.params?.key_fields || [];
+                        const seen = new Set();
+                        let duplicateCount = 0;
+                        data.forEach((row, idx) => {
+                            const key = keyFields.map(f => row[f]).join('|');
+                            if (seen.has(key)) {
+                                duplicateCount++;
+                                if (result.failedRows.length < 10) {
+                                    result.failedRows.push({
+                                        row: idx + 1,
+                                        issue: `Duplicate key: ${key}`
+                                    });
+                                }
+                            }
+                            seen.add(key);
+                        });
+                        result.passed = duplicateCount === 0;
+                        result.message = result.passed
+                            ? `✅ All keys are unique`
+                            : `❌ ${duplicateCount} duplicate key(s) found`;
+                        break;
+
+                    case 'PatternMatchCheck':
+                        const pattern = validation.params?.pattern;
+                        const field = validation.params?.field;
+                        if (pattern && field) {
+                            const regex = new RegExp(pattern, 'i');
+                            let mismatchCount = 0;
+                            data.forEach((row, idx) => {
+                                if (!regex.test(row[field] || '')) {
+                                    mismatchCount++;
+                                    if (result.failedRows.length < 10) {
+                                        result.failedRows.push({
+                                            row: idx + 1,
+                                            issue: `Value doesn't match pattern: "${row[field]}"`
+                                        });
+                                    }
+                                }
+                            });
+                            result.passed = mismatchCount === 0;
+                            result.message = result.passed
+                                ? `✅ All values match pattern`
+                                : `❌ ${mismatchCount} value(s) don't match pattern`;
+                        }
+                        break;
+
+                    case 'RangeCheck':
+                        const rangeField = validation.params?.field;
+                        const min = validation.params?.min;
+                        const max = validation.params?.max;
+                        if (rangeField) {
+                            let outOfRangeCount = 0;
+                            data.forEach((row, idx) => {
+                                const value = parseFloat(row[rangeField]);
+                                if (!isNaN(value)) {
+                                    const outOfRange = (min !== undefined && value < min) || (max !== undefined && value > max);
+                                    if (outOfRange) {
+                                        outOfRangeCount++;
+                                        if (result.failedRows.length < 10) {
+                                            result.failedRows.push({
+                                                row: idx + 1,
+                                                issue: `Value ${value} out of range [${min ?? '-∞'}, ${max ?? '∞'}]`
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                            result.passed = outOfRangeCount === 0;
+                            result.message = result.passed
+                                ? `✅ All values within range`
+                                : `❌ ${outOfRangeCount} value(s) out of range`;
+                        }
+                        break;
+
+                    default:
+                        result.message = `⚠️ ${validation.type} - Testing not implemented (configuration validation only)`;
+                        result.passed = null; // null = not tested
+                        break;
+                }
+            } catch (error) {
+                result.passed = false;
+                result.message = `❌ Error running validation: ${error.message}`;
+            }
+
+            return result;
+        }
+
+        /**
+         * Renders live preview test results in the modal
+         */
+        function renderLivePreviewResults() {
+            if (!livePreviewTestResults) return;
+
+            const container = document.getElementById('livePreviewResults');
+            const passedCount = livePreviewTestResults.filter(r => r.passed === true).length;
+            const failedCount = livePreviewTestResults.filter(r => r.passed === false).length;
+            const notTestedCount = livePreviewTestResults.filter(r => r.passed === null).length;
+            const totalTests = passedCount + failedCount;
+
+            const successRate = totalTests > 0 ? Math.round((passedCount / totalTests) * 100) : 0;
+
+            let html = `
+                <!-- Summary Card -->
+                <div style="padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 2px solid ${successRate === 100 ? 'var(--md-sys-color-primary)' : failedCount > 0 ? 'var(--severity-error)' : 'var(--severity-warning)'};">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 32px;">${successRate === 100 ? '✅' : failedCount > 0 ? '❌' : '⚠️'}</span>
+                        <div style="flex: 1;">
+                            <h3 style="color: var(--text-primary); margin: 0 0 4px 0; font-size: 18px;">
+                                Test Results: ${passedCount}/${totalTests} Passed
+                            </h3>
+                            <p style="color: var(--text-muted); margin: 0; font-size: 13px;">
+                                ${livePreviewData.length} rows tested against ${livePreviewTestResults.length} validation${livePreviewTestResults.length !== 1 ? 's' : ''}
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 28px; font-weight: 700; color: ${successRate === 100 ? 'var(--md-sys-color-primary)' : failedCount > 0 ? 'var(--severity-error)' : 'var(--severity-warning)'};">
+                                ${successRate}%
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted);">
+                                Success Rate
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        ${passedCount > 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--md-sys-color-primary);">
+                                <span style="color: var(--md-sys-color-primary); font-weight: 600;">${passedCount}</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">Passed</span>
+                            </div>
+                        ` : ''}
+                        ${failedCount > 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--severity-error);">
+                                <span style="color: var(--severity-error); font-weight: 600;">${failedCount}</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">Failed</span>
+                            </div>
+                        ` : ''}
+                        ${notTestedCount > 0 ? `
+                            <div style="padding: 8px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border);">
+                                <span style="color: var(--text-muted); font-weight: 600;">${notTestedCount}</span>
+                                <span style="color: var(--text-muted); font-size: 12px; margin-left: 4px;">Not Tested</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Detailed Results -->
+                <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                    <h4 style="color: var(--text-primary); margin: 0 0 16px 0; font-size: 14px;">Detailed Results</h4>
+                    <div style="display: grid; gap: 12px;">
+                        ${livePreviewTestResults.map((result, idx) => `
+                            <div style="padding: 12px; background: var(--bg-primary); border-radius: 8px; border-left: 3px solid ${result.passed === true ? 'var(--md-sys-color-primary)' : result.passed === false ? 'var(--severity-error)' : 'var(--border)'};">
+                                <div style="color: var(--text-primary); font-weight: 500; margin-bottom: 4px;">
+                                    ${result.type}
+                                </div>
+                                <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px;">
+                                    ${result.message}
+                                </div>
+                                ${result.failedRows.length > 0 ? `
+                                    <details style="margin-top: 8px;">
+                                        <summary style="cursor: pointer; color: var(--severity-error); font-size: 12px; font-weight: 500;">
+                                            View ${result.failedRows.length} failed row${result.failedRows.length !== 1 ? 's' : ''} (showing first 10)
+                                        </summary>
+                                        <div style="margin-top: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 4px; font-size: 11px; font-family: 'Courier New', monospace;">
+                                            ${result.failedRows.map(fr => `
+                                                <div style="padding: 4px 0; border-bottom: 1px solid var(--border);">
+                                                    <span style="color: var(--severity-error);">Row ${fr.row}:</span>
+                                                    <span style="color: var(--text-muted);">${fr.issue}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </details>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        /**
+         * Exports test report as a downloadable file
+         */
+        function exportTestReport() {
+            if (!livePreviewTestResults) return;
+
+            const currentFile = state.files[state.currentFileIndex];
+            const passedCount = livePreviewTestResults.filter(r => r.passed === true).length;
+            const failedCount = livePreviewTestResults.filter(r => r.passed === false).length;
+            const totalTests = passedCount + failedCount;
+
+            let report = `LIVE VALIDATION TEST REPORT
+================================================================================
+File: ${currentFile.name}
+Date: ${new Date().toLocaleString()}
+Sample Rows: ${livePreviewData.length}
+Validations Tested: ${livePreviewTestResults.length}
+
+SUMMARY
+================================================================================
+Passed: ${passedCount}/${totalTests}
+Failed: ${failedCount}/${totalTests}
+Success Rate: ${totalTests > 0 ? Math.round((passedCount / totalTests) * 100) : 0}%
+
+DETAILED RESULTS
+================================================================================
+
+`;
+
+            livePreviewTestResults.forEach((result, idx) => {
+                report += `${idx + 1}. ${result.type}\n`;
+                report += `   Status: ${result.passed === true ? 'PASS' : result.passed === false ? 'FAIL' : 'NOT TESTED'}\n`;
+                report += `   Message: ${result.message.replace(/[✅❌⚠️]/g, '')}\n`;
+                if (result.failedRows.length > 0) {
+                    report += `   Failed Rows:\n`;
+                    result.failedRows.forEach(fr => {
+                        report += `     - Row ${fr.row}: ${fr.issue}\n`;
+                    });
+                }
+                report += `\n`;
+            });
+
+            report += `================================================================================\n`;
+            report += `End of Report\n`;
+
+            // Download report
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `validation-test-report-${currentFile.name}-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showNotification('Test report downloaded successfully!', 'success');
+        }
+
+        /**
          * Extracts all unique field names used across all validations
          * Used for field name autocomplete suggestions
          * @returns {Array<string>} Array of unique field names
@@ -4731,6 +6121,7 @@
         function updateYAMLPreview() {
             const yaml = generateYAML();
             document.getElementById('yamlPreview').textContent = yaml;
+            updateQuickStats(); // Update sidebar stats
         }
 
         function generateYAML() {
