@@ -10,10 +10,28 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 **Major redesign with three-panel layout and validation wizard!** Professional, modern interface inspired by leading open-source config builders.
 
+**🆕 LATEST UPDATE - Clarity-Focused Theme & Multi-Selection (January 2025):**
+
+**Multiple Validation Selection:**
+- **Multi-Select Modal** - Click to toggle multiple validations at once
+- **Smart Button Text** - Shows count when multiple selected ("Add 3 Validations")
+- **Batch Addition** - Add all selected validations with single click
+- **Clear Feedback** - Visual toggle states with color-coded borders
+
+**Clarity-Focused Theme Overhaul:**
+- **Enhanced Contrast** - Improved text and UI element visibility (WCAG AA compliant)
+- **Better Typography** - 15px base font, 1.6 line-height, refined letter-spacing
+- **Improved Icon Visibility** - Icons now use proper on-container colors for maximum contrast
+- **Refined Color Palette** - Higher contrast validation type colors (#60A5FA, #A78BFA, #34D399, #FBBF24, #F472B6, #2DD4BF)
+- **Enhanced Spacing** - Increased padding throughout (sidebar: 280px, content: 32px, cards: 20px)
+- **Better Visual Hierarchy** - Larger titles (28px page, 22px modal), improved card borders (1.5px)
+- **Smoother Interactions** - Subtle card lift on hover, refined transitions, better elevation shadows
+- **Professional Polish** - Rounded corners (14-20px), improved button styling, enhanced modal design
+
 **NEW in v3 - Complete Interface Overhaul:**
 
 **Three-Panel Layout:**
-- **Sidebar Navigation** (260px) - Job settings, files list with badges, advanced settings
+- **Sidebar Navigation** (280px) - Job settings, files list with badges, advanced settings
 - **Main Workspace** (fluid) - Form-based configuration with clear sections
 - **Live Preview Panel** (400px) - Real-time YAML preview with syntax highlighting
 - **Mobile-First Design** - Hidden sidebar with hamburger menu, collapsible preview panel
