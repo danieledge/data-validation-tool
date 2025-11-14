@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <!-- Version: 2.4.0 - Build: 2025-01-14 -->
+    <!-- Version: 2.5.0 - Build: 2025-01-14 -->
 
     <!-- Material Design 3 - Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1159,6 +1159,126 @@
         </div>
     </div>
 
+    <!-- Template Selection Modal -->
+    <div class="modal" id="templateModal" onclick="if(event.target === this) closeTemplateModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Use Validation Template</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Quickly add standard groupings of validation checks
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeTemplateModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; gap: 16px;">
+                    <!-- Essential File Checks Template -->
+                    <div class="validation-type-option" onclick="applyTemplate('essential')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🛡️</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Essential File Checks
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Minimum set of validations every file should have. Catches empty files and unexpected row counts.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-file);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Includes:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>EmptyFileCheck - Prevents processing files with no data</li>
+                                <li>RowCountRangeCheck - Ensures expected data volume</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Data Quality Basics Template -->
+                    <div class="validation-type-option" onclick="applyTemplate('quality')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">✅</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Data Quality Basics
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Common field-level and record-level checks for data integrity and cleanliness.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-field);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Includes:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>MandatoryFieldCheck - Ensures critical fields are populated</li>
+                                <li>UniqueKeyCheck - Validates primary key uniqueness</li>
+                                <li>DuplicateRowCheck - Detects duplicate records</li>
+                                <li>BlankRecordCheck - Finds completely empty rows</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Schema Validation Suite Template -->
+                    <div class="validation-type-option" onclick="applyTemplate('schema')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🏗️</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Schema Validation Suite
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Complete schema structure checks to ensure data format compliance.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-schema);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Includes:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>ColumnPresenceCheck - Verifies required columns exist</li>
+                                <li>DataTypeCheck - Validates column data types</li>
+                                <li>SchemaMatchCheck - Enforces exact schema compliance</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Production Ready Template -->
+                    <div class="validation-type-option" onclick="applyTemplate('production')" style="cursor: pointer; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🚀</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 16px; margin-bottom: 4px;">
+                                    Production Ready
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                                    Comprehensive validation suite combining file, schema, and data quality checks.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-cross-file);">
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Includes all checks from:</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+                                <li>Essential File Checks (2 validations)</li>
+                                <li>Data Quality Basics (4 validations)</li>
+                                <li>Schema Validation Suite (3 validations)</li>
+                            </ul>
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-primary); font-weight: 500;">
+                                Total: 9 validations
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTemplateModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1243,7 +1363,7 @@
                         <span class="status-badge success" id="statusBadge">Ready</span>
                     </div>
                     <div class="header-actions">
-                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.4.0</span>
+                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.5.0</span>
                         <button class="btn btn-primary" onclick="downloadConfig()" title="Download YAML Configuration" style="margin-right: 8px;">
                             <span class="icon">📥</span>
                             <span>Download</span>
@@ -1341,7 +1461,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Version and cache busting check
-            const version = '2.4.0';
+            const version = '2.5.0';
             const buildDate = '2025-01-14';
             console.log(`%c Data Validation Config Builder v${version} `, 'background: #10B981; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold');
             console.log(`Build Date: ${buildDate}`);
@@ -1584,6 +1704,102 @@
                 // Close modal
                 closeValidationModal();
             }
+        }
+
+        // Template Modal Functions
+        /**
+         * Opens the template selection modal for a specific file
+         * @param {number} fileId - The file ID to apply template to
+         */
+        function openTemplateModal(fileId) {
+            state.modalState.fileId = fileId;
+            const modal = document.getElementById('templateModal');
+            modal.style.display = 'flex';
+            modal.offsetHeight; // Force reflow
+            modal.style.opacity = '1';
+        }
+
+        /**
+         * Closes the template modal
+         */
+        function closeTemplateModal() {
+            const modal = document.getElementById('templateModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 200);
+        }
+
+        /**
+         * Applies a validation template to the current file
+         * @param {string} templateName - The template to apply (essential, quality, schema, production)
+         */
+        function applyTemplate(templateName) {
+            const file = state.files.find(f => f.id === state.modalState.fileId);
+            if (!file) return;
+
+            // Define template validation sets
+            const templates = {
+                essential: [
+                    { type: 'EmptyFileCheck', severity: 'ERROR', params: {} },
+                    { type: 'RowCountRangeCheck', severity: 'ERROR', params: { min_rows: 1, max_rows: 1000000 } }
+                ],
+                quality: [
+                    { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: [] } },
+                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: [] } },
+                    { type: 'DuplicateRowCheck', severity: 'WARNING', params: {} },
+                    { type: 'BlankRecordCheck', severity: 'WARNING', params: {} }
+                ],
+                schema: [
+                    { type: 'ColumnPresenceCheck', severity: 'ERROR', params: { required_columns: [] } },
+                    { type: 'DataTypeCheck', severity: 'ERROR', params: {} },
+                    { type: 'SchemaMatchCheck', severity: 'ERROR', params: {} }
+                ],
+                production: [
+                    // Essential checks
+                    { type: 'EmptyFileCheck', severity: 'ERROR', params: {} },
+                    { type: 'RowCountRangeCheck', severity: 'ERROR', params: { min_rows: 1, max_rows: 1000000 } },
+                    // Quality checks
+                    { type: 'MandatoryFieldCheck', severity: 'ERROR', params: { fields: [] } },
+                    { type: 'UniqueKeyCheck', severity: 'ERROR', params: { key_fields: [] } },
+                    { type: 'DuplicateRowCheck', severity: 'WARNING', params: {} },
+                    { type: 'BlankRecordCheck', severity: 'WARNING', params: {} },
+                    // Schema checks
+                    { type: 'ColumnPresenceCheck', severity: 'ERROR', params: { required_columns: [] } },
+                    { type: 'DataTypeCheck', severity: 'ERROR', params: {} },
+                    { type: 'SchemaMatchCheck', severity: 'ERROR', params: {} }
+                ]
+            };
+
+            const validations = templates[templateName];
+            if (!validations) return;
+
+            // Add all validations from template
+            validations.forEach(v => {
+                file.validations.push({
+                    type: v.type,
+                    severity: v.severity,
+                    params: v.params,
+                    enabled: true
+                });
+            });
+
+            // Update UI
+            renderContent(state.modalState.fileId);
+            updateYAMLPreview();
+            updateFilesNav();
+
+            // Close modal
+            closeTemplateModal();
+
+            // Show success message
+            const templateNames = {
+                essential: 'Essential File Checks (2 validations)',
+                quality: 'Data Quality Basics (4 validations)',
+                schema: 'Schema Validation Suite (3 validations)',
+                production: 'Production Ready (9 validations)'
+            };
+            alert(`✅ Applied template: ${templateNames[templateName]}`);
         }
 
         // Navigation
@@ -1847,10 +2063,16 @@
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                             <h3 style="color: var(--text-primary); font-size: 18px;">Validations</h3>
-                            <button class="btn btn-primary" onclick="addValidation(${fileId})">
-                                <span class="icon">➕</span>
-                                Add Validation
-                            </button>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" onclick="openTemplateModal(${fileId})" title="Use validation template">
+                                    <span class="icon">📋</span>
+                                    <span>Use Template</span>
+                                </button>
+                                <button class="btn btn-primary" onclick="addValidation(${fileId})">
+                                    <span class="icon">➕</span>
+                                    <span>Add Validation</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="validation-grid">
@@ -2128,7 +2350,7 @@
         function getValidationDescription(type) {
             const descriptions = {
                 // File Validations
-                'EmptyFileCheck': '<strong>Prevents processing empty files.</strong> Validates that the file contains at least one data row (excluding headers). Use this as a first-line check to catch missing or corrupted file transfers. Fails immediately if file is empty, saving processing time.',
+                'EmptyFileCheck': '<strong>Prevents processing empty files.</strong> Validates that the file contains at least one data row. <em>How headers are detected:</em> For CSV files, if your file format config specifies <code>has_header: true</code>, the first row is treated as headers and excluded from the count. For files without headers (<code>has_header: false</code>), all rows count as data. Excel files use the sheet\'s first row as headers by default. The check fails if zero data rows remain after excluding headers. Use this as a first-line check to catch missing or corrupted file transfers—it fails immediately, saving processing time.',
 
                 'RowCountRangeCheck': '<strong>Ensures data volume is as expected.</strong> Validates row count falls within specified min/max range. Useful for detecting incomplete data loads (too few rows) or unexpected duplicates (too many rows). Example: Daily sales file should have 1,000-5,000 rows.',
 
