@@ -4,7 +4,86 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 2.5.0 (Current) - January 2025
+## Version 3.1.0 (Current) - January 2025
+
+### ⚡ Power User Features - Batch 2
+
+**Enhanced productivity with keyboard shortcuts, undo/redo, theming, and advanced file management!** This release adds features that make complex configuration management faster and more efficient.
+
+**🎹 Keyboard Shortcuts System:**
+- **Ctrl+S** - Download configuration YAML instantly
+- **Ctrl+Z** - Undo last action
+- **Ctrl+Shift+Z / Ctrl+Y** - Redo action
+- **Ctrl+I** - Open import dialog
+- **Ctrl+E** - Export HTML documentation
+- **Ctrl+K** - Share via URL
+- **Ctrl+/** - Show keyboard shortcuts help
+- **Escape** - Close any open modal
+- Full cross-platform support (Ctrl on Windows/Linux, Cmd on Mac)
+- Non-intrusive help modal with auto-dismiss
+- All shortcuts prevent browser defaults for smooth UX
+
+**↩️ Comprehensive Undo/Redo System:**
+- Tracks up to 50 state changes with full configuration snapshots
+- Integrated with ALL state-changing operations:
+  - File operations (add, remove, update, clone)
+  - Validation operations (add, remove, move, update parameters)
+  - Template applications
+  - Bulk changes
+- Smart state management prevents memory issues
+- Visual feedback with notifications
+- Clears redo stack appropriately on new actions
+- Deep copy state snapshots prevent reference issues
+
+**🎨 Dark/Light Mode Toggle:**
+- Seamless theme switching with single click
+- Persists preference to localStorage
+- Comprehensive color system with 20+ CSS custom properties
+- Optimized for readability in both modes
+- Light mode: Clean white background with dark text
+- Dark mode: Professional dark background with light text
+- Smooth transitions without page reload
+- Applied immediately on page load
+- Theme indicator in notifications
+
+**📑 Clone File Configuration:**
+- Duplicate entire file configurations with all validations
+- Deep copy ensures complete independence
+- Automatically appends "(Copy)" to file name
+- Auto-navigates to cloned file for immediate editing
+- Preserves all validation parameters and settings
+- Integrated with undo system
+- Visual feedback with success notification
+- Accessible from file configuration header
+
+**🗑️ Delete File Functionality:**
+- Safe file deletion with confirmation dialog
+- Integrated with undo system for easy recovery
+- Automatically creates default file if last file deleted
+- Smart navigation to remaining files
+- Shows file name in confirmation prompt
+- Visual feedback with success notification
+- Prevents accidental data loss
+
+**Technical Improvements:**
+- Complete undo/redo integration across all operations
+- Maximum stack depth of 50 to prevent memory issues
+- Event listener optimization for keyboard shortcuts
+- CSS custom property architecture for theming
+- Deep copy utilities for state management
+- localStorage persistence for preferences
+- Notification system enhancements
+
+**How to Use:**
+- Press **Ctrl+/** to see all available keyboard shortcuts
+- Use **Ctrl+Z/Y** to undo/redo any configuration changes
+- Click **🎨 Toggle Theme** in sidebar to switch modes
+- Use **Clone File** button in file header to duplicate configurations
+- Use **Delete File** button with confidence knowing undo is available
+
+---
+
+## Version 2.5.0 - January 2025
 
 ### 📋 Validation Templates & EmptyFileCheck Clarification
 

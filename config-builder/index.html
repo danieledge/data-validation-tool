@@ -1444,6 +1444,14 @@
                         <span class="nav-icon">🔗</span>
                         <span class="nav-label">Share URL</span>
                     </div>
+                    <div class="nav-item" onclick="toggleTheme()">
+                        <span class="nav-icon">🎨</span>
+                        <span class="nav-label">Toggle Theme</span>
+                    </div>
+                    <div class="nav-item" onclick="showKeyboardShortcutsHelp()">
+                        <span class="nav-icon">⌨️</span>
+                        <span class="nav-label">Keyboard Shortcuts</span>
+                    </div>
                     <div class="nav-item" onclick="clearLocalStorage()">
                         <span class="nav-icon">🗑️</span>
                         <span class="nav-label">Clear Storage</span>
@@ -1528,8 +1536,14 @@
                 currentFileId: null,
                 selectedTypes: [],  // Changed to array for multiple selection
                 selectedSeverity: 'ERROR'
-            }
+            },
+            theme: localStorage.getItem('theme') || 'dark' // Theme preference
         };
+
+        // Undo/Redo system
+        const undoStack = [];
+        const redoStack = [];
+        const MAX_UNDO_STACK = 50;
 
         // Validation Types Catalog with clear, concise descriptions
         const validationTypes = {
@@ -1612,6 +1626,12 @@
 
             // Update last saved indicator every minute
             setInterval(updateLastSavedIndicator, 60000);
+
+            // Initialize keyboard shortcuts
+            initKeyboardShortcuts();
+
+            // Apply saved theme
+            applyTheme(state.theme);
         });
 
         // Auto-Save Functions
@@ -1945,6 +1965,9 @@
 
             const file = state.files.find(f => f.id === state.modalState.fileId);
             if (file) {
+                // Save state for undo
+                saveStateToUndoStack();
+
                 // Add all selected validations to the file
                 state.modalState.selectedTypes.forEach(type => {
                     file.validations.push({
@@ -1996,6 +2019,9 @@
         function applyTemplate(templateName) {
             const file = state.files.find(f => f.id === state.modalState.fileId);
             if (!file) return;
+
+            // Save state for undo
+            saveStateToUndoStack();
 
             // Define template validation sets
             const templates = {
@@ -2517,6 +2543,310 @@
             }
         }
 
+        // Undo/Redo System
+        /**
+         * Saves current state to undo stack
+         */
+        function saveStateToUndoStack() {
+            const stateCopy = {
+                jobName: state.jobName,
+                files: JSON.parse(JSON.stringify(state.files)),
+                settings: JSON.parse(JSON.stringify(state.settings)),
+                fileCounter: state.fileCounter
+            };
+
+            undoStack.push(stateCopy);
+
+            // Limit stack size
+            if (undoStack.length > MAX_UNDO_STACK) {
+                undoStack.shift();
+            }
+
+            // Clear redo stack on new action
+            redoStack.length = 0;
+        }
+
+        /**
+         * Undoes the last action
+         */
+        function undo() {
+            if (undoStack.length === 0) {
+                showNotification('Nothing to undo');
+                return;
+            }
+
+            // Save current state to redo stack
+            const currentState = {
+                jobName: state.jobName,
+                files: JSON.parse(JSON.stringify(state.files)),
+                settings: JSON.parse(JSON.stringify(state.settings)),
+                fileCounter: state.fileCounter
+            };
+            redoStack.push(currentState);
+
+            // Restore previous state
+            const previousState = undoStack.pop();
+            state.jobName = previousState.jobName;
+            state.files = previousState.files;
+            state.settings = previousState.settings;
+            state.fileCounter = previousState.fileCounter;
+
+            // Update UI
+            updateFilesNav();
+            updateYAMLPreview();
+            renderContent(state.currentSection);
+            showNotification('↩️ Undone');
+        }
+
+        /**
+         * Redoes the last undone action
+         */
+        function redo() {
+            if (redoStack.length === 0) {
+                showNotification('Nothing to redo');
+                return;
+            }
+
+            // Save current state to undo stack
+            saveStateToUndoStack();
+
+            // Restore next state
+            const nextState = redoStack.pop();
+            state.jobName = nextState.jobName;
+            state.files = nextState.files;
+            state.settings = nextState.settings;
+            state.fileCounter = nextState.fileCounter;
+
+            // Update UI
+            updateFilesNav();
+            updateYAMLPreview();
+            renderContent(state.currentSection);
+            showNotification('↪️ Redone');
+        }
+
+        // Keyboard Shortcuts System
+        /**
+         * Initializes keyboard shortcuts
+         */
+        function initKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + S: Download config
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    downloadConfig();
+                    showNotification('⬇️ Config downloaded (Ctrl+S)');
+                }
+
+                // Ctrl/Cmd + Z: Undo
+                if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    undo();
+                }
+
+                // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y: Redo
+                if (((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) ||
+                    ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+                    e.preventDefault();
+                    redo();
+                }
+
+                // Ctrl/Cmd + I: Import
+                if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                    e.preventDefault();
+                    openImportModal();
+                    showNotification('📂 Import modal opened (Ctrl+I)');
+                }
+
+                // Ctrl/Cmd + E: Export documentation
+                if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                    e.preventDefault();
+                    exportDocumentation();
+                }
+
+                // Ctrl/Cmd + K: Share URL
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    shareViaURL();
+                }
+
+                // Ctrl/Cmd + /: Show keyboard shortcuts help
+                if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                    e.preventDefault();
+                    showKeyboardShortcutsHelp();
+                }
+
+                // Escape: Close modals
+                if (e.key === 'Escape') {
+                    closeValidationModal();
+                    closeTemplateModal();
+                    closeImportModal();
+                }
+            });
+        }
+
+        /**
+         * Shows keyboard shortcuts help modal
+         */
+        function showKeyboardShortcutsHelp() {
+            const shortcuts = [
+                { keys: 'Ctrl+S', action: 'Download configuration' },
+                { keys: 'Ctrl+Z', action: 'Undo last action' },
+                { keys: 'Ctrl+Shift+Z / Ctrl+Y', action: 'Redo action' },
+                { keys: 'Ctrl+I', action: 'Import YAML configuration' },
+                { keys: 'Ctrl+E', action: 'Export documentation' },
+                { keys: 'Ctrl+K', action: 'Share via URL' },
+                { keys: 'Ctrl+/', action: 'Show keyboard shortcuts' },
+                { keys: 'Escape', action: 'Close modal' }
+            ];
+
+            let html = '<div style="padding: 20px;"><h3 style="margin-top: 0; color: var(--text-primary);">⌨️ Keyboard Shortcuts</h3>';
+            html += '<div style="display: grid; gap: 12px;">';
+
+            shortcuts.forEach(sc => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">${sc.action}</span>
+                        <kbd style="padding: 4px 8px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 4px; font-family: monospace; font-size: 12px; color: var(--text-primary);">${sc.keys}</kbd>
+                    </div>
+                `;
+            });
+
+            html += '</div></div>';
+
+            // Show in temporary modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--bg-secondary);
+                border-radius: 16px;
+                box-shadow: var(--md-sys-elevation-5);
+                border: 1px solid var(--border);
+                z-index: 10000;
+                max-width: 500px;
+                width: 90%;
+            `;
+            modal.innerHTML = html;
+
+            document.body.appendChild(modal);
+
+            // Close on click outside
+            const backdrop = document.createElement('div');
+            backdrop.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+            `;
+            document.body.appendChild(backdrop);
+
+            backdrop.onclick = () => {
+                modal.remove();
+                backdrop.remove();
+            };
+
+            // Close after 5 seconds
+            setTimeout(() => {
+                if (modal.parentElement) {
+                    modal.remove();
+                    backdrop.remove();
+                }
+            }, 5000);
+        }
+
+        // Clone File Configuration
+        /**
+         * Clones an entire file configuration
+         * @param {number} fileId - The file ID to clone
+         */
+        function cloneFile(fileId) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file) return;
+
+            saveStateToUndoStack();
+
+            const newFileId = state.fileCounter++;
+            const clonedFile = {
+                id: newFileId,
+                name: file.name + ' (Copy)',
+                path: file.path,
+                format: file.format,
+                validations: JSON.parse(JSON.stringify(file.validations)) // Deep copy
+            };
+
+            state.files.push(clonedFile);
+
+            // Update UI
+            updateFilesNav();
+            updateYAMLPreview();
+            showNotification('✅ File configuration cloned');
+
+            // Navigate to cloned file
+            showSection(newFileId);
+        }
+
+        // Dark/Light Mode Toggle
+        /**
+         * Toggles between dark and light themes
+         */
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', state.theme);
+            applyTheme(state.theme);
+            showNotification(`🎨 Switched to ${state.theme} mode`);
+        }
+
+        /**
+         * Applies the selected theme
+         * @param {string} theme - 'dark' or 'light'
+         */
+        function applyTheme(theme) {
+            const root = document.documentElement;
+
+            if (theme === 'light') {
+                // Light theme colors
+                root.style.setProperty('--md-sys-color-surface', '#FFFFFF');
+                root.style.setProperty('--md-sys-color-on-surface', '#1A1C1E');
+                root.style.setProperty('--md-sys-color-surface-container', '#F3F4F6');
+                root.style.setProperty('--md-sys-color-surface-container-high', '#E5E7EB');
+                root.style.setProperty('--md-sys-color-surface-container-highest', '#D1D5DB');
+                root.style.setProperty('--md-sys-color-outline', '#9CA3AF');
+                root.style.setProperty('--md-sys-color-outline-variant', '#D1D5DB');
+
+                // Update legacy variables
+                root.style.setProperty('--bg-primary', '#FFFFFF');
+                root.style.setProperty('--bg-secondary', '#F9FAFB');
+                root.style.setProperty('--bg-tertiary', '#F3F4F6');
+                root.style.setProperty('--text-primary', '#111827');
+                root.style.setProperty('--text-secondary', '#4B5563');
+                root.style.setProperty('--text-muted', '#6B7280');
+                root.style.setProperty('--border', '#D1D5DB');
+            } else {
+                // Dark theme colors (restore defaults)
+                root.style.setProperty('--md-sys-color-surface', '#0F172A');
+                root.style.setProperty('--md-sys-color-on-surface', '#F8FAFC');
+                root.style.setProperty('--md-sys-color-surface-container', '#1E293B');
+                root.style.setProperty('--md-sys-color-surface-container-high', '#334155');
+                root.style.setProperty('--md-sys-color-surface-container-highest', '#475569');
+                root.style.setProperty('--md-sys-color-outline', '#64748B');
+                root.style.setProperty('--md-sys-color-outline-variant', '#475569');
+
+                // Update legacy variables
+                root.style.setProperty('--bg-primary', '#0F172A');
+                root.style.setProperty('--bg-secondary', '#1E293B');
+                root.style.setProperty('--bg-tertiary', '#334155');
+                root.style.setProperty('--text-primary', '#F8FAFC');
+                root.style.setProperty('--text-secondary', '#CBD5E1');
+                root.style.setProperty('--text-muted', '#94A3B8');
+                root.style.setProperty('--border', '#334155');
+            }
+        }
+
         // Navigation
         function showSection(section) {
             state.currentSection = section;
@@ -2727,6 +3057,19 @@
 
                 content.innerHTML = `
                     <div style="max-width: 800px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div></div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" onclick="cloneFile(${fileId})" title="Clone this file configuration">
+                                    <span class="icon">📑</span>
+                                    <span>Clone File</span>
+                                </button>
+                                <button class="btn btn-danger" onclick="removeFile(${fileId})" title="Delete this file">
+                                    <span class="icon">🗑️</span>
+                                    <span>Delete File</span>
+                                </button>
+                            </div>
+                        </div>
                         <div style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
                             <div style="display: grid; gap: 16px;">
                                 <div>
@@ -3029,6 +3372,9 @@
         function updateValidationParam(fileId, validationIdx, paramName, paramValue) {
             const file = state.files.find(f => f.id === fileId);
             if (file && file.validations[validationIdx]) {
+                // Save state for undo
+                saveStateToUndoStack();
+
                 if (!file.validations[validationIdx].params) {
                     file.validations[validationIdx].params = {};
                 }
@@ -3122,6 +3468,7 @@
 
         // File Management
         function addFile() {
+            saveStateToUndoStack();
             const fileId = state.fileCounter++;
             state.files.push({
                 id: fileId,
@@ -3138,10 +3485,53 @@
         function updateFile(fileId, field, value) {
             const file = state.files.find(f => f.id === fileId);
             if (file) {
+                // Save state for undo
+                saveStateToUndoStack();
+
                 file[field] = value;
                 updateFilesNav();
                 updateYAMLPreview();
             }
+        }
+
+        /**
+         * Removes a file configuration from the project
+         * @param {number} fileId - The ID of the file to remove
+         */
+        function removeFile(fileId) {
+            const fileIndex = state.files.findIndex(f => f.id === fileId);
+            if (fileIndex === -1) return;
+
+            const file = state.files[fileIndex];
+            if (!confirm(`Delete file "${file.name}"? This will remove all its validations.`)) {
+                return;
+            }
+
+            // Save state for undo
+            saveStateToUndoStack();
+
+            // Remove the file
+            state.files.splice(fileIndex, 1);
+
+            // If no files remain, add a default file
+            if (state.files.length === 0) {
+                const fileId = state.fileCounter++;
+                state.files.push({
+                    id: fileId,
+                    name: `file_${fileId}`,
+                    path: 'data.csv',
+                    format: 'csv',
+                    validations: []
+                });
+                showSection(fileId);
+            } else {
+                // Navigate to the first available file
+                showSection(state.files[0].id);
+            }
+
+            updateFilesNav();
+            updateYAMLPreview();
+            showNotification('🗑️ File deleted successfully');
         }
 
         function updateFilesNav() {
@@ -3168,6 +3558,7 @@
         function removeValidation(fileId, idx) {
             const file = state.files.find(f => f.id === fileId);
             if (file && confirm('Remove this validation?')) {
+                saveStateToUndoStack();
                 file.validations.splice(idx, 1);
                 renderContent(fileId);
                 updateYAMLPreview();
@@ -3183,6 +3574,7 @@
         function moveValidationUp(fileId, idx) {
             const file = state.files.find(f => f.id === fileId);
             if (file && idx > 0) {
+                saveStateToUndoStack();
                 // Swap with previous item
                 [file.validations[idx - 1], file.validations[idx]] =
                     [file.validations[idx], file.validations[idx - 1]];
@@ -3201,6 +3593,7 @@
         function moveValidationDown(fileId, idx) {
             const file = state.files.find(f => f.id === fileId);
             if (file && idx < file.validations.length - 1) {
+                saveStateToUndoStack();
                 // Swap with next item
                 [file.validations[idx], file.validations[idx + 1]] =
                     [file.validations[idx + 1], file.validations[idx]];
