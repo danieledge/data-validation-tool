@@ -3152,7 +3152,7 @@
                                 <input
                                     type="text"
                                     id="search-${fileId}"
-                                    placeholder="🔍 Search validations (type, severity, parameters)..."
+                                    placeholder="🔍 Search validations (type, severity, parameters, notes)..."
                                     value="${state.searchQuery[fileId] || ''}"
                                     oninput="filterValidations(${fileId}, this.value)"
                                     style="width: 100%; padding: 12px 14px 12px 40px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px; transition: border-color 0.2s;">
@@ -3295,6 +3295,20 @@
 
                         <!-- Parameters Section -->
                         ${renderValidationParameters(fileId, idx, validation.type, params)}
+
+                        <!-- Notes/Comments Section -->
+                        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500; font-size: 13px;">
+                                📝 Notes
+                            </label>
+                            <textarea
+                                placeholder="Add notes or comments about this validation (e.g., why it's needed, business context, edge cases)..."
+                                onchange="updateValidationNote(${fileId}, ${idx}, this.value)"
+                                style="width: 100%; min-height: 60px; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical;">${validation.note || ''}</textarea>
+                            <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px;">
+                                Optional documentation for team members. Exported as YAML comments.
+                            </small>
+                        </div>
                     </div>
                 </div>
             `;
@@ -3435,7 +3449,28 @@
         function updateValidationSeverity(fileId, validationIdx, severity) {
             const file = state.files.find(f => f.id === fileId);
             if (file && file.validations[validationIdx]) {
+                // Save state for undo
+                saveStateToUndoStack();
+
                 file.validations[validationIdx].severity = severity;
+                updateYAMLPreview();
+                showNotification(`Severity updated to ${severity}`);
+            }
+        }
+
+        /**
+         * Updates a validation's note/comment for documentation
+         * @param {number} fileId - The file ID
+         * @param {number} validationIdx - The validation index
+         * @param {string} note - The note text
+         */
+        function updateValidationNote(fileId, validationIdx, note) {
+            const file = state.files.find(f => f.id === fileId);
+            if (file && file.validations[validationIdx]) {
+                // Save state for undo
+                saveStateToUndoStack();
+
+                file.validations[validationIdx].note = note.trim();
                 updateYAMLPreview();
             }
         }
@@ -3514,7 +3549,10 @@
                 const category = getValidationCategory(validation.type);
                 const categoryMatch = category.toLowerCase().includes(lowerQuery);
 
-                if (typeMatch || severityMatch || paramsMatch || categoryMatch) {
+                // Search in notes
+                const noteMatch = validation.note && validation.note.toLowerCase().includes(lowerQuery);
+
+                if (typeMatch || severityMatch || paramsMatch || categoryMatch || noteMatch) {
                     results.push({
                         validation: validation,
                         originalIdx: idx,
@@ -3800,10 +3838,37 @@ files:
                         yaml += '      []\n';
                     } else {
                         file.validations.forEach(v => {
+                            // Add note as a comment if it exists
+                            if (v.note && v.note.trim()) {
+                                // Split multi-line notes and add # to each line
+                                const noteLines = v.note.trim().split('\n');
+                                noteLines.forEach(line => {
+                                    yaml += `      # ${line}\n`;
+                                });
+                            }
+
                             yaml += `      - type: "${v.type}"
         severity: "${v.severity}"
-        params: {}
 `;
+
+                            // Add parameters if they exist
+                            if (v.params && Object.keys(v.params).length > 0) {
+                                yaml += '        params:\n';
+                                Object.entries(v.params).forEach(([key, value]) => {
+                                    if (Array.isArray(value)) {
+                                        yaml += `          ${key}:\n`;
+                                        value.forEach(item => {
+                                            yaml += `            - "${item}"\n`;
+                                        });
+                                    } else if (typeof value === 'string') {
+                                        yaml += `          ${key}: "${value}"\n`;
+                                    } else {
+                                        yaml += `          ${key}: ${value}\n`;
+                                    }
+                                });
+                            } else {
+                                yaml += '        params: {}\n';
+                            }
                         });
                     }
                 });
