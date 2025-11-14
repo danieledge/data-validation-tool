@@ -1506,6 +1506,94 @@
         </div>
     </div>
 
+    <!-- Regex Tester Modal -->
+    <div class="modal" id="regexTesterModal" onclick="if(event.target === this) closeRegexTesterModal()">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Regex Pattern Tester</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted); font-weight: normal;">
+                        Test and validate regular expression patterns for PatternMatchCheck
+                    </p>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="closeRegexTesterModal()">
+                    <span>✕</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; gap: 20px;">
+                    <!-- Pattern Input -->
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                            Regular Expression Pattern
+                        </label>
+                        <input
+                            type="text"
+                            id="regexPattern"
+                            placeholder="^[A-Z]{2}\\d{4}$"
+                            oninput="testRegexPattern()"
+                            style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px; font-family: 'Courier New', monospace;">
+                        <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px;">
+                            Enter a regex pattern (e.g., ^\d{3}-\d{2}-\d{4}$ for SSN format)
+                        </small>
+                    </div>
+
+                    <!-- Test String Input -->
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                            Test String
+                        </label>
+                        <textarea
+                            id="regexTestString"
+                            placeholder="AB1234&#10;CD5678&#10;EF9999"
+                            oninput="testRegexPattern()"
+                            rows="5"
+                            style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px; font-family: 'Courier New', monospace; resize: vertical;"></textarea>
+                        <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px;">
+                            Enter test strings (one per line) to validate against the pattern
+                        </small>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="regexResults" style="display: none;">
+                        <div style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border);">
+                            <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px;">Test Results</h4>
+                            <div id="regexResultsContent"></div>
+                        </div>
+                    </div>
+
+                    <!-- Common Patterns Reference -->
+                    <div style="padding: 16px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--md-sys-color-primary);">
+                        <h4 style="color: var(--text-primary); margin: 0 0 12px 0; font-size: 14px;">💡 Common Patterns</h4>
+                        <div style="display: grid; gap: 8px; font-size: 12px; color: var(--text-muted);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <code style="background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; color: var(--md-sys-color-primary);">^\d{3}-\d{2}-\d{4}$</code>
+                                <span>SSN (123-45-6789)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <code style="background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; color: var(--md-sys-color-primary);">^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$</code>
+                                <span>Email</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <code style="background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; color: var(--md-sys-color-primary);">^\d{4}-\d{2}-\d{2}$</code>
+                                <span>Date (YYYY-MM-DD)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <code style="background: var(--bg-primary); padding: 4px 8px; border-radius: 4px; color: var(--md-sys-color-primary);">^[A-Z]{2}\d{6}$</code>
+                                <span>Code (AB123456)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRegexTesterModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1587,6 +1675,10 @@
                     <div class="nav-item" onclick="openProjectTemplatesModal()">
                         <span class="nav-icon">🎯</span>
                         <span class="nav-label">Project Templates</span>
+                    </div>
+                    <div class="nav-item" onclick="openRegexTesterModal()">
+                        <span class="nav-icon">🔧</span>
+                        <span class="nav-label">Regex Tester</span>
                     </div>
                     <div class="nav-item" onclick="clearLocalStorage()">
                         <span class="nav-icon">🗑️</span>
@@ -2381,6 +2473,115 @@
                 'master-reference': 'Master-Reference (2 files)'
             };
             showNotification(`🎯 Applied project template: ${templateInfo[templateName]}`);
+        }
+
+        // Regex Tester Functions
+        /**
+         * Opens the regex tester modal
+         */
+        function openRegexTesterModal() {
+            const modal = document.getElementById('regexTesterModal');
+            modal.style.display = 'flex';
+            modal.offsetHeight; // Force reflow
+            modal.style.opacity = '1';
+
+            // Clear previous inputs
+            document.getElementById('regexPattern').value = '';
+            document.getElementById('regexTestString').value = '';
+            document.getElementById('regexResults').style.display = 'none';
+        }
+
+        /**
+         * Closes the regex tester modal
+         */
+        function closeRegexTesterModal() {
+            const modal = document.getElementById('regexTesterModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 200);
+        }
+
+        /**
+         * Tests a regex pattern against test strings
+         * Provides real-time feedback on matches
+         */
+        function testRegexPattern() {
+            const patternInput = document.getElementById('regexPattern').value;
+            const testStringInput = document.getElementById('regexTestString').value;
+            const resultsDiv = document.getElementById('regexResults');
+            const resultsContent = document.getElementById('regexResultsContent');
+
+            // Hide results if either input is empty
+            if (!patternInput.trim() || !testStringInput.trim()) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // Show results section
+            resultsDiv.style.display = 'block';
+
+            try {
+                // Create regex (case-insensitive flag included)
+                const regex = new RegExp(patternInput, 'i');
+
+                // Split test string into lines
+                const testStrings = testStringInput.split('\n').filter(s => s.trim() !== '');
+
+                // Test each string
+                const results = testStrings.map(str => {
+                    const matches = regex.test(str);
+                    return {
+                        string: str,
+                        matches: matches
+                    };
+                });
+
+                // Count matches
+                const matchCount = results.filter(r => r.matches).length;
+                const totalCount = results.length;
+
+                // Generate results HTML
+                let html = `
+                    <div style="margin-bottom: 16px; padding: 12px; background: var(--bg-tertiary); border-radius: 6px;">
+                        <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">
+                            <strong>Pattern is valid!</strong>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);">
+                            Matched <strong style="color: var(--md-sys-color-primary);">${matchCount}</strong> of <strong>${totalCount}</strong> test strings
+                        </div>
+                    </div>
+                    <div style="display: grid; gap: 6px; max-height: 200px; overflow-y: auto;">
+                `;
+
+                results.forEach(result => {
+                    const icon = result.matches ? '✅' : '❌';
+                    const color = result.matches ? 'var(--md-sys-color-primary)' : 'var(--severity-error)';
+                    html += `
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-primary); border-radius: 4px; font-size: 13px;">
+                            <span style="font-size: 16px;">${icon}</span>
+                            <code style="flex: 1; color: var(--text-primary); font-family: 'Courier New', monospace;">${result.string}</code>
+                            <span style="color: ${color}; font-size: 11px; font-weight: 500;">${result.matches ? 'MATCH' : 'NO MATCH'}</span>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+                resultsContent.innerHTML = html;
+
+            } catch (error) {
+                // Invalid regex
+                resultsContent.innerHTML = `
+                    <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 6px; border-left: 3px solid var(--severity-error);">
+                        <div style="font-size: 14px; color: var(--severity-error); margin-bottom: 4px;">
+                            <strong>❌ Invalid Pattern</strong>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); font-family: 'Courier New', monospace;">
+                            ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // Import/Export Functions
