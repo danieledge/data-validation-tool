@@ -1305,7 +1305,6 @@
                             <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px;">Includes:</div>
                             <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.6;">
                                 <li>ColumnPresenceCheck - Verifies required columns exist</li>
-                                <li>DataTypeCheck - Validates column data types</li>
                                 <li>SchemaMatchCheck - Enforces exact schema compliance</li>
                             </ul>
                         </div>
@@ -1990,8 +1989,7 @@
             ],
             schema: [
                 { type: 'SchemaMatchCheck', desc: 'Enforces exact column structure (names, order, types)' },
-                { type: 'ColumnPresenceCheck', desc: 'Verifies required columns exist (flexible order)' },
-                { type: 'DataTypeCheck', desc: 'Validates columns contain correct data types' }
+                { type: 'ColumnPresenceCheck', desc: 'Verifies required columns exist (flexible order)' }
             ],
             field: [
                 { type: 'MandatoryFieldCheck', desc: 'Ensures critical fields are never empty/null' },
@@ -2476,7 +2474,6 @@
                 ],
                 schema: [
                     { type: 'ColumnPresenceCheck', severity: 'ERROR', params: { required_columns: [] } },
-                    { type: 'DataTypeCheck', severity: 'ERROR', params: {} },
                     { type: 'SchemaMatchCheck', severity: 'ERROR', params: {} }
                 ],
                 production: [
@@ -2490,7 +2487,6 @@
                     { type: 'BlankRecordCheck', severity: 'WARNING', params: {} },
                     // Schema checks
                     { type: 'ColumnPresenceCheck', severity: 'ERROR', params: { required_columns: [] } },
-                    { type: 'DataTypeCheck', severity: 'ERROR', params: {} },
                     { type: 'SchemaMatchCheck', severity: 'ERROR', params: {} }
                 ]
             };
@@ -4301,17 +4297,7 @@
                     }
                 });
 
-                // Detect redundant validation combinations
-                const hasDataTypeCheck = file.validations.some(v => v.type === 'DataTypeCheck');
-                const hasSchemaMatchCheck = file.validations.some(v => v.type === 'SchemaMatchCheck');
-                if (hasDataTypeCheck && hasSchemaMatchCheck) {
-                    conflicts.push({
-                        title: `Redundant schema checks in "${file.name}"`,
-                        description: 'SchemaMatchCheck already includes data type validation. Consider removing DataTypeCheck to avoid redundancy.',
-                        type: 'redundant',
-                        fileId: file.id
-                    });
-                }
+                // Detect redundant validation combinations would go here if needed
 
                 // Detect EmptyFileCheck with RowCountRangeCheck conflict
                 const emptyFileCheck = file.validations.find(v => v.type === 'EmptyFileCheck');
@@ -4383,7 +4369,7 @@
                 const hasMandatoryFieldCheck = file.validations.some(v => v.type === 'MandatoryFieldCheck');
                 const hasUniqueKeyCheck = file.validations.some(v => v.type === 'UniqueKeyCheck');
                 const hasSchemaCheck = file.validations.some(v =>
-                    v.type === 'ColumnPresenceCheck' || v.type === 'SchemaMatchCheck' || v.type === 'DataTypeCheck');
+                    v.type === 'ColumnPresenceCheck' || v.type === 'SchemaMatchCheck');
 
                 // High priority: Files without any validations
                 if (file.validations.length === 0) {
@@ -5951,8 +5937,6 @@ DETAILED RESULTS
                 'SchemaMatchCheck': '<strong>Enforces exact schema compliance.</strong> Validates that all columns match expected names, order, and types exactly. Strictest schema check - fails if any column is missing, extra, renamed, or reordered. Use when schema changes are not tolerated.',
 
                 'ColumnPresenceCheck': '<strong>Verifies required columns exist.</strong> Checks that specific critical columns are present, regardless of column order or extra columns. More flexible than SchemaMatchCheck. Example: Require "customer_id", "order_date", "amount" columns even if other columns vary.',
-
-                'DataTypeCheck': '<strong>Validates column data types match expectations.</strong> Ensures columns contain the correct data type (string, integer, float, date, boolean). Catches type mismatches early before processing. Example: "age" must be integer, "email" must be string, "created_date" must be date.',
 
                 // Field Validations
                 'MandatoryFieldCheck': '<strong>Ensures critical fields are never empty.</strong> Validates that specified fields contain values (not null, not blank, not whitespace). Essential for business-critical fields. Example: Customer records must have "customer_id", "name", and "email" populated.',
