@@ -3412,6 +3412,33 @@
                         `;
                     })()}
 
+                    <!-- Conflicts Detector -->
+                    ${(() => {
+                        const conflicts = detectValidationConflicts();
+                        if (conflicts.length === 0) return '';
+
+                        return `
+                            <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                                <h3 style="color: var(--text-primary); margin-bottom: 16px;">⚠️ Potential Issues</h3>
+                                <div style="display: grid; gap: 12px;">
+                                    ${conflicts.map(conflict => `
+                                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--severity-warning);">
+                                            <div style="color: var(--text-primary); font-weight: 500; font-size: 14px; margin-bottom: 4px;">
+                                                ${conflict.title}
+                                            </div>
+                                            <div style="color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+                                                ${conflict.description}
+                                            </div>
+                                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+                                                ${conflict.type === 'duplicate' ? '📋 Duplicate' : conflict.type === 'redundant' ? '🔄 Redundant' : '⚠️ Warning'}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    })()}
+
                     <!-- Configuration Summary -->
                     <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border);">
                         <h3 style="color: var(--text-primary); margin-bottom: 16px;">⚙️ Configuration Settings</h3>
@@ -3822,6 +3849,104 @@
                     }).join('')}
                 </div>
             `;
+        }
+
+        /**
+         * Detects validation conflicts and potential issues
+         * Identifies duplicates, redundancies, and problematic configurations
+         * @returns {Array} Array of conflict objects
+         */
+        function detectValidationConflicts() {
+            const conflicts = [];
+
+            state.files.forEach(file => {
+                // Detect duplicate validations (same type multiple times)
+                const validationCounts = {};
+                file.validations.forEach((v, idx) => {
+                    if (!validationCounts[v.type]) {
+                        validationCounts[v.type] = [];
+                    }
+                    validationCounts[v.type].push(idx);
+                });
+
+                Object.entries(validationCounts).forEach(([type, indices]) => {
+                    if (indices.length > 1) {
+                        conflicts.push({
+                            title: `Duplicate ${type} in "${file.name}"`,
+                            description: `This validation appears ${indices.length} times. Consider consolidating into a single validation or removing duplicates.`,
+                            type: 'duplicate',
+                            fileId: file.id
+                        });
+                    }
+                });
+
+                // Detect redundant validation combinations
+                const hasDataTypeCheck = file.validations.some(v => v.type === 'DataTypeCheck');
+                const hasSchemaMatchCheck = file.validations.some(v => v.type === 'SchemaMatchCheck');
+                if (hasDataTypeCheck && hasSchemaMatchCheck) {
+                    conflicts.push({
+                        title: `Redundant schema checks in "${file.name}"`,
+                        description: 'SchemaMatchCheck already includes data type validation. Consider removing DataTypeCheck to avoid redundancy.',
+                        type: 'redundant',
+                        fileId: file.id
+                    });
+                }
+
+                // Detect EmptyFileCheck with RowCountRangeCheck conflict
+                const emptyFileCheck = file.validations.find(v => v.type === 'EmptyFileCheck');
+                const rowCountCheck = file.validations.find(v => v.type === 'RowCountRangeCheck');
+                if (emptyFileCheck && rowCountCheck) {
+                    const minRows = rowCountCheck.params?.min_rows;
+                    if (minRows && minRows > 0) {
+                        conflicts.push({
+                            title: `Potential conflict in "${file.name}"`,
+                            description: `EmptyFileCheck may be redundant since RowCountRangeCheck requires min_rows=${minRows}. Files with 0 rows will fail both checks.`,
+                            type: 'redundant',
+                            fileId: file.id
+                        });
+                    }
+                }
+
+                // Detect UniqueKeyCheck without fields
+                const uniqueKeyCheck = file.validations.find(v => v.type === 'UniqueKeyCheck');
+                if (uniqueKeyCheck && (!uniqueKeyCheck.params?.key_fields || uniqueKeyCheck.params.key_fields.length === 0)) {
+                    conflicts.push({
+                        title: `UniqueKeyCheck missing parameters in "${file.name}"`,
+                        description: 'UniqueKeyCheck requires key_fields to be specified. Add the fields that should be unique.',
+                        type: 'warning',
+                        fileId: file.id
+                    });
+                }
+
+                // Detect MandatoryFieldCheck without fields
+                const mandatoryFieldCheck = file.validations.find(v => v.type === 'MandatoryFieldCheck');
+                if (mandatoryFieldCheck && (!mandatoryFieldCheck.params?.fields || mandatoryFieldCheck.params.fields.length === 0)) {
+                    conflicts.push({
+                        title: `MandatoryFieldCheck missing parameters in "${file.name}"`,
+                        description: 'MandatoryFieldCheck requires fields to be specified. Add the mandatory field names.',
+                        type: 'warning',
+                        fileId: file.id
+                    });
+                }
+
+                // Detect RangeCheck with inverted min/max
+                const rangeChecks = file.validations.filter(v => v.type === 'RangeCheck');
+                rangeChecks.forEach(check => {
+                    const min = check.params?.min;
+                    const max = check.params?.max;
+                    if (min !== undefined && max !== undefined && min > max) {
+                        conflicts.push({
+                            title: `Invalid RangeCheck in "${file.name}"`,
+                            description: `RangeCheck has min (${min}) greater than max (${max}). This will always fail. Swap the values.`,
+                            type: 'warning',
+                            fileId: file.id
+                        });
+                    }
+                });
+            });
+
+            // Limit to top 10 issues
+            return conflicts.slice(0, 10);
         }
 
         /**
