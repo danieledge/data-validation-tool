@@ -4,7 +4,61 @@ This document tracks new features, improvements, and changes in the Data Validat
 
 ---
 
-## Version 3.3.0 (Current) - January 2025
+## Version 3.4.0 (Current) - January 2025
+
+### 🔧 Developer Tools & UX Polish
+
+**Regex testing, improved clarity, and final polish!** This release adds essential developer tools and improves the user experience throughout the application.
+
+**🔧 Regex Pattern Tester:**
+- Interactive regex testing tool in sidebar
+- Real-time pattern validation
+- Test multiple strings simultaneously (one per line)
+- Visual match indicators (✅ match, ❌ no match)
+- Match count and percentage display
+- Automatic error detection for invalid patterns
+- Common patterns reference guide:
+  * SSN format (^\d{3}-\d{2}-\d{4}$)
+  * Email validation pattern
+  * Date format (YYYY-MM-DD)
+  * Custom code patterns
+- Monospace fonts for readability
+- Perfect for PatternMatchCheck validation development
+
+**🎨 Improved Severity Display:**
+- Clearer severity labels in metrics dashboard
+- Changed "Errors" to "ERROR Severity" with 🔴 icon
+- Changed "Warnings" to "WARNING Severity" with 🟡 icon
+- Prevents confusion with system errors
+- Better visual distinction with emoji indicators
+- Professional card-based layout
+
+**Technical Improvements:**
+- testRegexPattern() for real-time regex testing
+- Syntax error handling and display
+- Line-by-line test string processing
+- Case-insensitive pattern matching
+- Scrollable results for large test sets
+- Modal-based interface with fade animations
+
+**Use Cases:**
+- Test regex patterns before adding to validations
+- Debug complex regex patterns
+- Learn regex syntax
+- Validate patterns against sample data
+- Share working patterns with team
+- Prevent regex errors in production
+
+**How to Use:**
+- Click "🔧 Regex Tester" in sidebar Actions
+- Enter regex pattern in top input
+- Add test strings (one per line)
+- See instant match results
+- Copy working patterns to validations
+
+---
+
+## Version 3.3.0 - January 2025
 
 ### 🤖 Intelligence & Analytics
 
