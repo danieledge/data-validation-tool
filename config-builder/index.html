@@ -3373,6 +3373,45 @@
                         </div>
                     </div>
 
+                    <!-- Recommendations -->
+                    ${(() => {
+                        const recommendations = generateRecommendations();
+                        if (recommendations.length === 0) return '';
+
+                        return `
+                            <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                                <h3 style="color: var(--text-primary); margin-bottom: 16px;">💡 Recommendations</h3>
+                                <div style="display: grid; gap: 12px;">
+                                    ${recommendations.map(rec => `
+                                        <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid ${rec.priority === 'high' ? 'var(--severity-error)' : 'var(--md-sys-color-primary)'};">
+                                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                                <div style="flex: 1;">
+                                                    <div style="color: var(--text-primary); font-weight: 500; font-size: 14px; margin-bottom: 4px;">
+                                                        ${rec.title}
+                                                    </div>
+                                                    <div style="color: var(--text-muted); font-size: 13px; line-height: 1.5;">
+                                                        ${rec.description}
+                                                    </div>
+                                                </div>
+                                                ${rec.action ? `
+                                                    <button
+                                                        class="btn btn-secondary btn-sm"
+                                                        onclick="${rec.action}"
+                                                        style="margin-left: 12px; white-space: nowrap;">
+                                                        ${rec.actionLabel}
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+                                                ${rec.priority === 'high' ? '🔴 High Priority' : '🟡 Recommended'}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    })()}
+
                     <!-- Configuration Summary -->
                     <div style="background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border);">
                         <h3 style="color: var(--text-primary); margin-bottom: 16px;">⚙️ Configuration Settings</h3>
@@ -3783,6 +3822,119 @@
                     }).join('')}
                 </div>
             `;
+        }
+
+        /**
+         * Generates intelligent recommendations based on current configuration
+         * Analyzes files and validations to suggest improvements
+         * @returns {Array} Array of recommendation objects
+         */
+        function generateRecommendations() {
+            const recommendations = [];
+
+            state.files.forEach(file => {
+                const hasEmptyFileCheck = file.validations.some(v => v.type === 'EmptyFileCheck');
+                const hasMandatoryFieldCheck = file.validations.some(v => v.type === 'MandatoryFieldCheck');
+                const hasUniqueKeyCheck = file.validations.some(v => v.type === 'UniqueKeyCheck');
+                const hasSchemaCheck = file.validations.some(v =>
+                    v.type === 'ColumnPresenceCheck' || v.type === 'SchemaMatchCheck' || v.type === 'DataTypeCheck');
+
+                // High priority: Files without any validations
+                if (file.validations.length === 0) {
+                    recommendations.push({
+                        title: `File "${file.name}" has no validations`,
+                        description: 'Every file should have at least basic validation checks to ensure data quality.',
+                        priority: 'high',
+                        action: `openTemplateModal(${file.id})`,
+                        actionLabel: 'Add Template'
+                    });
+                }
+
+                // High priority: Missing EmptyFileCheck
+                if (file.validations.length > 0 && !hasEmptyFileCheck) {
+                    recommendations.push({
+                        title: `Add EmptyFileCheck to "${file.name}"`,
+                        description: 'EmptyFileCheck prevents processing files with no data, saving time and resources.',
+                        priority: 'high',
+                        action: `addValidationToFile(${file.id}, 'EmptyFileCheck')`,
+                        actionLabel: 'Add Check'
+                    });
+                }
+
+                // Medium priority: Missing MandatoryFieldCheck
+                if (file.validations.length > 0 && !hasMandatoryFieldCheck) {
+                    recommendations.push({
+                        title: `Consider MandatoryFieldCheck for "${file.name}"`,
+                        description: 'Ensures critical fields are always populated, preventing downstream errors.',
+                        priority: 'medium',
+                        action: `addValidationToFile(${file.id}, 'MandatoryFieldCheck')`,
+                        actionLabel: 'Add Check'
+                    });
+                }
+
+                // Medium priority: Missing UniqueKeyCheck
+                if (file.validations.length > 1 && !hasUniqueKeyCheck) {
+                    recommendations.push({
+                        title: `Consider UniqueKeyCheck for "${file.name}"`,
+                        description: 'Validates primary key uniqueness to prevent duplicate records and data integrity issues.',
+                        priority: 'medium',
+                        action: `addValidationToFile(${file.id}, 'UniqueKeyCheck')`,
+                        actionLabel: 'Add Check'
+                    });
+                }
+
+                // Medium priority: Missing schema validation
+                if (file.validations.length > 2 && !hasSchemaCheck) {
+                    recommendations.push({
+                        title: `Consider schema validation for "${file.name}"`,
+                        description: 'Schema checks ensure data structure compliance and catch format changes early.',
+                        priority: 'medium',
+                        action: `addValidationToFile(${file.id}, 'ColumnPresenceCheck')`,
+                        actionLabel: 'Add Check'
+                    });
+                }
+            });
+
+            // Overall recommendations
+            if (state.files.length === 0) {
+                recommendations.push({
+                    title: 'No files configured',
+                    description: 'Start by adding files to validate or use a project template for common scenarios.',
+                    priority: 'high',
+                    action: 'openProjectTemplatesModal()',
+                    actionLabel: 'Use Template'
+                });
+            }
+
+            // Limit to top 5 recommendations
+            return recommendations.slice(0, 5);
+        }
+
+        /**
+         * Adds a validation to a specific file (helper for recommendations)
+         * @param {number} fileId - The file ID
+         * @param {string} validationType - The validation type to add
+         */
+        function addValidationToFile(fileId, validationType) {
+            const file = state.files.find(f => f.id === fileId);
+            if (!file) return;
+
+            // Save state for undo
+            saveStateToUndoStack();
+
+            // Add the validation
+            file.validations.push({
+                type: validationType,
+                severity: 'ERROR',
+                params: {},
+                enabled: true
+            });
+
+            // Update UI
+            updateFilesNav();
+            updateYAMLPreview();
+            showSection(fileId);
+            showNotification(`✅ Added ${validationType} to ${file.name}`);
         }
 
         /**
