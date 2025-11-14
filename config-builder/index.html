@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <!-- Version: 2.3.0 - Build: 2025-01-13 -->
+    <!-- Version: 2.4.0 - Build: 2025-01-14 -->
 
     <!-- Material Design 3 - Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1137,9 +1137,12 @@
 
                 <!-- Severity selector -->
                 <div class="severity-selector">
-                    <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">
                         Severity Level
                     </label>
+                    <small style="display: block; margin-bottom: 12px; color: var(--text-muted); font-size: 13px; line-height: 1.5;">
+                        <strong>ERROR:</strong> Stops validation immediately when triggered (critical checks) • <strong>WARNING:</strong> Logs issue but continues processing (monitoring/quality metrics)
+                    </small>
                     <div id="severitySelector" style="display: flex; gap: 8px;">
                         <!-- Severity buttons will be rendered here -->
                     </div>
@@ -1240,7 +1243,7 @@
                         <span class="status-badge success" id="statusBadge">Ready</span>
                     </div>
                     <div class="header-actions">
-                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.3.0</span>
+                        <span style="font-size: 11px; color: var(--text-muted); margin-right: 12px; opacity: 0.7;">v2.4.0</span>
                         <button class="btn btn-primary" onclick="downloadConfig()" title="Download YAML Configuration" style="margin-right: 8px;">
                             <span class="icon">📥</span>
                             <span>Download</span>
@@ -1297,49 +1300,49 @@
             }
         };
 
-        // Validation Types Catalog
+        // Validation Types Catalog with clear, concise descriptions
         const validationTypes = {
             file: [
-                { type: 'EmptyFileCheck', desc: 'Ensures the file is not empty' },
-                { type: 'RowCountRangeCheck', desc: 'Validates row count within expected range' },
-                { type: 'FileSizeCheck', desc: 'Checks file size limits' }
+                { type: 'EmptyFileCheck', desc: 'Prevents processing files with no data rows' },
+                { type: 'RowCountRangeCheck', desc: 'Ensures row count falls within min/max bounds' },
+                { type: 'FileSizeCheck', desc: 'Validates file size to prevent memory issues' }
             ],
             schema: [
-                { type: 'SchemaMatchCheck', desc: 'Validates exact schema match' },
-                { type: 'ColumnPresenceCheck', desc: 'Checks required columns exist' },
-                { type: 'DataTypeCheck', desc: 'Validates column data types' }
+                { type: 'SchemaMatchCheck', desc: 'Enforces exact column structure (names, order, types)' },
+                { type: 'ColumnPresenceCheck', desc: 'Verifies required columns exist (flexible order)' },
+                { type: 'DataTypeCheck', desc: 'Validates columns contain correct data types' }
             ],
             field: [
-                { type: 'MandatoryFieldCheck', desc: 'Ensures required fields are not null' },
-                { type: 'RegexCheck', desc: 'Validates field values match pattern' },
-                { type: 'ValidValuesCheck', desc: 'Checks values are in allowed list' },
-                { type: 'RangeCheck', desc: 'Validates numeric values within range' },
-                { type: 'DateFormatCheck', desc: 'Validates date format' },
-                { type: 'StringLengthCheck', desc: 'Checks string length limits' },
-                { type: 'CompletenessCheck', desc: 'Validates field completeness percentage' }
+                { type: 'MandatoryFieldCheck', desc: 'Ensures critical fields are never empty/null' },
+                { type: 'RegexCheck', desc: 'Validates field format using regex (emails, IDs, etc.)' },
+                { type: 'ValidValuesCheck', desc: 'Restricts fields to approved whitelist values' },
+                { type: 'RangeCheck', desc: 'Ensures numbers stay within min/max bounds' },
+                { type: 'DateFormatCheck', desc: 'Validates dates match specific format (e.g., YYYY-MM-DD)' },
+                { type: 'StringLengthCheck', desc: 'Checks text length falls within character limits' },
+                { type: 'CompletenessCheck', desc: 'Monitors minimum field population percentage' }
             ],
             record: [
-                { type: 'DuplicateRowCheck', desc: 'Detects duplicate rows' },
-                { type: 'BlankRecordCheck', desc: 'Finds completely empty rows' },
-                { type: 'UniqueKeyCheck', desc: 'Validates unique constraints' }
+                { type: 'DuplicateRowCheck', desc: 'Finds duplicate records based on key columns' },
+                { type: 'BlankRecordCheck', desc: 'Identifies completely empty rows (all fields null)' },
+                { type: 'UniqueKeyCheck', desc: 'Enforces primary key uniqueness constraints' }
             ],
             crossFile: [
-                { type: 'ReferentialIntegrityCheck', desc: 'Validates foreign key relationships' },
-                { type: 'CrossFileComparisonCheck', desc: 'Compares aggregates between files' },
-                { type: 'CrossFileDuplicateCheck', desc: 'Finds duplicates across files' }
+                { type: 'ReferentialIntegrityCheck', desc: 'Validates foreign key relationships between files' },
+                { type: 'CrossFileComparisonCheck', desc: 'Compares aggregated metrics across related files' },
+                { type: 'CrossFileDuplicateCheck', desc: 'Detects duplicate records appearing in multiple files' }
             ],
             statistical: [
-                { type: 'StatisticalOutlierCheck', desc: 'Detects statistical anomalies' },
-                { type: 'DistributionCheck', desc: 'Validates data distribution' },
-                { type: 'CorrelationCheck', desc: 'Checks column correlations' }
+                { type: 'StatisticalOutlierCheck', desc: 'Identifies values beyond statistical norms (±3σ)' },
+                { type: 'DistributionCheck', desc: 'Validates data follows expected distribution patterns' },
+                { type: 'CorrelationCheck', desc: 'Monitors field relationships for data consistency' }
             ]
         };
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Version and cache busting check
-            const version = '2.3.0';
-            const buildDate = '2025-01-13';
+            const version = '2.4.0';
+            const buildDate = '2025-01-14';
             console.log(`%c Data Validation Config Builder v${version} `, 'background: #10B981; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold');
             console.log(`Build Date: ${buildDate}`);
             console.log(`Load Time: ${new Date().toISOString()}`);
@@ -1658,8 +1661,8 @@
                 `;
             }  else if (section === 'settings') {
                 content.innerHTML = `
-                    <div style="max-width: 600px;">
-                        <div style="display: grid; gap: 20px;">
+                    <div style="max-width: 700px;">
+                        <div style="display: grid; gap: 24px;">
                             <div>
                                 <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
                                     Chunk Size
@@ -1669,8 +1672,29 @@
                                     value="${state.settings.chunk_size}"
                                     onchange="state.settings.chunk_size = parseInt(this.value); updateYAMLPreview();"
                                     style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                                <div style="margin-top: 8px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--color-field);">
+                                    <div style="color: var(--text-primary); font-size: 13px; font-weight: 500; margin-bottom: 4px;">💡 How to Choose:</div>
+                                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.5;">
+                                        <strong>Small files (&lt;100K rows):</strong> 5,000-10,000<br>
+                                        <strong>Medium files (100K-1M rows):</strong> 10,000-50,000<br>
+                                        <strong>Large files (&gt;1M rows):</strong> 50,000-100,000<br>
+                                        <strong>Low memory systems:</strong> Use smaller chunks (1,000-5,000)<br>
+                                        Larger chunks = faster processing but more memory usage.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">
+                                    Max Sample Failures
+                                </label>
+                                <input
+                                    type="number"
+                                    value="${state.settings.max_sample_failures}"
+                                    onchange="state.settings.max_sample_failures = parseInt(this.value); updateYAMLPreview();"
+                                    style="width: 100%; padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
                                 <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
-                                    Number of rows to process at a time
+                                    Maximum number of validation failures to report per check. Prevents overwhelming logs with thousands of similar errors. Set to 0 for unlimited.
                                 </small>
                             </div>
 
@@ -1686,6 +1710,9 @@
                                     <option ${state.settings.log_level === 'WARNING' ? 'selected' : ''}>WARNING</option>
                                     <option ${state.settings.log_level === 'ERROR' ? 'selected' : ''}>ERROR</option>
                                 </select>
+                                <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                    <strong>DEBUG:</strong> Detailed diagnostic info (very verbose) | <strong>INFO:</strong> General progress updates (recommended) | <strong>WARNING:</strong> Only warnings and errors | <strong>ERROR:</strong> Only critical errors
+                                </small>
                             </div>
 
                             <div>
@@ -1698,7 +1725,7 @@
                                     <span style="color: var(--text-primary); font-weight: 500;">Fail Fast</span>
                                 </label>
                                 <small style="display: block; margin-top: 6px; margin-left: 28px; color: var(--text-muted); font-size: 13px;">
-                                    Stop validation on first error
+                                    When enabled, validation stops immediately upon encountering the first error. Useful for quick debugging or when you need instant feedback. Disable to get a complete report of all issues.
                                 </small>
                             </div>
                         </div>
@@ -1811,6 +1838,9 @@
                                         <option ${file.format === 'json' ? 'selected' : ''}>json</option>
                                         <option ${file.format === 'parquet' ? 'selected' : ''}>parquet</option>
                                     </select>
+                                    <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 13px;">
+                                        <strong>csv:</strong> Comma-separated values (.csv) | <strong>excel:</strong> Excel workbooks (.xlsx, .xls) | <strong>json:</strong> JSON files (.json) | <strong>parquet:</strong> Columnar format (.parquet)
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -1897,6 +1927,9 @@
                                 <option value="ERROR" ${validation.severity === 'ERROR' ? 'selected' : ''}>🔴 ERROR - Stop processing</option>
                                 <option value="WARNING" ${validation.severity === 'WARNING' ? 'selected' : ''}>🟡 WARNING - Continue processing</option>
                             </select>
+                            <small style="display: block; margin-top: 6px; color: var(--text-muted); font-size: 12px;">
+                                <strong>ERROR:</strong> Critical - validation job fails immediately | <strong>WARNING:</strong> Non-critical - logged but processing continues
+                            </small>
                         </div>
 
                         <!-- Parameters Section -->
@@ -2088,47 +2121,63 @@
         }
 
         /**
-         * Gets human-readable description for validation type
+         * Gets comprehensive human-readable description for validation type
          * @param {string} type - Validation type
-         * @returns {string} Description text
+         * @returns {string} Description text with usage guidance
          */
         function getValidationDescription(type) {
             const descriptions = {
                 // File Validations
-                'EmptyFileCheck': 'Ensures the file contains data and is not empty',
-                'RowCountRangeCheck': 'Validates that row count falls within expected minimum and maximum values',
-                'FileSizeCheck': 'Checks that file size is within acceptable limits',
+                'EmptyFileCheck': '<strong>Prevents processing empty files.</strong> Validates that the file contains at least one data row (excluding headers). Use this as a first-line check to catch missing or corrupted file transfers. Fails immediately if file is empty, saving processing time.',
+
+                'RowCountRangeCheck': '<strong>Ensures data volume is as expected.</strong> Validates row count falls within specified min/max range. Useful for detecting incomplete data loads (too few rows) or unexpected duplicates (too many rows). Example: Daily sales file should have 1,000-5,000 rows.',
+
+                'FileSizeCheck': '<strong>Catches oversized or undersized files early.</strong> Checks file size in bytes/KB/MB before processing. Prevents memory issues from unexpectedly large files. Example: Reject files over 500MB or under 1KB as likely corrupted.',
 
                 // Schema Validations
-                'SchemaMatchCheck': 'Validates that the file schema exactly matches the expected structure',
-                'ColumnPresenceCheck': 'Checks that all required columns are present in the file',
-                'DataTypeCheck': 'Validates that column data types match expected types',
+                'SchemaMatchCheck': '<strong>Enforces exact schema compliance.</strong> Validates that all columns match expected names, order, and types exactly. Strictest schema check - fails if any column is missing, extra, renamed, or reordered. Use when schema changes are not tolerated.',
+
+                'ColumnPresenceCheck': '<strong>Verifies required columns exist.</strong> Checks that specific critical columns are present, regardless of column order or extra columns. More flexible than SchemaMatchCheck. Example: Require "customer_id", "order_date", "amount" columns even if other columns vary.',
+
+                'DataTypeCheck': '<strong>Validates column data types match expectations.</strong> Ensures columns contain the correct data type (string, integer, float, date, boolean). Catches type mismatches early before processing. Example: "age" must be integer, "email" must be string, "created_date" must be date.',
 
                 // Field Validations
-                'MandatoryFieldCheck': 'Ensures that specified required fields are not null or empty',
-                'RegexCheck': 'Validates that field values match a specified regular expression pattern',
-                'ValidValuesCheck': 'Checks that field values are within an allowed list of valid values',
-                'RangeCheck': 'Validates that numeric field values fall within min/max range',
-                'DateFormatCheck': 'Ensures date fields match the specified format (e.g., YYYY-MM-DD)',
-                'StringLengthCheck': 'Validates that string length is within min/max character limits',
-                'CompletenessCheck': 'Ensures a minimum percentage of non-null values in a field',
+                'MandatoryFieldCheck': '<strong>Ensures critical fields are never empty.</strong> Validates that specified fields contain values (not null, not blank, not whitespace). Essential for business-critical fields. Example: Customer records must have "customer_id", "name", and "email" populated.',
+
+                'RegexCheck': '<strong>Enforces specific field formats using patterns.</strong> Validates field values match a regular expression pattern. Perfect for formatted data like emails, phone numbers, postal codes, IDs. Example: Email must match pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".',
+
+                'ValidValuesCheck': '<strong>Restricts fields to predefined allowed values.</strong> Checks that field values are in an approved whitelist. Ideal for status codes, categories, enums. Example: "status" must be one of: "active", "inactive", "pending", "suspended".',
+
+                'RangeCheck': '<strong>Validates numeric values stay within bounds.</strong> Ensures numbers fall between minimum and maximum values (inclusive). Catches data entry errors and outliers. Example: Age must be 0-120, discount_percent must be 0-100, temperature must be -50 to 50.',
+
+                'DateFormatCheck': '<strong>Enforces consistent date formatting.</strong> Validates dates match a specific format string using strftime codes. Prevents date parsing errors. Example: "2024-01-15" matches "%Y-%m-%d", "15/01/2024" matches "%d/%m/%Y".',
+
+                'StringLengthCheck': '<strong>Ensures text fields meet length requirements.</strong> Validates string length falls within min/max character limits. Prevents database truncation errors and catches input issues. Example: Username must be 3-20 characters, description must be 10-500 characters.',
+
+                'CompletenessCheck': '<strong>Monitors field population rates.</strong> Validates that a minimum percentage of rows have non-null values in a field. Useful for data quality metrics. Example: "phone_number" must be populated in at least 95% of customer records.',
 
                 // Record Validations
-                'DuplicateRowCheck': 'Detects and reports duplicate rows based on specified columns',
-                'BlankRecordCheck': 'Finds rows that are completely empty across all fields',
-                'UniqueKeyCheck': 'Validates that key fields contain unique values with no duplicates',
+                'DuplicateRowCheck': '<strong>Detects duplicate records.</strong> Finds rows with identical values across all columns (or specified subset). Prevents duplicate data loads. Can check full rows or key columns only. Example: Find duplicate orders based on "order_id" and "order_date".',
+
+                'BlankRecordCheck': '<strong>Identifies completely empty rows.</strong> Finds rows where all fields are null or empty. Common with CSV files that have trailing blank lines or data entry errors. Helps clean data before processing.',
+
+                'UniqueKeyCheck': '<strong>Enforces primary key constraints.</strong> Validates that specified key field(s) contain unique values with no duplicates. Essential for ensuring data integrity. Example: "customer_id" must be unique, or combination of "order_id" + "line_number" must be unique.',
 
                 // Cross-File Validations
-                'ReferentialIntegrityCheck': 'Validates foreign key relationships between files',
-                'CrossFileComparisonCheck': 'Compares aggregates or counts between multiple files',
-                'CrossFileDuplicateCheck': 'Finds duplicate records across multiple files',
+                'ReferentialIntegrityCheck': '<strong>Validates foreign key relationships across files.</strong> Ensures all foreign key values in this file exist in the reference file\'s primary key. Prevents orphaned records. Example: All "customer_id" values in orders.csv must exist in customers.csv "id" column.',
+
+                'CrossFileComparisonCheck': '<strong>Compares metrics between related files.</strong> Validates that aggregated values match across files (sums, counts, averages). Ensures data consistency. Example: Total order amount in orders.csv should equal sum of line items in order_details.csv.',
+
+                'CrossFileDuplicateCheck': '<strong>Finds duplicate records across multiple files.</strong> Detects when the same record appears in multiple files based on key fields. Useful for identifying data duplication across systems. Example: Same customer record in both US and EU customer files.',
 
                 // Statistical Validations
-                'StatisticalOutlierCheck': 'Detects values that fall outside expected statistical ranges',
-                'DistributionCheck': 'Validates that data distribution matches expected patterns',
-                'CorrelationCheck': 'Checks correlations between columns meet expected values'
+                'StatisticalOutlierCheck': '<strong>Identifies anomalous values using statistics.</strong> Detects values that fall outside expected statistical ranges (e.g., beyond 3 standard deviations from mean). Catches data quality issues and potential fraud. Example: Transaction amounts more than 3σ from average may be errors or fraud.',
+
+                'DistributionCheck': '<strong>Validates data follows expected patterns.</strong> Checks that data distribution matches expected statistical distribution (normal, uniform, etc.). Useful for detecting biased or skewed data. Example: Test scores should follow normal distribution, random sampling should be uniform.',
+
+                'CorrelationCheck': '<strong>Monitors relationships between fields.</strong> Validates that correlation between two columns meets expected values. Catches data inconsistencies. Example: "price" and "quantity" should have expected correlation; deviation indicates pricing errors or data quality issues.'
             };
-            return descriptions[type] || 'Validates data quality according to specified rules';
+            return descriptions[type] || 'Validates data quality according to specified rules.';
         }
 
         // File Management
