@@ -2935,8 +2935,7 @@
          * @returns {object} Parsed configuration
          */
         function parseYAML(yaml) {
-            // This is a simplified YAML parser for our specific use case
-            // For production, consider using a proper YAML library
+            // Parses YAML with structure: validation_job -> name, description, files, processing
             const lines = yaml.split('\n');
             const config = {
                 job_name: '',
@@ -2946,83 +2945,166 @@
 
             let currentFile = null;
             let currentValidation = null;
-            let inSettings = false;
+            let currentParamKey = null;
+            let currentParamArray = null;
+            let inValidationJob = false;
+            let inProcessing = false;
             let inFiles = false;
             let inValidations = false;
+            let inParams = false;
 
-            for (let line of lines) {
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
                 const trimmed = line.trim();
+                const indent = line.search(/\S/); // Count leading spaces
 
                 // Skip empty lines and comments
                 if (!trimmed || trimmed.startsWith('#')) continue;
 
-                // Parse job_name
-                if (trimmed.startsWith('job_name:')) {
-                    config.job_name = trimmed.split('job_name:')[1].trim().replace(/['"]/g, '');
+                // Detect validation_job section
+                if (trimmed === 'validation_job:') {
+                    inValidationJob = true;
                     continue;
                 }
 
-                // Settings section
-                if (trimmed === 'settings:') {
-                    inSettings = true;
+                // If not in validation_job yet, skip
+                if (!inValidationJob) continue;
+
+                // Top-level under validation_job (indent 2)
+                if (indent === 2 && trimmed.includes(':')) {
+                    // Reset section flags when encountering new top-level key
+                    inProcessing = false;
                     inFiles = false;
+
+                    if (trimmed.startsWith('name:')) {
+                        config.job_name = trimmed.split('name:')[1].trim().replace(/['"]/g, '');
+                    } else if (trimmed.startsWith('description:')) {
+                        // description is parsed but not used in config builder state
+                        continue;
+                    } else if (trimmed === 'files:') {
+                        inFiles = true;
+                    } else if (trimmed === 'processing:') {
+                        inProcessing = true;
+                    }
                     continue;
                 }
 
-                // Files section
-                if (trimmed === 'files:') {
-                    inFiles = true;
-                    inSettings = false;
-                    continue;
-                }
-
-                // Parse settings
-                if (inSettings && trimmed.includes(':')) {
+                // Parse processing settings (indent 4)
+                if (inProcessing && indent === 4 && trimmed.includes(':')) {
                     const [key, value] = trimmed.split(':').map(s => s.trim());
                     if (key === 'chunk_size' || key === 'max_sample_failures') {
                         config.settings[key] = parseInt(value);
                     } else if (key === 'fail_fast') {
                         config.settings[key] = value === 'true';
-                    } else {
+                    } else if (key === 'log_level') {
                         config.settings[key] = value.replace(/['"]/g, '');
                     }
                     continue;
                 }
 
-                // Parse files
-                if (inFiles && trimmed.startsWith('- name:')) {
+                // Parse files array (indent 4, starts with -)
+                if (inFiles && indent === 4 && trimmed.startsWith('- name:')) {
                     if (currentFile) config.files.push(currentFile);
-                    currentFile = { name: trimmed.split('name:')[1].trim().replace(/['"]/g, ''), validations: [] };
+                    currentFile = {
+                        name: trimmed.split('name:')[1].trim().replace(/['"]/g, ''),
+                        validations: []
+                    };
                     inValidations = false;
+                    currentValidation = null;
                     continue;
                 }
 
-                if (currentFile) {
+                // File properties (indent 6)
+                if (currentFile && indent === 6 && trimmed.includes(':')) {
                     if (trimmed.startsWith('path:')) {
                         currentFile.path = trimmed.split('path:')[1].trim().replace(/['"]/g, '');
                     } else if (trimmed.startsWith('format:')) {
                         currentFile.format = trimmed.split('format:')[1].trim().replace(/['"]/g, '');
                     } else if (trimmed === 'validations:') {
                         inValidations = true;
-                    } else if (inValidations && trimmed.startsWith('- type:')) {
-                        if (currentValidation) currentFile.validations.push(currentValidation);
-                        currentValidation = { type: trimmed.split('type:')[1].trim().replace(/['"]/g, ''), params: {} };
-                    } else if (currentValidation) {
-                        if (trimmed.startsWith('severity:')) {
-                            currentValidation.severity = trimmed.split('severity:')[1].trim().replace(/['"]/g, '');
-                        } else if (trimmed.startsWith('enabled:')) {
-                            currentValidation.enabled = trimmed.split('enabled:')[1].trim() === 'true';
-                        } else if (trimmed.includes(':') && !trimmed.startsWith('params:')) {
-                            const [key, value] = trimmed.split(':').map(s => s.trim());
+                    }
+                    continue;
+                }
+
+                // Validations array (indent 8, starts with -)
+                if (inValidations && indent === 8 && trimmed.startsWith('- type:')) {
+                    if (currentValidation) {
+                        currentFile.validations.push(currentValidation);
+                    }
+                    const typeValue = trimmed.split('type:')[1].trim().replace(/['"]/g, '').split('#')[0].trim();
+                    currentValidation = {
+                        type: typeValue,
+                        severity: 'ERROR',
+                        params: {},
+                        enabled: true
+                    };
+                    inParams = false;
+                    currentParamKey = null;
+                    currentParamArray = null;
+                    continue;
+                }
+
+                // Validation properties (indent 10)
+                if (currentValidation && indent === 10 && trimmed.includes(':')) {
+                    if (trimmed.startsWith('severity:')) {
+                        currentValidation.severity = trimmed.split('severity:')[1].trim().replace(/['"]/g, '');
+                        inParams = false;
+                    } else if (trimmed.startsWith('enabled:')) {
+                        currentValidation.enabled = trimmed.split('enabled:')[1].trim() === 'true';
+                        inParams = false;
+                    } else if (trimmed === 'params:' || trimmed === 'params: {}') {
+                        inParams = true;
+                        currentParamKey = null;
+                        currentParamArray = null;
+                    }
+                    continue;
+                }
+
+                // Param properties (indent 12)
+                if (inParams && currentValidation && indent === 12 && trimmed.includes(':')) {
+                    const colonIndex = trimmed.indexOf(':');
+                    const key = trimmed.substring(0, colonIndex).trim();
+                    const value = trimmed.substring(colonIndex + 1).trim();
+
+                    currentParamKey = key;
+                    currentParamArray = null;
+
+                    if (value === '' || value === '[]') {
+                        // Empty array or value on next line
+                        currentValidation.params[key] = [];
+                        currentParamArray = currentValidation.params[key];
+                    } else if (value && value !== '{}') {
+                        // Inline value
+                        if (value === 'true' || value === 'false') {
+                            currentValidation.params[key] = value === 'true';
+                        } else if (!isNaN(value)) {
+                            currentValidation.params[key] = parseFloat(value);
+                        } else {
                             currentValidation.params[key] = value.replace(/['"]/g, '');
                         }
                     }
+                    continue;
+                }
+
+                // Param array items (indent 14, starts with -)
+                if (currentParamKey && indent === 14 && trimmed.startsWith('- ')) {
+                    const item = trimmed.substring(2).trim().replace(/['"]/g, '');
+                    if (Array.isArray(currentValidation.params[currentParamKey])) {
+                        currentValidation.params[currentParamKey].push(item);
+                    } else {
+                        currentValidation.params[currentParamKey] = [item];
+                    }
+                    continue;
                 }
             }
 
-            // Push last file and validation
-            if (currentValidation && currentFile) currentFile.validations.push(currentValidation);
-            if (currentFile) config.files.push(currentFile);
+            // Push last validation and file
+            if (currentValidation && currentFile) {
+                currentFile.validations.push(currentValidation);
+            }
+            if (currentFile) {
+                config.files.push(currentFile);
+            }
 
             return config;
         }
