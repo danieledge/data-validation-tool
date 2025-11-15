@@ -68,19 +68,8 @@ class ProfileHTMLReporter:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Profile Report - {profile.file_name}</title>
-    <!-- Try multiple CDNs for better compatibility -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="loadChartJSFallback()"></script>
-    <script>
-        function loadChartJSFallback() {{
-            var script = document.createElement('script');
-            script.src = 'https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js';
-            script.onerror = function() {{
-                console.error('Failed to load Chart.js from all CDNs');
-                document.getElementById('chart-error').style.display = 'block';
-            }};
-            document.head.appendChild(script);
-        }}
-    </script>
+    <!-- Chart.js Library (Self-Hosted for Offline Use) -->
+    <script src="resources/js/chart.min.js"></script>
     <style>
         * {{
             margin: 0;

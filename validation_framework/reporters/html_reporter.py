@@ -988,8 +988,8 @@ HTML_TEMPLATE = """
         {% endfor %}
     </div>
 
-    <!-- Chart.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Chart.js Library (Self-Hosted) -->
+    <script src="resources/js/chart.min.js"></script>
 
     <script>
         // Chart.js global configuration

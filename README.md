@@ -112,7 +112,7 @@ open validation_report.html
 - 📊 **Real-time Preview** - Live YAML generation with two-way sync
 - 🎯 **Context Help** - Right panel auto-updates with relevant documentation
 
-**For Corporate Environments:** Self-hosted Monaco Editor means no external dependencies - perfect for air-gapped networks and strict firewall policies. See [MONACO_SELF_HOSTED.md](MONACO_SELF_HOSTED.md) for details.
+**For Corporate Environments:** 100% offline-capable with self-hosted Monaco Editor and Chart.js - perfect for air-gapped networks and strict firewall policies. See [OFFLINE_MODE.md](OFFLINE_MODE.md) for complete offline deployment guide.
 
 ---
 
