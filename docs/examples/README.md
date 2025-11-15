@@ -6,55 +6,33 @@ Real-world validation scenarios using **DataK9** - your K9 guardian for data qua
 
 ## 📚 Example Categories
 
-### By Complexity
-
-**Beginner**
-- **[Basic Examples](basic-examples.md)** - Simple validations to get started
-  - Single file validation
-  - Common field checks
-  - Basic reports
-
-**Intermediate**
-- **[Advanced Examples](advanced-examples.md)** - More sophisticated scenarios
-  - Multiple file validation
-  - Conditional logic
-  - Cross-file validations
-  - Statistical checks
-
-**Advanced**
-- **[Complete Workflows](complete-workflows.md)** - End-to-end production examples
-  - AutoSys integration
-  - CI/CD pipelines
-  - Data warehouse loading
-  - Multi-stage validation
-
----
-
 ### By Industry
 
-- **[Finance & Banking](industry-examples/finance.md)**
+Comprehensive industry-specific validation examples:
+
+- **[Finance & Banking](finance.md)**
   - Transaction validation
   - Account data quality
-  - Regulatory compliance (AML, KYC)
+  - Regulatory compliance (AML, KYC, BSA, CTR)
+  - Trading data validation (SEC, FINRA)
   - Fraud detection
+  - Credit card data (PCI-DSS)
 
-- **[Healthcare](industry-examples/healthcare.md)**
+- **[Healthcare](healthcare.md)**
   - Patient data validation
-  - HIPAA compliance
+  - HIPAA compliance & de-identification
   - Clinical data quality
-  - Lab results validation
+  - Lab results validation (LOINC codes)
+  - Insurance claims (ICD-10, CPT)
+  - EHR integration (HL7)
 
-- **[E-Commerce](industry-examples/ecommerce.md)**
+- **[E-Commerce](ecommerce.md)**
   - Customer data validation
   - Order processing
   - Inventory management
   - Product catalog quality
-
-- **[Manufacturing](industry-examples/manufacturing.md)**
-  - IoT sensor data
-  - Quality control metrics
-  - Supply chain data
-  - Production tracking
+  - Payment transactions
+  - Shopping cart validation
 
 ---
 

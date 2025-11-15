@@ -17,7 +17,6 @@ Learn how to configure DataK9:
 - **[Configuration Guide](configuration-guide.md)** - Complete YAML reference
 - **[Validation Catalog](validation-catalog.md)** - All 35+ validation types
 - **[Best Practices](best-practices.md)** - ERROR vs WARNING, production tips
-- **[No-Code Custom Rules](no-code-custom-rules.md)** - Build rules without coding
 
 ### DataK9 Studio
 Use the visual IDE:
@@ -98,7 +97,7 @@ Connect DataK9 to your pipeline:
 
 1. **[What is DataK9?](what-is-datak9.md)** (5 min)
 2. **[DataK9 Studio Guide](studio-guide.md)** (20 min)
-3. **[No-Code Custom Rules](no-code-custom-rules.md)** (15 min)
+3. **[Validation Catalog](validation-catalog.md)** (15 min)
 4. **[Reading Reports](reading-reports.md)** (10 min)
 
 **Total: 50 minutes to building rules**
@@ -143,10 +142,9 @@ Connect DataK9 to your pipeline:
 
 Looking for industry-specific examples?
 
-- **[Finance & Banking](../examples/industry-examples/finance.md)** - Transactions, compliance
-- **[Healthcare](../examples/industry-examples/healthcare.md)** - Patient data, HIPAA
-- **[E-Commerce](../examples/industry-examples/ecommerce.md)** - Orders, customers
-- **[Manufacturing](../examples/industry-examples/manufacturing.md)** - IoT, sensor data
+- **[Finance & Banking](../examples/finance.md)** - Transactions, compliance, AML
+- **[Healthcare](../examples/healthcare.md)** - Patient data, HIPAA compliance
+- **[E-Commerce](../examples/ecommerce.md)** - Orders, customers, inventory
 
 ---
 

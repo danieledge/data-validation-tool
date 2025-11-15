@@ -10,12 +10,12 @@
 
 A robust, extensible Python framework for validating data quality before loading to databases, data warehouses, or analytics platforms. Like a well-trained K9 unit, DataK9 vigilantly guards your data, sniffing out quality issues before they become problems. Designed to handle enterprise-scale datasets (200GB+) with memory-efficient chunked processing.
 
-[![Version 2.3.0](https://img.shields.io/badge/version-2.3.0-blue.svg)](docs/WHATS_NEW.md)
+[![Version 2.3.0](https://img.shields.io/badge/version-2.3.0-blue.svg)](#-datak9-studio)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Tests: 115+ passing](https://img.shields.io/badge/tests-115%2B%20passing-brightgreen.svg)](tests/)
 [![Coverage: 48%](https://img.shields.io/badge/coverage-48%25-yellow.svg)](htmlcov/)
 
-**🎉 NEW in v2.3:** [DataK9 Studio - Visual Configuration IDE](docs/WHATS_NEW.md) • [Validation Type Wizard](docs/WHATS_NEW.md) • [Three-Panel Layout](docs/WHATS_NEW.md) • **[See What's New →](docs/WHATS_NEW.md)**
+**🎉 NEW in v2.3:** [DataK9 Studio - Visual Configuration IDE](#-datak9-studio) • Validation Type Wizard • Three-Panel Layout • Monaco Editor Integration
 
 ---
 
@@ -64,7 +64,7 @@ open validation_report.html
 
 **🎨 NEW: [DataK9 Studio →](https://raw.githack.com/danieledge/data-validation-tool/main/datak9-studio.html)** - Build validation configs with a modern IDE-style interface and validation wizard!
 
-**New to DataK9?** Start with the **[Getting Started Guide →](docs/GETTING_STARTED.md)**
+**New to DataK9?** Start with the **[5-Minute Quickstart →](docs/getting-started/quickstart-5min.md)**
 
 ---
 
@@ -127,16 +127,6 @@ python3 -m validation_framework.cli profile data.csv
 # - Quality metrics and suggestions
 ```
 
-### 🎨 View Live Examples
-
-See the profiler in action with these interactive example reports:
-
-| Example | Rows | Size | Preview |
-|---------|------|------|---------|
-| **Simple Customer Data** | 10 | 728 B | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/example_profile_report.html) |
-| **E-Commerce Orders** | 30 | 2.51 KB | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/comprehensive_profile_report.html) |
-| **Large Dataset** | 5,000 | 428 KB | [View Report →](https://htmlpreview.github.io/?https://github.com/danieledge/data-validation-tool/blob/main/docs/large_profile_report.html) |
-
 **Features:**
 - 📈 Interactive charts with quality metrics
 - 🔍 Type inference (known vs inferred)
@@ -154,7 +144,7 @@ See the profiler in action with these interactive example reports:
 ### New DataK9 Documentation
 
 **Using DataK9** (For all users):
-- **[Getting Started](docs/using-datak9/getting-started.md)** - Installation to first validation
+- **[5-Minute Quickstart](docs/getting-started/quickstart-5min.md)** - Get started in 5 minutes
 - **[Configuration Guide](docs/using-datak9/configuration-guide.md)** - Complete YAML reference
 - **[Validation Catalog](docs/using-datak9/validation-catalog.md)** - All 35+ validation types
 - **[DataK9 Studio Guide](docs/using-datak9/studio-guide.md)** - Visual configuration IDE
@@ -187,9 +177,6 @@ See the profiler in action with these interactive example reports:
 - **[Finance](docs/examples/finance.md)** - Banking, trading, AML validation
 - **[Healthcare](docs/examples/healthcare.md)** - HIPAA-compliant patient data
 - **[E-Commerce](docs/examples/ecommerce.md)** - Customer, order, inventory validation
-
-### Legacy Documentation
-The old documentation is archived in `docs/zzdocs/` for reference.
 
 ---
 
@@ -539,7 +526,7 @@ Contributions welcome! See **[Contributing Guide](docs/for-developers/contributi
 ## 📖 Quick Links
 
 ### Getting Started
-- [Installation & Quick Start](docs/using-datak9/getting-started.md)
+- [Installation & Quick Start](docs/getting-started/quickstart-5min.md)
 - [Configuration Guide](docs/using-datak9/configuration-guide.md)
 - [Validation Catalog](docs/using-datak9/validation-catalog.md)
 - [DataK9 Studio Guide](docs/using-datak9/studio-guide.md)
@@ -589,7 +576,7 @@ MIT License - see [LICENSE](LICENSE) for details
 - ✅ **Scalable** - Handles files from KB to 200GB+
 - 🐕 **Vigilant Guardian** - Like a K9 unit, always on watch for data quality issues
 
-**Ready to get started?** → **[Quick Start Guide](docs/using-datak9/getting-started.md)**
+**Ready to get started?** → **[5-Minute Quickstart](docs/getting-started/quickstart-5min.md)**
 
 ---
 

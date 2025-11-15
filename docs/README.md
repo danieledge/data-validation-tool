@@ -148,7 +148,6 @@ Open `validation_report.html` in your browser to see:
 ### Essential Reading
 - [Best Practices: ERROR vs WARNING](using-datak9/best-practices.md#error-vs-warning)
 - [Handling Large Files (200GB+)](using-datak9/large-files.md)
-- [No-Code Custom Validations](using-datak9/no-code-custom-rules.md)
 - [AutoSys Integration](using-datak9/autosys-integration.md)
 - [CI/CD Integration](using-datak9/cicd-integration.md)
 
@@ -313,8 +312,6 @@ python3 -m validation_framework.cli profile data/customers.csv --auto-config
 ### Getting Started
 - [Quickstart (5 minutes)](getting-started/quickstart-5min.md)
 - [Installation](getting-started/installation.md)
-- [Your First Validation](getting-started/first-validation.md)
-- [Next Steps](getting-started/next-steps.md)
 
 ### Using DataK9
 - [What is DataK9?](using-datak9/what-is-datak9.md)
@@ -323,7 +320,6 @@ python3 -m validation_framework.cli profile data/customers.csv --auto-config
 - [Best Practices](using-datak9/best-practices.md)
 - [DataK9 Studio Guide](using-datak9/studio-guide.md)
 - [Data Profiling](using-datak9/data-profiling.md)
-- [No-Code Custom Rules](using-datak9/no-code-custom-rules.md)
 - [Reading Reports](using-datak9/reading-reports.md)
 - [Performance Tuning](using-datak9/performance-tuning.md)
 - [AutoSys Integration](using-datak9/autosys-integration.md)
@@ -343,13 +339,9 @@ python3 -m validation_framework.cli profile data/customers.csv --auto-config
 - [Design Patterns](for-developers/design-patterns.md)
 
 ### Examples
-- [Basic Examples](examples/basic-examples.md)
-- [E-Commerce](examples/industry-examples/ecommerce.md)
-- [Finance](examples/industry-examples/finance.md)
-- [Healthcare](examples/industry-examples/healthcare.md)
-- [Manufacturing](examples/industry-examples/manufacturing.md)
-- [Advanced Examples](examples/advanced-examples.md)
-- [Complete Workflows](examples/complete-workflows.md)
+- [Finance](examples/finance.md) - Banking, trading, AML validation
+- [Healthcare](examples/healthcare.md) - HIPAA-compliant patient data
+- [E-Commerce](examples/ecommerce.md) - Customer, order, inventory validation
 
 ### Reference
 - [CLI Reference](reference/cli-reference.md)
@@ -357,7 +349,6 @@ python3 -m validation_framework.cli profile data/customers.csv --auto-config
 - [YAML Reference](reference/yaml-reference.md)
 - [Error Codes](reference/error-codes.md)
 - [Glossary](reference/glossary.md)
-- [Compatibility](reference/compatibility.md)
 
 ---
 
@@ -436,5 +427,3 @@ Like a K9 unit that sniffs out problems before they escalate, DataK9:
 ---
 
 **🐕 Guard your data pipelines with DataK9 - Your K9 guardian for data quality**
-
-*This documentation is a living resource. For updates, see [What's New](WHATS_NEW.md)*
