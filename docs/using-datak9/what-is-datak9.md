@@ -48,22 +48,6 @@ DataK9 validates data **before** it enters your data warehouse, analytics platfo
 
 ---
 
-## Who Uses DataK9?
-
-### Data Engineers
-"I use DataK9 to validate data before loading to Snowflake. It catches schema changes and data quality issues that would otherwise break our pipelines."
-
-### Business Analysts
-"With DataK9 Studio, I can build validation rules without coding. I define the business logic, and DataK9 enforces it."
-
-### QA Engineers
-"DataK9 is part of our automated testing. Every data file gets validated before it goes to production."
-
-### Compliance Officers
-"We use DataK9 to ensure PII fields are properly formatted and regulatory requirements are met."
-
----
-
 ## Key Features
 
 ### 35+ Built-in Validation Rules
