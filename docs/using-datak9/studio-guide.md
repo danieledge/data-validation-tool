@@ -1,6 +1,10 @@
-# DataK9 Studio Guide
+<div align="center">
+  <img src="../../resources/images/datak9studio-web.png" alt="DataK9 Studio Logo" width="300">
 
-**Your IDE for Data Quality**
+  # DataK9 Studio Guide
+
+  **Your IDE for Data Quality**
+</div>
 
 DataK9 Studio is a professional, IDE-style interface for creating validation configurations without writing YAML by hand. Like VS Code for data quality - build powerful validation rules through an intuitive visual interface.
 
