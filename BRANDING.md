@@ -1,31 +1,67 @@
-# DataGuard Studio - Brand Guidelines
+# DataK9 - Brand Guidelines
 
-**Official Name:** DataGuard Studio
-**Tagline:** *Your IDE for data quality*
-**Version:** 1.0.0
-**Created:** January 2025
+**Official Name:** DataK9 Data Quality Framework
+**Tagline:** *Your K9 guardian for data quality*
+**Version:** 2.0.0
+**Updated:** November 2025
 
 ---
 
 ## 📝 Brand Identity
 
 ### Name
-**DataGuard Studio**
 
-- Always use "DataGuard" as one word (not "Data Guard")
-- Always capitalize both words: "DataGuard Studio"
-- Short form: "DataGuard" or "DGS"
-- Never: "data guard studio", "DataguardStudio", "Data Guard"
+**DataK9 Data Quality Framework**
+
+- Always use "DataK9" as one word (not "Data K9" or "DataK-9")
+- Always capitalize the 'D' and 'K': "DataK9"
+- Short form: "DataK9"
+- Never: "data k9", "DataK-9", "Data K9", "dk9", "DK9"
+
+### Components
+
+**DataK9 CLI** (or **DataK9 Validate**)
+The command-line validation tool for executing data quality checks
+
+**DataK9 Studio**
+The visual IDE for building validation configurations
+
+**DataK9 Profiler**
+The data analysis component for profiling data files
 
 ### Tagline Options
 
-**Primary:** *Your IDE for data quality*
+**Primary:** *Your K9 guardian for data quality*
 
 **Alternatives:**
-- *Professional data validation made simple*
-- *Guard your data pipelines with confidence*
-- *The IDE for data quality engineers*
-- *Build bulletproof validation rules*
+- *Sniff out data quality issues before they bite*
+- *Loyal, vigilant, and always on guard*
+- *Your trusty companion for data validation*
+- *Guard your data pipelines with K9 precision*
+- *Data quality protection with canine instinct*
+
+---
+
+## 🐕 Brand Concept - K9 Theme
+
+### Why K9?
+
+**K9 (canine) = guardian, loyal, vigilant, protective**
+
+- Dogs sniff out problems before humans notice them
+- Reliable, trainable, and always alert
+- Technical wordplay: K9 sounds like "canine"
+- Security forces use K9 units for detection and protection
+- Natural connection to "guard" and "protect" concepts
+
+### Personality Traits
+
+- **Vigilant** - Always watching for data quality issues
+- **Loyal** - Consistently guards your pipelines
+- **Trainable** - Configurable to your specific needs
+- **Reliable** - Production-grade, enterprise-ready
+- **Friendly** - Accessible to both technical and non-technical users
+- **Protective** - Shields your data from quality issues
 
 ---
 
@@ -34,46 +70,54 @@
 ### Logo Concept
 
 ```
-╔═══════════════════════════════════════╗
-║                                       ║
-║    ╔═╗  ┌─┐  ┌─┐                    ║
-║    ║ ║  │ │  └─┐                     ║
-║    ║ ║  │ │  ┌─┘                     ║
-║    ╚═╝  └─┘  └─┘                     ║
-║                                       ║
-║    D A T A G U A R D                  ║
-║    ─────────────────                  ║
-║    S T U D I O                        ║
-║                                       ║
-╚═══════════════════════════════════════╝
+  ╔══════════════════════════════════╗
+  ║                                  ║
+  ║    ██████╗  █████╗ ████████╗ █████╗
+  ║    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗
+  ║    ██║  ██║███████║   ██║   ███████║
+  ║    ██║  ██║██╔══██║   ██║   ██╔══██║
+  ║    ██████╔╝██║  ██║   ██║   ██║  ██║
+  ║    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+  ║                                  ║
+  ║    ██╗  ██╗ █████╗                ║
+  ║    ██║ ██╔╝██╔══██╗               ║
+  ║    █████╔╝ ╙█████╔╝               ║
+  ║    ██╔═██╗ ██╔══██╗               ║
+  ║    ██║  ██╗╚█████╔╝               ║
+  ║    ╚═╝  ╚═╝ ╚════╝                ║
+  ║                                  ║
+  ║  Your K9 guardian for data quality  ║
+  ║                                  ║
+  ╚══════════════════════════════════╝
 ```
 
-### Shield Icon
+### K9 Shield Icon
 
 ```
         ╱╲
        ╱  ╲
-      ╱ ✓  ╲
-     ╱  DG  ╲
+      ╱ 🐕 ╲
+     ╱  K9  ╲
     ╱────────╲
-   ╱          ╲
+   ╱    ✓     ╲
   ╱____________╲
 
-  Shield with checkmark
-  "DG" or "✓" in center
+  Shield with K9 dog silhouette
+  Checkmark symbolizes validation
 ```
 
 ### Simplified Icon (Favicon/Small Sizes)
 
 ```
 ┌─────┐
-│ 🛡️  │  Shield emoji
+│ 🐕  │  Dog/K9 emoji
 └─────┘
 
 OR
 
 ┌─────┐
-│ ✓D  │  Checkmark + D
+│ K9  │  K9 text
+│ ✓   │  with checkmark
 └─────┘
 ```
 
@@ -83,74 +127,92 @@ OR
 
 ### Primary Colors
 
-**DataGuard Dark** (Main background)
+**K9 Blue** (Primary brand color, trust, technology)
 ```css
---dgs-dark: #0F172A;
-RGB: 15, 23, 42
+--datak9-blue: #4A90E2;
+RGB: 74, 144, 226
+HEX: #4A90E2
 ```
 
-**DataGuard Blue** (Primary accent)
+**Guard Orange** (Alert, attention, energy)
 ```css
---dgs-blue: #60A5FA;
-RGB: 96, 165, 250
+--datak9-orange: #FF8C42;
+RGB: 255, 140, 66
+HEX: #FF8C42
 ```
 
-**DataGuard Green** (Success/Shield accent)
+**Validation Green** (Success, passed checks)
 ```css
---dgs-green: #34D399;
-RGB: 52, 211, 153
+--datak9-green: #5CB85C;
+RGB: 92, 184, 92
+HEX: #5CB85C
 ```
 
 ### Secondary Colors
 
-**Surface Dark**
+**Dark Background** (Main UI background)
 ```css
---dgs-surface: #1E293B;
-RGB: 30, 41, 59
+--datak9-dark: #1E1E1E;
+RGB: 30, 30, 30
+HEX: #1E1E1E
 ```
 
-**Border**
+**Surface Dark** (Cards, panels)
 ```css
---dgs-border: #3E3E42;
+--datak9-surface: #2D2D2D;
+RGB: 45, 45, 45
+HEX: #2D2D2D
+```
+
+**Border** (Dividers, outlines)
+```css
+--datak9-border: #3E3E42;
 RGB: 62, 62, 66
+HEX: #3E3E42
 ```
 
-**Text Primary**
+**Text Primary** (Main text)
 ```css
---dgs-text: #F8FAFC;
-RGB: 248, 250, 252
+--datak9-text: #F5F5F5;
+RGB: 245, 245, 245
+HEX: #F5F5F5
 ```
 
-**Text Secondary**
+**Text Secondary** (Muted text, labels)
 ```css
---dgs-text-muted: #94A3B8;
-RGB: 148, 163, 184
+--datak9-text-muted: #6C757D;
+RGB: 108, 117, 125
+HEX: #6C757D
 ```
 
 ### Status Colors
 
-**Error**
+**Error** (Critical issues, must fix)
 ```css
---dgs-error: #F48771;
-RGB: 244, 135, 113
+--datak9-error: #D9534F;
+RGB: 217, 83, 79
+HEX: #D9534F
 ```
 
-**Warning**
+**Warning** (Caution, should review)
 ```css
---dgs-warning: #FBBF24;
-RGB: 251, 191, 36
+--datak9-warning: #F0AD4E;
+RGB: 240, 173, 78
+HEX: #F0AD4E
 ```
 
-**Success**
+**Success** (Passed validations)
 ```css
---dgs-success: #34D399;
-RGB: 52, 211, 153
+--datak9-success: #5CB85C;
+RGB: 92, 184, 92
+HEX: #5CB85C
 ```
 
-**Info**
+**Info** (Informational messages)
 ```css
---dgs-info: #60A5FA;
-RGB: 96, 165, 250
+--datak9-info: #5BC0DE;
+RGB: 91, 192, 222
+HEX: #5BC0DE
 ```
 
 ---
@@ -159,19 +221,24 @@ RGB: 96, 165, 250
 
 ### Gradient Combinations
 
-**Primary Gradient** (Headers, CTAs)
+**Primary Brand Gradient** (Headers, hero sections)
 ```css
-background: linear-gradient(135deg, #60A5FA 0%, #34D399 100%);
+background: linear-gradient(135deg, #4A90E2 0%, #FF8C42 100%);
 ```
 
-**Dark Gradient** (Panels)
+**Dark Panel Gradient** (Sidebars, panels)
 ```css
-background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+background: linear-gradient(180deg, #2D2D2D 0%, #1E1E1E 100%);
 ```
 
-**Subtle Accent** (Hover states)
+**Subtle Accent** (Hover states, highlights)
 ```css
-background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(255, 140, 66, 0.1) 100%);
+```
+
+**Success Gradient** (Passed validation cards)
+```css
+background: linear-gradient(135deg, #5CB85C 0%, #4CAF50 100%);
 ```
 
 ---
@@ -180,34 +247,38 @@ background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(52, 211, 15
 
 ### Font Stack
 
-**Sans-Serif (UI)**
+**Sans-Serif (UI, documentation)**
 ```css
-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+             'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+             sans-serif;
 ```
 
-**Monospace (Code/YAML)**
+**Monospace (Code, YAML, CLI output)**
 ```css
-font-family: 'Consolas', 'SF Mono', 'Monaco', 'Courier New', monospace;
+font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Fira Mono',
+             'Roboto Mono', 'Consolas', 'Courier New', monospace;
 ```
 
 ### Font Sizes
 
 | Element | Size | Weight | Use Case |
 |---------|------|--------|----------|
-| Page Title | 28px | 600 | Main headings |
-| Section Header | 22px | 600 | Panel headers |
-| Subsection | 18px | 600 | Card titles |
-| Body Text | 14px | 400 | Main content |
-| Small Text | 13px | 400 | Descriptions |
-| Tiny Text | 11px | 500 | Labels, tags |
-| Code | 14px | 400 | YAML, code blocks |
+| Hero Title | 48px | 700 | Landing page main heading |
+| Page Title | 32px | 600 | Documentation page titles |
+| Section Header | 24px | 600 | Major section headers |
+| Subsection | 20px | 600 | Card titles, subsections |
+| Body Text | 16px | 400 | Main content |
+| Small Text | 14px | 400 | Descriptions, captions |
+| Tiny Text | 12px | 500 | Labels, tags, badges |
+| Code | 14px | 400 | Code blocks, YAML |
 
 ### Letter Spacing
 
-- Headers: `-0.02em` (tighter)
-- Labels: `0.05em` (wider, uppercase)
+- Headers: `-0.02em` (tighter, more compact)
+- Labels: `0.05em` (wider, uppercase tags)
 - Body: `0` (normal)
-- Code: `0` (normal)
+- Code: `0` (normal, monospace)
 
 ---
 
@@ -215,36 +286,42 @@ font-family: 'Consolas', 'SF Mono', 'Monaco', 'Courier New', monospace;
 
 ### Tone
 
-**Professional** - Enterprise-ready, trustworthy
-**Clear** - No jargon, straightforward
-**Confident** - "Guard your data" not "Try to guard"
+**Professional** - Enterprise-ready, trustworthy, production-grade
+**Clear** - No jargon, straightforward communication
+**Confident** - "DataK9 catches errors" not "might help find errors"
 **Helpful** - Guides users, doesn't lecture
+**Approachable** - Technical but not intimidating
 
 ### Writing Style
 
 **Do:**
-- Use active voice: "DataGuard validates your data"
-- Be direct: "Add validation" not "Would you like to add?"
-- Use "your" and "you": "Guard your pipelines"
-- Technical but accessible
+- ✅ Use active voice: "DataK9 validates your data"
+- ✅ Be direct: "Add validation" not "Would you like to add?"
+- ✅ Use "your" and "you": "Guard your pipelines"
+- ✅ Be specific: "DataK9 found 3 errors" not "issues detected"
+- ✅ Use K9 metaphors sparingly: "sniff out", "guard", "protect"
 
 **Don't:**
-- Use passive voice: "Data is validated by..."
-- Be vague: "Maybe check your data"
-- Use corporate speak: "Leverage synergies"
-- Over-explain: Keep it concise
+- ❌ Use passive voice: "Data is validated by the system"
+- ❌ Be vague: "Maybe check your data"
+- ❌ Use corporate speak: "Leverage synergies", "paradigm shift"
+- ❌ Over-explain: Keep it concise
+- ❌ Overuse dog metaphors: Use them purposefully, not constantly
 
 ### Example Messages
 
 **Good:**
-✅ "DataGuard found 3 validation errors"
-✅ "Your configuration is ready to download"
-✅ "Add a validation check to protect your data"
+- ✅ "DataK9 found 3 validation errors in customer_data.csv"
+- ✅ "Train DataK9 with custom validation rules"
+- ✅ "Your data pipeline is protected by DataK9"
+- ✅ "DataK9 sniffed out 127 duplicate records"
+- ✅ "Guard your data quality with 35+ validation checks"
 
 **Avoid:**
-❌ "The system has detected validation issues"
-❌ "It appears that your configuration may be ready"
-❌ "Consider adding validation to improve quality"
+- ❌ "The system detected validation issues in the data"
+- ❌ "It appears there may be problems with the file"
+- ❌ "Please consider reviewing the validation output"
+- ❌ "Data quality issues have been identified by the framework"
 
 ---
 
@@ -252,90 +329,144 @@ font-family: 'Consolas', 'SF Mono', 'Monaco', 'Courier New', monospace;
 
 ### Buttons
 
-**Primary Button** (Main actions: Save, Add, Download)
+**Primary Button** (Main actions: Save, Validate, Download)
 ```css
-background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+background: linear-gradient(135deg, #4A90E2 0%, #3B82F6 100%);
 color: #FFFFFF;
 border: none;
 border-radius: 6px;
-padding: 10px 20px;
+padding: 12px 24px;
 font-weight: 600;
-box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+font-size: 14px;
+box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+transition: all 0.3s ease;
 ```
 
-**Secondary Button** (Cancel, Close)
+**Secondary Button** (Cancel, Close, Back)
 ```css
 background: transparent;
-color: #94A3B8;
+color: #6C757D;
 border: 2px solid #3E3E42;
 border-radius: 6px;
-padding: 8px 18px;
+padding: 10px 22px;
 font-weight: 500;
+font-size: 14px;
 ```
 
-**Danger Button** (Delete)
+**Success Button** (Complete, Confirm)
 ```css
-background: #F48771;
+background: #5CB85C;
 color: #FFFFFF;
 border: none;
 border-radius: 6px;
-padding: 10px 20px;
+padding: 12px 24px;
 font-weight: 600;
+font-size: 14px;
+```
+
+**Danger Button** (Delete, Remove)
+```css
+background: #D9534F;
+color: #FFFFFF;
+border: none;
+border-radius: 6px;
+padding: 12px 24px;
+font-weight: 600;
+font-size: 14px;
 ```
 
 ### Cards/Panels
 
+**Standard Card**
 ```css
-background: #1E293B;
+background: #2D2D2D;
 border: 1px solid #3E3E42;
 border-radius: 8px;
-padding: 20px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+padding: 24px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+```
+
+**Highlighted Card** (Active, selected)
+```css
+background: #2D2D2D;
+border: 2px solid #4A90E2;
+border-radius: 8px;
+padding: 24px;
+box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2);
 ```
 
 ### Input Fields
 
 ```css
-background: #0F172A;
-color: #F8FAFC;
+background: #1E1E1E;
+color: #F5F5F5;
 border: 2px solid #3E3E42;
 border-radius: 6px;
-padding: 10px 14px;
+padding: 12px 16px;
 font-size: 14px;
 
 /* Focus state */
-border-color: #60A5FA;
-box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+border-color: #4A90E2;
+box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 ```
 
 ---
 
 ## 🏷️ Validation Type Icons
 
-Standard icon set for validation types:
+Standard emoji icons for validation types:
 
 ```
-📄 EmptyFileCheck
-📊 RowCountRangeCheck
-📝 MandatoryFieldCheck
-🔑 UniqueKeyCheck
-📅 DateFormatCheck
-📏 RangeCheck
-🔗 ForeignKeyCheck
-🎯 AcceptedValuesCheck
-📧 EmailFormatCheck
-🔢 NumericRangeCheck
-✅ BooleanCheck
-📱 PhoneFormatCheck
-🌐 URLFormatCheck
-🔤 RegexPatternCheck
-🎨 SchemaValidation
-📍 GeoCoordinateCheck
-💰 CurrencyFormatCheck
-⏰ TimestampCheck
-🆔 UUIDCheck
-📦 JSONSchemaCheck
-🔐 HashCheck
+📄 File-Level Validations
+  📄 EmptyFileCheck
+  📊 RowCountRangeCheck
+  📦 FileSizeCheck
+
+📋 Schema Validations
+  📋 SchemaMatchCheck
+  📝 ColumnPresenceCheck
+
+🔍 Field-Level Validations
+  🔴 MandatoryFieldCheck
+  🔤 RegexCheck
+  ✅ ValidValuesCheck
+  📏 RangeCheck
+  📅 DateFormatCheck
+
+📑 Record-Level Validations
+  🔁 DuplicateRowCheck
+  ⚠️ BlankRecordCheck
+  🔑 UniqueKeyCheck
+
+⚡ Advanced Validations
+  📊 StatisticalOutlierCheck
+  🔗 CrossFieldComparisonCheck
+  ⏰ FreshnessCheck
+  📈 CompletenessCheck
+  📐 StringLengthCheck
+  🔢 NumericPrecisionCheck
+
+🔄 Conditional Validations
+  ❓ ConditionalValidation
+
+🔗 Cross-File Validations
+  🔗 ReferentialIntegrityCheck
+  📊 CrossFileComparisonCheck
+  🔁 CrossFileDuplicateCheck
+
+💾 Database Validations
+  💾 SQLCustomCheck
+  🔗 DatabaseReferentialIntegrityCheck
+  ✓ DatabaseConstraintCheck
+
+📈 Temporal Validations
+  📊 BaselineComparisonCheck
+  📈 TrendDetectionCheck
+
+📉 Statistical Validations
+  📊 DistributionCheck
+  📈 CorrelationCheck
+  🎯 AdvancedAnomalyDetectionCheck
 ```
 
 ---
@@ -343,20 +474,24 @@ Standard icon set for validation types:
 ## 📄 File Naming Conventions
 
 ### HTML Files
-- `index.html` - Main landing/home
-- `ide.html` - IDE interface (when built)
-- `index-clarity.html` - Current enhanced version
+- `datak9-studio.html` - DataK9 Studio IDE
+- `index.html` - Landing page / documentation hub
+- `profile-report.html` - Data profiler output template
 
 ### CSS Files
-- `dataguard-theme.css` - Main theme
-- `ide-layout.css` - IDE-specific styles
-- `components.css` - Reusable components
+- `datak9-theme.css` - Main theme and brand colors
+- `datak9-studio.css` - Studio-specific styles
+- `components.css` - Reusable UI components
 
 ### JavaScript Files
-- `dataguard.js` - Main app
-- `dataguard-ide.js` - IDE version
-- `validation-types.js` - Validation definitions
-- `yaml-parser.js` - YAML handling
+- `datak9.js` - Core functionality
+- `datak9-studio.js` - Studio IDE application
+- `validation-engine.js` - Validation logic
+- `yaml-generator.js` - YAML configuration generation
+
+### Python Modules
+- `validation_framework/` - Core framework (existing structure)
+- CLI entry point: `datak9` (future consideration)
 
 ---
 
@@ -364,83 +499,111 @@ Standard icon set for validation types:
 
 ### Domain Options
 
-**Primary:** `dataguard.studio`
+**Primary Recommendations:**
+- `datak9.dev` (developer-focused)
+- `datak9.io` (tech-focused)
+- `datak9.com` (general)
+
 **Alternatives:**
-- `dataguardstudio.com`
-- `dataguard.dev`
-- `dgs.dev`
+- `datak9studio.com`
+- `getdatak9.com`
+- `datak9.org` (open source community)
 
 ### Social Media Handles
 
-- GitHub: `/dataguard-studio`
-- Twitter: `@DataGuardStudio`
-- LinkedIn: `/company/dataguard-studio`
+- GitHub: `/danieledge/data-validation-tool` (current)
+- Future: `/datak9` or `/datak9-framework`
+- Twitter/X: `@DataK9`
+- LinkedIn: `/company/datak9`
+- Dev.to: `@datak9`
 
-### Email
+### Contact
 
-- General: `hello@dataguard.studio`
-- Support: `support@dataguard.studio`
-- Security: `security@dataguard.studio`
+- General: `hello@datak9.dev`
+- Support: `support@datak9.dev`
+- Security: `security@datak9.dev`
+- Contributions: `contribute@datak9.dev`
 
 ---
 
 ## 📦 Product Variants
 
-### Free/Open Source
-**DataGuard Studio** (Community Edition)
-- Full-featured config builder
-- Local use only
+### Open Source (Current)
+**DataK9 Data Quality Framework**
+- Complete validation framework
+- DataK9 Studio visual IDE
+- DataK9 Profiler
+- Full CLI functionality
 - MIT License
+- Community-driven development
 
 ### Future Editions (Potential)
 
-**DataGuard Studio Pro**
-- Cloud sync
+**DataK9 Cloud** (SaaS offering)
+- Hosted validation service
 - Team collaboration
-- Advanced templates
+- Cloud storage sync
+- Scheduled validations
+- Email alerts
 
-**DataGuard Studio Enterprise**
-- SSO integration
-- Audit logs
-- Custom validation types
+**DataK9 Enterprise**
+- SSO/LDAP integration
+- Advanced audit logs
+- Custom validation marketplace
+- Priority support
+- SLA guarantees
+- Multi-tenant deployment
 
 ---
 
-## 📋 Tagline for Different Contexts
+## 📋 Taglines for Different Contexts
 
 **Website Header:**
-> DataGuard Studio - Your IDE for data quality
+> DataK9 - Your K9 guardian for data quality
 
-**GitHub Description:**
-> Professional IDE for building YAML data validation configurations. Guard your data pipelines with confidence.
+**GitHub Repository Description:**
+> Production-grade data quality framework with 35+ validations. Guard your data pipelines with DataK9 - the K9 that sniffs out quality issues before they bite.
 
 **Meta Description (SEO):**
-> DataGuard Studio is a free, open-source IDE for creating data validation configurations. Build, test, and deploy YAML validation rules with an intuitive visual interface.
+> DataK9 is an open-source data quality framework that validates CSV, Excel, JSON, and Parquet files. Build validation rules visually with DataK9 Studio or configure via YAML. Enterprise-ready with AutoSys and CI/CD integration.
 
 **One-Liner (Elevator Pitch):**
-> DataGuard Studio is like VS Code for data quality - a professional IDE that makes building validation rules as easy as writing code.
+> DataK9 is like a guard dog for your data pipelines - it sniffs out quality issues before they cause problems in production.
+
+**Technical Summary:**
+> DataK9 is a Python-based data validation framework that processes files up to 200GB+ with 35+ built-in validation rules, visual IDE, data profiler, and production-grade reporting.
 
 ---
 
 ## 🎯 Brand Positioning
 
-### What DataGuard Studio Is:
-- ✅ Professional IDE for data validation
-- ✅ Visual YAML configuration builder
-- ✅ Data quality engineering tool
-- ✅ Developer-friendly validation designer
+### What DataK9 Is:
 
-### What DataGuard Studio Is Not:
+- ✅ Production-grade data quality framework
+- ✅ Visual IDE for building validation rules
+- ✅ CLI tool for batch validation
+- ✅ Data profiler with auto-generated configs
+- ✅ Enterprise-ready (AutoSys, CI/CD integration)
+- ✅ Configuration-driven (YAML)
+- ✅ Memory-efficient (handles 200GB+ files)
+
+### What DataK9 Is Not:
+
 - ❌ A database management tool
-- ❌ A data pipeline orchestrator
+- ❌ A data pipeline orchestrator (like Airflow)
 - ❌ A data visualization platform
-- ❌ Only for non-technical users
+- ❌ A data catalog or metadata management tool
+- ❌ An ETL tool
+- ❌ Only for non-technical users (serves all skill levels)
 
 ### Target Audience:
-1. **Data Engineers** - Build validation rules for pipelines
-2. **Data Analysts** - Define quality checks visually
-3. **QA Engineers** - Validate data quality
-4. **Platform Engineers** - Standardize validation configs
+
+1. **Data Engineers** - Validate data before loading to warehouses
+2. **Business Analysts** - Define quality checks without coding
+3. **QA Engineers** - Automate data quality testing
+4. **Platform Engineers** - Standardize validation across teams
+5. **Compliance Officers** - Ensure data quality standards
+6. **Data Scientists** - Validate input datasets before modeling
 
 ---
 
@@ -449,85 +612,125 @@ Standard icon set for validation types:
 ### Announcement Template
 
 **Title:**
-Introducing DataGuard Studio - Your IDE for Data Quality
+Introducing DataK9 - Your K9 Guardian for Data Quality
 
 **Body:**
-We're excited to announce DataGuard Studio, a professional IDE for building data validation configurations.
+We're excited to announce DataK9, a production-grade data quality framework designed to guard your data pipelines with vigilance and precision.
 
-Just like VS Code revolutionized code editing, DataGuard Studio brings the same IDE experience to data quality engineering. Build validation rules visually or in YAML, sync changes instantly, and guard your data pipelines with confidence.
+Just like a K9 unit sniffs out problems before they escalate, DataK9 catches data quality issues before they reach production. Whether you're validating customer data, financial transactions, or IoT sensor readings, DataK9 is your loyal companion for ensuring data quality.
 
 **Key Features:**
-- 🎨 Visual validation builder
-- 💻 YAML code editor with IntelliSense
-- 🌳 Hierarchical file navigation
-- 🔄 Bi-directional sync
-- 📦 21+ built-in validation types
-- 🎯 Template library
-- 💾 Auto-save to localStorage
-- 📱 Mobile-friendly
+- 🐕 35+ Built-in Validation Rules
+- 🎨 DataK9 Studio Visual IDE
+- 📊 Data Profiler with Auto-Config Generation
+- 💾 Handles 200GB+ Files Efficiently
+- 🔧 AutoSys & CI/CD Integration
+- 📋 Comprehensive HTML Reports
+- ⚙️ Configuration-Driven (YAML)
+- 🌐 Open Source (MIT License)
 
-Try it now: [link]
+**Get Started:**
+- Documentation: [link]
+- GitHub: [link]
+- Try DataK9 Studio: [link]
 
 ---
 
 ## 📐 ASCII Art Logo
 
-### Full Logo (for terminals, docs)
+### Full Logo (for CLIoutput, terminal splash)
 
 ```
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║     ██████╗  █████╗ ████████╗ █████╗  ██████╗ ██╗   ██╗ █████╗ ██████╗ ██████╗
-║     ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔════╝ ██║   ██║██╔══██╗██╔══██╗██╔══██╗
-║     ██║  ██║███████║   ██║   ███████║██║  ███╗██║   ██║███████║██████╔╝██║  ██║
-║     ██║  ██║██╔══██║   ██║   ██╔══██║██║   ██║██║   ██║██╔══██║██╔══██╗██║  ██║
-║     ██████╔╝██║  ██║   ██║   ██║  ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝
-║     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝
-║                                                               ║
-║     ███████╗████████╗██╗   ██╗██████╗ ██╗ ██████╗            ║
-║     ██╔════╝╚══██╔══╝██║   ██║██╔══██╗██║██╔═══██╗           ║
-║     ███████╗   ██║   ██║   ██║██║  ██║██║██║   ██║           ║
-║     ╚════██║   ██║   ██║   ██║██║  ██║██║██║   ██║           ║
-║     ███████║   ██║   ╚██████╔╝██████╔╝██║╚██████╔╝           ║
-║     ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝            ║
-║                                                               ║
-║                  Your IDE for data quality                    ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   ██████╗  █████╗ ████████╗ █████╗ ██╗  ██╗ █████╗              ║
+║   ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██║ ██╔╝██╔══██╗             ║
+║   ██║  ██║███████║   ██║   ███████║█████╔╝ ╙█████╔╝             ║
+║   ██║  ██║██╔══██║   ██║   ██╔══██║██╔═██╗ ██╔══██╗             ║
+║   ██████╔╝██║  ██║   ██║   ██║  ██║██║  ██╗╚█████╔╝             ║
+║   ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚════╝              ║
+║                                                                  ║
+║              Your K9 guardian for data quality                   ║
+║                                                                  ║
+║   🐕 Vigilant  |  🛡️ Protective  |  ✅ Reliable                 ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
-### Compact Logo (for headers)
+### Compact Logo (for documentation headers)
 
 ```
-╔╦╗╔═╗╔╦╗╔═╗╔═╗╦ ╦╔═╗╦═╗╔╦╗  ╔═╗╔╦╗╦ ╦╔╦╗╦╔═╗
- ║║╠═╣ ║ ╠═╣║ ╦║ ║╠═╣╠╦╝ ║║  ╚═╗ ║ ║ ║ ║║║║ ║
-═╩╝╩ ╩ ╩ ╩ ╩╚═╝╚═╝╩ ╩╩╚══╩╝  ╚═╝ ╩ ╚═╝═╩╝╩╚═╝
+╔╦╗╔═╗╔╦╗╔═╗╦╔═╗ █████╗
+ ║║╠═╣ ║ ╠═╣╠╩╗╙█████╔╝
+═╩╝╩ ╩ ╩ ╩ ╩╩ ╩ ╚════╝
+Your K9 guardian for data quality
 ```
 
-### Minimal (for CLI)
+### Minimal (for CLI prompt)
 
 ```
-[DGS] DataGuard Studio
+[DataK9] 🐕
 ```
 
 ---
 
 ## 📜 License & Copyright
 
-**Copyright:** © 2025 DataGuard Studio Contributors
+**Copyright:** © 2025 Daniel Edge and Contributors
 **License:** MIT License
 **Repository:** https://github.com/danieledge/data-validation-tool
+**Author:** Daniel Edge
 
 ---
 
 ## 🔄 Version History
 
-- **v1.0.0** (January 2025) - Initial branding
-  - Chosen name: DataGuard Studio
-  - Established color palette
-  - Created brand guidelines
-  - Defined visual identity
+- **v2.0.0** (November 2025) - DataK9 Rebranding
+  - Complete rebrand from "Data Validation Framework" to "DataK9"
+  - Established K9 (canine) theme and brand identity
+  - Updated color palette (K9 Blue, Guard Orange)
+  - Created comprehensive brand guidelines
+  - Defined brand voice and messaging
+  - Updated visual identity and icon system
+
+- **v1.0.0** (January 2025) - Initial Branding (DataGuard)
+  - Original branding as "DataGuard Studio"
+  - Established initial color palette
+  - Created first brand guidelines
 
 ---
 
-*This brand guide is a living document and will evolve as DataGuard Studio grows.*
+## 🎨 Brand Application Examples
+
+### CLI Output Example
+
+```
+[DataK9] 🐕 Starting validation...
+[DataK9] ✓ Loaded customer_data.csv (1.2M rows)
+[DataK9] ⚡ Running 12 validation checks...
+[DataK9] ✗ Found 3 validation errors
+[DataK9] 📊 Report: validation_report_20251115.html
+[DataK9] 🛡️ Your data is being guarded
+```
+
+### Report Header Example
+
+```html
+<header style="background: linear-gradient(135deg, #4A90E2 0%, #FF8C42 100%);">
+  <h1>DataK9 Validation Report</h1>
+  <p>Your K9 guardian for data quality</p>
+</header>
+```
+
+### Email Signature Example
+
+```
+Daniel Edge
+Data Engineer
+🐕 DataK9 - Your K9 guardian for data quality
+https://github.com/danieledge/data-validation-tool
+```
+
+---
+
+*This brand guide is a living document and will evolve as DataK9 grows. For questions or suggestions, please open an issue on GitHub.*

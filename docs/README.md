@@ -1,42 +1,76 @@
-# Data Validation Tool Documentation
+<div align="center">
+  <img src="../resources/images/datak9-web.png" alt="DataK9 Logo" width="300">
 
-Welcome to the comprehensive documentation for the Data Validation Tool - a production-grade Python framework for validating large-scale datasets before loading into your data warehouse or analytics platform.
+  # DataK9 Documentation
+  ## 🐕 Your K9 guardian for data quality
+</div>
 
-## 📚 Documentation Index
-
-### For Business Analysts
-- **[Business Analyst Guide](BA_GUIDE.md)** - Define custom validations without coding
-- **[Quick Start Guide](#quick-start)** - Get started in 5 minutes
-- **[Validation Reference](VALIDATION_REFERENCE.md)** - Complete list of all available checks
-
-### For Developers & Technical Users
-- **[Architecture Overview](ARCHITECTURE.md)** - System design and components
-- **[Technical Guide](TECHNICAL_GUIDE.md)** - Advanced usage and customization
-- **[API Reference](API_REFERENCE.md)** - Python API documentation
-- **[Contributing Guide](CONTRIBUTING.md)** - How to extend the framework
-
-### Additional Resources
-- **[Example Configurations](../examples/)** - Sample YAML configs
-- **[Test Datasets Guide](test_datasets.md)** - Open source data for testing
+Welcome to **DataK9** - a production-grade data quality framework that guards your data pipelines with vigilance and precision. Like a K9 unit sniffing out problems before they escalate, DataK9 catches data quality issues before they reach production.
 
 ---
 
-## 🎯 What is the Data Validation Tool?
+## 🎯 Choose Your Path
 
-The Data Validation Tool is a robust, extensible framework that validates data quality and completeness **before** loading into your data warehouse. It helps you:
+### 👥 Using DataK9
+**I want to validate data, build quality checks, and integrate with my pipeline**
 
-- ✅ Catch data quality issues early
-- ✅ Define validation rules in simple YAML configuration
-- ✅ Handle massive datasets (200GB+) efficiently
-- ✅ Generate beautiful, actionable HTML reports
-- ✅ Integrate into CI/CD pipelines
-- ✅ Support multiple formats (CSV, Excel, Parquet, JSON)
+Whether you're a business analyst, data engineer, or QA professional, this guide covers everything you need to use DataK9 effectively.
+
+**Start here:** [What is DataK9?](using-datak9/what-is-datak9.md)
+**Then:** [5-Minute Quickstart](getting-started/quickstart-5min.md)
+**Configure:** [Configuration Guide](using-datak9/configuration-guide.md)
+**Reference:** [Validation Catalog](reference/validation-reference.md) (35+ checks)
+
+→ **[Using DataK9 Guide](using-datak9/README.md)**
 
 ---
 
-## 🚀 Quick Start
+### 💻 For Developers
+**I want to understand the architecture, extend the framework, or contribute**
 
-### Installation
+Deep dive into DataK9's internals, create custom validations, and contribute to the project.
+
+**Start here:** [Architecture Overview](for-developers/architecture.md)
+**Then:** [Creating Custom Validations](for-developers/custom-validations.md)
+**Reference:** [API Documentation](for-developers/api-reference.md)
+
+→ **[Developer Guide](for-developers/README.md)**
+
+---
+
+## 🔍 Quick Links
+
+| What do you need? | Go here |
+|-------------------|---------|
+| Install DataK9 | [Installation Guide](getting-started/installation.md) |
+| See all validation types | [Validation Catalog](reference/validation-reference.md) |
+| Real-world examples | [Examples & Recipes](examples/) |
+| Troubleshoot an issue | [Troubleshooting Guide](using-datak9/troubleshooting.md) |
+| FAQ | [Frequently Asked Questions](using-datak9/faq.md) |
+| DataK9 Studio IDE | [Studio Guide](using-datak9/studio-guide.md) |
+| Data Profiling | [Profiling Guide](using-datak9/data-profiling.md) |
+| Best Practices | [Best Practices](using-datak9/best-practices.md) |
+| AutoSys Integration | [AutoSys Integration](using-datak9/autosys-integration.md) |
+| CI/CD Integration | [CI/CD Integration](using-datak9/cicd-integration.md) |
+
+---
+
+## 🐕 What is DataK9?
+
+DataK9 is a production-grade data quality framework that validates data before it enters your warehouse or analytics platform. It helps you:
+
+- ✅ **Catch data quality issues early** - Before they reach production
+- ✅ **Define validation rules easily** - YAML configuration or visual IDE
+- ✅ **Handle massive datasets** - 200GB+ files with memory-efficient processing
+- ✅ **Generate actionable reports** - Beautiful HTML reports with dark theme
+- ✅ **Integrate seamlessly** - AutoSys, CI/CD pipelines, Airflow
+- ✅ **Support multiple formats** - CSV, Excel, Parquet, JSON, databases
+
+---
+
+## 🚀 Quick Start (5 Minutes)
+
+### 1. Install DataK9
 
 ```bash
 # Clone the repository
@@ -46,37 +80,37 @@ cd data-validation-tool
 # Install dependencies
 pip install -r requirements.txt
 
-# Install the tool
+# Install DataK9
 pip install -e .
 ```
 
-### Run Your First Validation
+### 2. Create Your First Validation
 
-1. **Create a YAML configuration file** (`my_validation.yaml`):
+Create `my_validation.yaml`:
 
 ```yaml
 validation_job:
-  name: "My First Validation"
+  name: "Customer Data Quality Check"
   version: "1.0"
 
   files:
-    - name: "customer_data"
+    - name: "customers"
       path: "data/customers.csv"
       format: "csv"
 
       validations:
-        # Check file is not empty
+        # File must not be empty
         - type: "EmptyFileCheck"
           severity: "ERROR"
 
-        # Check email format
+        # Email addresses must be valid
         - type: "RegexCheck"
           severity: "ERROR"
           params:
             field: "email"
             pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 
-        # Check age is reasonable
+        # Age must be reasonable
         - type: "RangeCheck"
           severity: "WARNING"
           params:
@@ -90,77 +124,98 @@ validation_job:
     fail_on_error: true
 ```
 
-2. **Run the validation**:
+### 3. Run the Validation
 
 ```bash
+[DataK9] 🐕
 python3 -m validation_framework.cli validate my_validation.yaml
 ```
 
-3. **View the report** - Open `validation_report.html` in your browser to see a beautiful dark-themed report with all validation results.
+### 4. View the Report
+
+Open `validation_report.html` in your browser to see:
+- ✅ Passed validations (green)
+- ❌ Failed validations (red) with sample failures
+- ⚠️ Warnings (yellow) requiring review
+- 📊 Summary statistics and charts
+
+→ **[Complete Quickstart Guide](getting-started/quickstart-5min.md)**
 
 ---
 
-## 📊 Key Features
+## 📖 Popular Topics
 
-### 1. **Handles Large Datasets**
-- Chunked processing for 200GB+ files
-- Memory-efficient streaming
+### Essential Reading
+- [Best Practices: ERROR vs WARNING](using-datak9/best-practices.md#error-vs-warning)
+- [Handling Large Files (200GB+)](using-datak9/large-files.md)
+- [No-Code Custom Validations](using-datak9/no-code-custom-rules.md)
+- [AutoSys Integration](using-datak9/autosys-integration.md)
+- [CI/CD Integration](using-datak9/cicd-integration.md)
+
+### Data Profiling
+- [Data Profiling Guide](using-datak9/data-profiling.md)
+- [Auto-Generate Validation Configs](using-datak9/data-profiling.md#auto-generate-configs)
+- [Understanding Profile Reports](using-datak9/data-profiling.md#reading-reports)
+
+### Advanced Topics
+- [Conditional Validations](using-datak9/configuration-guide.md#conditional-logic)
+- [Cross-File Validations](using-datak9/configuration-guide.md#cross-file)
+- [Database Validations](using-datak9/configuration-guide.md#database)
+- [Statistical Anomaly Detection](using-datak9/configuration-guide.md#statistical)
+
+---
+
+## 🛡️ Key Features
+
+### 35+ Built-in Validation Rules
+
+**File-Level (3):** EmptyFileCheck, RowCountRangeCheck, FileSizeCheck
+**Schema (2):** SchemaMatchCheck, ColumnPresenceCheck
+**Field-Level (5):** MandatoryFieldCheck, RegexCheck, ValidValuesCheck, RangeCheck, DateFormatCheck
+**Record-Level (3):** DuplicateRowCheck, BlankRecordCheck, UniqueKeyCheck
+**Advanced (6):** StatisticalOutlierCheck, CrossFieldComparisonCheck, FreshnessCheck, CompletenessCheck, StringLengthCheck, NumericPrecisionCheck
+**Conditional (1):** ConditionalValidation with if-then-else logic
+**Cross-File (3):** ReferentialIntegrityCheck, CrossFileComparisonCheck, CrossFileDuplicateCheck
+**Database (3):** SQLCustomCheck, DatabaseReferentialIntegrityCheck, DatabaseConstraintCheck
+**Temporal (2):** BaselineComparisonCheck, TrendDetectionCheck
+**Statistical (3):** DistributionCheck, CorrelationCheck, AdvancedAnomalyDetectionCheck
+
+→ **[Complete Validation Catalog](reference/validation-reference.md)**
+
+### DataK9 Studio - Visual IDE
+
+Build validation rules without writing YAML:
+- 🎨 Visual validation builder with drag-and-drop
+- 💻 Live YAML preview with syntax highlighting
+- 📁 Project management with file organization
+- 🔄 Import/export configurations
+- 📱 Mobile-responsive design
+- 🌙 Professional dark theme
+
+→ **[DataK9 Studio Guide](using-datak9/studio-guide.md)**
+
+### Memory-Efficient Processing
+
+- Handles 200GB+ files with ~400MB memory
+- Chunked processing (default: 50,000 rows/chunk)
 - Configurable chunk sizes
+- Parallel processing support
 
-### 2. **22 Built-in Validation Types**
+### Enterprise-Ready
 
-#### File-Level Checks (3)
-- Empty file detection
-- Row count validation
-- File size limits
+- ✅ AutoSys integration with proper exit codes
+- ✅ CI/CD pipeline ready (JSON output)
+- ✅ Airflow/orchestration compatible
+- ✅ Production-grade error handling
+- ✅ Comprehensive logging
 
-#### Schema Checks (2)
-- Column presence
-- Schema matching
+### Multiple Format Support
 
-#### Field-Level Checks (5)
-- Mandatory field validation
-- Regex pattern matching
-- Value range checks
-- Date format validation
-- Allowed/blocked value lists
-
-#### Record-Level Checks (3)
-- Duplicate detection
-- Blank record identification
-- Unique key constraints
-
-#### Bespoke Validation Checks (3 - No Coding!)
-- Custom regex patterns
-- Business rule expressions
-- Reference data lookups
-
-#### Advanced Quality Checks (6 - NEW!)
-- Statistical outlier detection (Z-score, IQR)
-- Cross-field comparison
-- Data freshness validation
-- Completeness percentage
-- String length constraints
-- Numeric precision validation
-
-### 3. **Modern, Mobile-Friendly Reports**
-- Dark theme (Tokyo Night color scheme)
-- Responsive design for mobile and desktop
-- Auto-expanding failed validations
-- Clear error visualization
-- Printable reports
-
-### 4. **Extensible Architecture**
-- Add custom validation types
-- Plugin-based system
-- Registry pattern for discovery
-
-### 5. **Multiple Format Support**
-- CSV (any delimiter)
-- Excel (XLS, XLSX)
-- Parquet
-- JSON (standard arrays and JSON Lines/JSONL/NDJSON)
-- Custom formats
+- **CSV** - Any delimiter, quoted fields, headers
+- **Excel** - XLS, XLSX, multiple sheets
+- **Parquet** - Columnar format (10x faster than CSV)
+- **JSON** - Standard arrays, JSON Lines (JSONL/NDJSON)
+- **Databases** - Direct SQL queries
 
 ---
 
@@ -168,118 +223,218 @@ python3 -m validation_framework.cli validate my_validation.yaml
 
 ### Financial Data Validation
 ```yaml
-validations:
-  # Account balance must be non-negative
-  - type: "InlineBusinessRuleCheck"
-    severity: "ERROR"
-    params:
-      rule: "account_balance >= 0"
-      description: "Account balance cannot be negative"
+# Account balance validation
+- type: "RangeCheck"
+  severity: "ERROR"
+  params:
+    field: "account_balance"
+    min_value: 0
 
-  # UK sort code format
-  - type: "RegexCheck"
-    severity: "ERROR"
-    params:
-      field: "sort_code"
-      pattern: "^[0-9]{2}-[0-9]{2}-[0-9]{2}$"
+# UK sort code format
+- type: "RegexCheck"
+  severity: "ERROR"
+  params:
+    field: "sort_code"
+    pattern: "^[0-9]{2}-[0-9]{2}-[0-9]{2}$"
 ```
 
 ### Customer Data Validation
 ```yaml
-validations:
-  # Email format
-  - type: "RegexCheck"
-    severity: "ERROR"
-    params:
-      field: "email"
-      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+# Email format
+- type: "RegexCheck"
+  severity: "ERROR"
+  params:
+    field: "email"
+    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
 
-  # Valid countries only
-  - type: "InlineLookupCheck"
-    severity: "ERROR"
-    params:
-      field: "country_code"
-      check_type: "allow"
-      reference_values: ["US", "UK", "CA", "AU", "DE", "FR"]
+# Valid countries only
+- type: "ValidValuesCheck"
+  severity: "ERROR"
+  params:
+    field: "country_code"
+    allowed_values: ["US", "UK", "CA", "AU", "DE", "FR"]
 ```
 
 ### Transaction Data Validation
 ```yaml
-validations:
-  # Transaction amount must be positive
-  - type: "InlineBusinessRuleCheck"
-    severity: "ERROR"
-    params:
-      rule: "amount > 0"
-      description: "Transaction amount must be positive"
+# Transaction amount must be positive
+- type: "ConditionalValidation"
+  severity: "ERROR"
+  params:
+    condition: "amount > 0"
+    message: "Transaction amount must be positive"
 
-  # Date cannot be in future
-  - type: "InlineBusinessRuleCheck"
-    severity: "ERROR"
-    params:
-      rule: "transaction_date <= today"
-      description: "Transaction date cannot be in future"
+# Date cannot be in future
+- type: "FreshnessCheck"
+  severity: "ERROR"
+  params:
+    date_field: "transaction_date"
+    max_age_days: 0
 ```
+
+→ **[More Examples](examples/)**
 
 ---
 
-## 🔧 CLI Commands
+## 🔧 CLI Reference
 
 ### Validate Data
 ```bash
 # Run validation
-data-validate validate config.yaml
+python3 -m validation_framework.cli validate config.yaml
 
 # With custom output directory
-data-validate validate config.yaml --output-dir ./reports/
+python3 -m validation_framework.cli validate config.yaml --output-dir ./reports/
 
 # Verbose mode
-data-validate validate config.yaml --verbose
+python3 -m validation_framework.cli validate config.yaml --verbose
 ```
 
 ### List Available Validations
 ```bash
-data-validate list-validations
+python3 -m validation_framework.cli list-validations
 ```
 
-### Generate Sample Config
+### Profile Data Files
 ```bash
-data-validate init-config sample_config.yaml
+# Profile a data file
+python3 -m validation_framework.cli profile data/customers.csv
+
+# Generate auto-config
+python3 -m validation_framework.cli profile data/customers.csv --auto-config
 ```
 
-### Check Version
-```bash
-data-validate version
-```
+→ **[Complete CLI Reference](reference/cli-reference.md)**
 
 ---
 
-## 📖 Next Steps
+## 📚 Documentation Structure
 
-### For Business Analysts
-1. Read the **[Business Analyst Guide](BA_GUIDE.md)** to learn how to define custom validations without coding
-2. Check out **[Validation Reference](VALIDATION_REFERENCE.md)** for all available validation types
-3. Explore the **[Bespoke Validation Example Config](../examples/bespoke_validations_config.yaml)**
+### Getting Started
+- [Quickstart (5 minutes)](getting-started/quickstart-5min.md)
+- [Installation](getting-started/installation.md)
+- [Your First Validation](getting-started/first-validation.md)
+- [Next Steps](getting-started/next-steps.md)
+
+### Using DataK9
+- [What is DataK9?](using-datak9/what-is-datak9.md)
+- [Configuration Guide](using-datak9/configuration-guide.md)
+- [Validation Catalog](using-datak9/validation-catalog.md)
+- [Best Practices](using-datak9/best-practices.md)
+- [DataK9 Studio Guide](using-datak9/studio-guide.md)
+- [Data Profiling](using-datak9/data-profiling.md)
+- [No-Code Custom Rules](using-datak9/no-code-custom-rules.md)
+- [Reading Reports](using-datak9/reading-reports.md)
+- [Performance Tuning](using-datak9/performance-tuning.md)
+- [AutoSys Integration](using-datak9/autosys-integration.md)
+- [CI/CD Integration](using-datak9/cicd-integration.md)
+- [Handling Large Files](using-datak9/large-files.md)
+- [Troubleshooting](using-datak9/troubleshooting.md)
+- [FAQ](using-datak9/faq.md)
 
 ### For Developers
-1. Review the **[Architecture Overview](ARCHITECTURE.md)** to understand system design
-2. Read the **[Technical Guide](TECHNICAL_GUIDE.md)** for advanced usage
-3. Learn how to create custom validations in the **[Contributing Guide](CONTRIBUTING.md)**
+- [Architecture](for-developers/architecture.md)
+- [Custom Validations](for-developers/custom-validations.md)
+- [Custom Loaders](for-developers/custom-loaders.md)
+- [Custom Reporters](for-developers/custom-reporters.md)
+- [API Reference](for-developers/api-reference.md)
+- [Testing Guide](for-developers/testing-guide.md)
+- [Contributing](for-developers/contributing.md)
+- [Design Patterns](for-developers/design-patterns.md)
+
+### Examples
+- [Basic Examples](examples/basic-examples.md)
+- [E-Commerce](examples/industry-examples/ecommerce.md)
+- [Finance](examples/industry-examples/finance.md)
+- [Healthcare](examples/industry-examples/healthcare.md)
+- [Manufacturing](examples/industry-examples/manufacturing.md)
+- [Advanced Examples](examples/advanced-examples.md)
+- [Complete Workflows](examples/complete-workflows.md)
+
+### Reference
+- [CLI Reference](reference/cli-reference.md)
+- [Validation Reference](reference/validation-reference.md)
+- [YAML Reference](reference/yaml-reference.md)
+- [Error Codes](reference/error-codes.md)
+- [Glossary](reference/glossary.md)
+- [Compatibility](reference/compatibility.md)
 
 ---
 
-## 🆘 Getting Help
+## 🆘 Need Help?
 
-- **Examples**: Check the `examples/` directory for sample configurations
-- **Issues**: Report bugs at [GitHub Issues](https://github.com/danieledge/data-validation-tool/issues)
-- **Validation Reference**: See [VALIDATION_REFERENCE.md](VALIDATION_REFERENCE.md) for all check types
+### Quick Help
+- **[FAQ](using-datak9/faq.md)** - Frequently asked questions
+- **[Troubleshooting](using-datak9/troubleshooting.md)** - Common issues and solutions
+- **[Examples](examples/)** - Real-world validation configurations
+- **[GitHub Issues](https://github.com/danieledge/data-validation-tool/issues)** - Report bugs or request features
+
+### Community
+- **GitHub:** [danieledge/data-validation-tool](https://github.com/danieledge/data-validation-tool)
+- **Issues:** [Report bugs or request features](https://github.com/danieledge/data-validation-tool/issues)
+- **Contributions:** [See Contributing Guide](for-developers/contributing.md)
 
 ---
 
-## 📝 License
+## 🏆 Why DataK9?
 
-MIT License - Copyright 2024 Daniel Edge
+### Vigilant Data Guardian
+Like a K9 unit that sniffs out problems before they escalate, DataK9:
+- 🐕 **Detects issues early** - Before they reach production
+- 🛡️ **Guards your pipelines** - Continuous data quality protection
+- ✅ **Reliable validation** - Production-grade, enterprise-ready
+- 🎯 **Trainable** - Configure to your specific needs
+- 👥 **Friendly** - Accessible to all skill levels
+
+### Production-Grade Performance
+- Handles 200GB+ files efficiently
+- Memory-efficient chunked processing
+- Tested with 115+ unit tests (48% code coverage)
+- Enterprise-ready with AutoSys/CI/CD integration
+
+### Open Source & Free
+- MIT License
+- Community-driven development
+- No vendor lock-in
+- Extensible architecture
 
 ---
 
-**Happy Validating! 🎯**
+## 📊 Performance Benchmarks
+
+| File Size | Processing Time | Memory Usage |
+|-----------|----------------|--------------|
+| 1 MB | < 1 second | ~50 MB |
+| 100 MB | ~10 seconds | ~200 MB |
+| 1 GB | ~2 minutes | ~400 MB |
+| 10 GB | ~20 minutes | ~400 MB |
+| 200 GB | ~4 hours (Parquet) | ~400 MB |
+
+*Benchmarks on standard hardware with default settings (50,000 rows/chunk)*
+
+---
+
+## 📝 License & Copyright
+
+**Copyright:** © 2025 Daniel Edge and Contributors
+**License:** MIT License
+**Repository:** https://github.com/danieledge/data-validation-tool
+**Author:** Daniel Edge
+
+---
+
+## 🚀 Next Steps
+
+**New to DataK9?** → Start with our **[5-Minute Quickstart](getting-started/quickstart-5min.md)**
+
+**Need to validate data?** → Read **[Using DataK9 Guide](using-datak9/README.md)**
+
+**Want to use the visual IDE?** → Try **[DataK9 Studio](using-datak9/studio-guide.md)**
+
+**Extending the framework?** → Understand the **[Architecture](for-developers/architecture.md)**
+
+---
+
+**🐕 Guard your data pipelines with DataK9 - Your K9 guardian for data quality**
+
+*This documentation is a living resource. For updates, see [What's New](WHATS_NEW.md)*

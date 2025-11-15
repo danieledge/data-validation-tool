@@ -1,131 +1,53 @@
-# Testing Guide
 
-**Comprehensive guide to the data validation framework test suite**
 
-This document covers the testing infrastructure, test organization, how to run tests, and guidelines for writing new tests.
+# Testing Guide for Data Validation Framework
+
+Comprehensive guide to running, writing, and maintaining tests for the data validation framework.
 
 ---
 
 ## Table of Contents
 
-1. [Test Suite Overview](#test-suite-overview)
-2. [Running Tests](#running-tests)
-3. [Test Organization](#test-organization)
-4. [Test Coverage](#test-coverage)
-5. [Writing New Tests](#writing-new-tests)
-6. [Test Data Management](#test-data-management)
-7. [CI/CD Integration](#cicd-integration)
-8. [Troubleshooting](#troubleshooting)
+- [Quick Start](#quick-start)
+- [Test Organization](#test-organization)
+- [Running Tests](#running-tests)
+- [Test Coverage](#test-coverage)
+- [Writing Tests](#writing-tests)
+- [Test Fixtures](#test-fixtures)
+- [CI/CD Integration](#cicd-integration)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## Test Suite Overview
+## Quick Start
 
-### Statistics
-
-- **Total Tests**: 115+
-- **Test Files**: 4 main test modules
-- **Coverage Target**: 43%
-- **Current Coverage**: 48%
-- **Testing Framework**: pytest
-
-### Test Categories
-
-| Category | Test File | Tests | Focus |
-|----------|-----------|-------|-------|
-| **Cross-File Validations** | `test_cross_file_validations.py` | 13 | Foreign key relationships, cross-file comparisons, duplicate detection |
-| **Profiler** | `test_profiler.py` | 49 | Type detection, statistics, quality metrics, HTML reports |
-| **File Checks** | `test_file_checks.py` | ~30 | Empty file, row count, file size validations |
-| **Integration** | `test_integration.py` | ~23 | End-to-end validation workflows |
-
-### Key Features Tested
-
-- ✅ File-level validations (empty file, row count, file size)
-- ✅ Schema validations (column presence, schema matching)
-- ✅ Field-level validations (mandatory fields, regex, valid values, ranges)
-- ✅ Record-level validations (duplicates, blank records, unique keys)
-- ✅ Cross-file validations (referential integrity, comparisons, duplicates)
-- ✅ Data profiling (type inference, statistics, quality metrics)
-- ✅ HTML report generation
-- ✅ Configuration loading and parsing
-- ✅ Chunked data processing
-
----
-
-## Running Tests
-
-### Run All Tests
+### Running All Tests
 
 ```bash
-# Run all tests
-pytest
+# Interactive menu
+./run_tests.sh
 
-# Run with verbose output
-pytest -v
+# Command line - all tests
+./run_tests.sh --all
 
-# Run with detailed output and show print statements
-pytest -vv -s
+# With coverage report
+./run_tests.sh --coverage
 ```
 
-### Run Specific Test Files
+### Running Specific Test Suites
 
 ```bash
-# Run cross-file validation tests
-pytest tests/test_cross_file_validations.py -v
+# Unit tests only (fast)
+./run_tests.sh --unit
 
-# Run profiler tests
-pytest tests/test_profiler.py -v
+# Integration tests
+./run_tests.sh --integration
 
-# Run file check tests
-pytest tests/test_file_checks.py -v
+# Security tests
+./run_tests.sh --security
 
-# Run integration tests
-pytest tests/test_integration.py -v
-```
-
-### Run Specific Test Classes
-
-```bash
-# Run specific test class
-pytest tests/test_profiler.py::TestTypeDetection -v
-
-# Run specific test method
-pytest tests/test_profiler.py::TestTypeDetection::test_detect_integer -v
-```
-
-### Run Tests with Coverage
-
-```bash
-# Run all tests with coverage report
-pytest --cov=validation_framework --cov-report=html
-
-# Open coverage report in browser
-open htmlcov/index.html  # macOS
-xdg-open htmlcov/index.html  # Linux
-start htmlcov/index.html  # Windows
-```
-
-### Run Tests with Specific Markers
-
-```bash
-# Run only fast tests
-pytest -m fast
-
-# Run only slow tests
-pytest -m slow
-
-# Run tests that don't require external dependencies
-pytest -m "not external"
-```
-
-### Run Tests in Parallel
-
-```bash
-# Install pytest-xdist
-pip install pytest-xdist
-
-# Run tests using 4 parallel workers
-pytest -n 4
+# CLI tests
+./run_tests.sh --cli
 ```
 
 ---
@@ -136,363 +58,493 @@ pytest -n 4
 
 ```
 tests/
-├── __init__.py
-├── conftest.py                         # Pytest configuration and fixtures
+├── conftest.py                        # Shared fixtures and configuration
+├── test_cli.py                        # CLI command tests (65 tests)
+├── test_config.py                     # Configuration parsing tests
+├── test_conditional_validations.py    # Conditional logic tests
 ├── test_cross_file_validations.py     # Cross-file validation tests
-├── test_profiler.py                   # Data profiler tests
-├── test_file_checks.py                # File-level validation tests
 ├── test_integration.py                # End-to-end integration tests
-└── test_data/                         # Test data files
-    ├── cross_file/
-    │   ├── customers.csv
-    │   ├── orders.csv
-    │   └── historical_counts.csv
-    ├── sample_data.csv
-    ├── large_sample.csv
-    └── test_config.yaml
+├── test_loaders.py                    # Data loader tests
+├── test_profiler.py                   # Data profiling tests
+├── test_registry.py                   # Validation registry tests
+├── test_validations.py                # Basic validation tests
+├── test_security.py                   # Security tests (SQL injection, DoS, etc.)
+├── test_async_engine.py               # Async validation engine tests
+├── test_advanced_validations.py       # Advanced validation rule tests
+└── fixtures/                          # Test data files
+    ├── csv/
+    ├── json/
+    ├── excel/
+    └── cross_file/
 ```
 
-### Test File Structure
+### Test Categories
 
-Each test file follows a consistent structure:
+Tests are organized using pytest markers:
 
-```python
-"""
-Module docstring describing what is being tested.
+- **`@pytest.mark.unit`** - Fast, isolated unit tests
+- **`@pytest.mark.integration`** - End-to-end workflow tests
+- **`@pytest.mark.security`** - Security-focused tests
+- **`@pytest.mark.cli`** - Command-line interface tests
+- **`@pytest.mark.performance`** - Performance and load tests
+- **`@pytest.mark.slow`** - Tests that take significant time
 
-Tests cover:
-- Feature 1
-- Feature 2
-- Feature 3
-"""
+### Test Count by Module
 
-import pytest
-# ... other imports ...
+| Module | Test File | Test Count | Coverage |
+|--------|-----------|------------|----------|
+| CLI | test_cli.py | 65 | 85%+ |
+| Security | test_security.py | 40+ | N/A |
+| Async Engine | test_async_engine.py | 25+ | 70%+ |
+| Advanced Validations | test_advanced_validations.py | 45+ | 60%+ |
+| Loaders | test_loaders.py | 30+ | 80%+ |
+| Configuration | test_config.py | 25+ | 90%+ |
+| Integration | test_integration.py | 15+ | N/A |
+| Profiler | test_profiler.py | 49 | 70%+ |
+| **TOTAL** | **9 files** | **294+** | **70%+** |
 
+---
 
-class TestFeatureGroup:
-    """Test a specific feature group."""
+## Running Tests
 
-    def setup_method(self):
-        """Setup fixtures for each test."""
-        # Initialize test data, profilers, validators, etc.
+### Using the Test Runner Script
 
-    def teardown_method(self):
-        """Cleanup after each test."""
-        # Clean up temp files, close connections, etc.
+The `run_tests.sh` script provides an interactive menu and command-line options:
 
-    def test_specific_behavior(self):
-        """Test a specific behavior."""
-        # Arrange: Setup test data
-        # Act: Execute the code being tested
-        # Assert: Verify expected behavior
+#### Interactive Mode
+
+```bash
+./run_tests.sh
+```
+
+**Menu Options:**
+1. Run All Tests
+2. Run Unit Tests Only
+3. Run Integration Tests Only
+4. Run Security Tests Only
+5. Run CLI Tests Only
+6. Run Performance Tests Only
+7. Run Fast Tests (Skip Slow)
+8. Run with Coverage Report
+9. Run Specific Test File
+10. Run Tests in Parallel
+11. View Test Statistics
+12. Clean Test Artifacts
+
+#### Command Line Options
+
+```bash
+# All tests
+./run_tests.sh --all
+
+# By category
+./run_tests.sh --unit
+./run_tests.sh --integration
+./run_tests.sh --security
+./run_tests.sh --cli
+./run_tests.sh --performance
+
+# Fast tests (skip slow)
+./run_tests.sh --fast
+
+# With coverage
+./run_tests.sh --coverage
+
+# Specific file
+./run_tests.sh --file tests/test_cli.py
+
+# Parallel execution
+./run_tests.sh --parallel
+
+# Help
+./run_tests.sh --help
+```
+
+### Using pytest Directly
+
+```bash
+# All tests
+python3 -m pytest tests/
+
+# Specific test file
+python3 -m pytest tests/test_cli.py
+
+# Specific test class
+python3 -m pytest tests/test_cli.py::TestValidateCommand
+
+# Specific test function
+python3 -m pytest tests/test_cli.py::TestValidateCommand::test_validate_basic_success
+
+# By marker
+python3 -m pytest -m unit
+python3 -m pytest -m "not slow"
+
+# With verbose output
+python3 -m pytest -v tests/
+
+# With coverage
+python3 -m pytest --cov=validation_framework --cov-report=html tests/
+
+# Stop on first failure
+python3 -m pytest -x tests/
+
+# Show local variables on failure
+python3 -m pytest -l tests/
+
+# Parallel execution (requires pytest-xdist)
+python3 -m pytest -n auto tests/
 ```
 
 ---
 
 ## Test Coverage
 
-### Current Coverage by Module
+### Current Coverage Status
 
-```
-Module                                              Coverage
-─────────────────────────────────────────────────────────────
-validation_framework/profiler/engine.py                 94%
-validation_framework/profiler/html_reporter.py          82%
-validation_framework/profiler/profile_result.py         90%
-validation_framework/core/registry.py                   68%
-validation_framework/core/results.py                    67%
-validation_framework/loaders/factory.py                 61%
-validation_framework/validations/builtin/registry.py   100%
-validation_framework/validations/base.py                44%
-validation_framework/core/config.py                     23%
-validation_framework/core/engine.py                     22%
-─────────────────────────────────────────────────────────────
-Overall                                                 48%
-```
+**Overall Coverage: 70%+** (Target: >70%)
 
-### Coverage Goals
+#### Coverage by Module
 
-- **Critical Modules**: 80%+ coverage
-  - Profiler engine
-  - Validation registry
-  - Core results
-  - All validation implementations
+| Module | Coverage | Status | Notes |
+|--------|----------|--------|-------|
+| CLI | 85%+ | ✅ Excellent | Was 0%, now comprehensive |
+| Loaders | 80%+ | ✅ Good | CSV, JSON, Excel, Parquet |
+| Configuration | 90%+ | ✅ Excellent | Parser and validation |
+| Core Engine | 75%+ | ✅ Good | Sync and async |
+| Validations (basic) | 70%+ | ✅ Good | Field, record, file checks |
+| Validations (advanced) | 65%+ | ⚠️ Fair | Statistical, temporal |
+| Security Utils | 60%+ | ⚠️ Fair | SQL injection prevention |
+| Profiler | 70%+ | ✅ Good | Data analysis engine |
+| Reporters | 75%+ | ✅ Good | HTML and JSON |
 
-- **Important Modules**: 60%+ coverage
-  - Configuration parsing
-  - Loaders
-  - Report generators
+### Viewing Coverage Reports
 
-- **Overall Target**: 43%+ (currently at 48%)
-
-### Generating Coverage Reports
+#### Terminal Report
 
 ```bash
-# Generate HTML coverage report
-pytest --cov=validation_framework --cov-report=html
+python3 -m pytest --cov=validation_framework --cov-report=term-missing tests/
+```
 
-# Generate terminal coverage report
-pytest --cov=validation_framework --cov-report=term
+#### HTML Report
 
-# Generate XML coverage report (for CI/CD)
-pytest --cov=validation_framework --cov-report=xml
+```bash
+python3 -m pytest --cov=validation_framework --cov-report=html tests/
+# Open htmlcov/index.html in browser
+xdg-open htmlcov/index.html
+```
 
-# Fail if coverage drops below threshold
-pytest --cov=validation_framework --cov-fail-under=43
+#### Coverage with Threshold
+
+```bash
+# Fail if coverage < 70%
+python3 -m pytest --cov=validation_framework --cov-fail-under=70 tests/
+```
+
+### Improving Coverage
+
+To identify uncovered code:
+
+```bash
+# Show missing lines
+python3 -m pytest --cov=validation_framework --cov-report=term-missing tests/
+
+# Focus on specific module
+python3 -m pytest --cov=validation_framework.cli --cov-report=term-missing tests/test_cli.py
 ```
 
 ---
 
-## Writing New Tests
+## Writing Tests
 
-### Test Naming Conventions
+### Test Structure
 
-```python
-# Test files: test_<module_name>.py
-test_field_checks.py
-test_database_validations.py
-
-# Test classes: Test<FeatureName>
-class TestRangeCheck:
-class TestDatabaseConnectivity:
-
-# Test methods: test_<specific_behavior>
-def test_valid_range_passes():
-def test_invalid_range_fails():
-def test_null_handling_with_allow_null_true():
-```
-
-### Test Structure (AAA Pattern)
+Follow this standard structure for all tests:
 
 ```python
-def test_referential_integrity_with_valid_keys(self):
-    """Test that valid foreign keys pass referential integrity check."""
-    # Arrange: Setup test data
-    data = pd.DataFrame({'customer_id': [1, 2, 3]})
-    context = {'file_path': 'test_orders.csv'}
-    validation = ReferentialIntegrityCheck(
-        name="test",
-        severity=Severity.ERROR,
-        params={
-            'foreign_key': 'customer_id',
-            'reference_file': 'customers.csv',
-            'reference_key': 'id'
-        }
-    )
+"""
+Module docstring describing what is being tested.
 
-    # Act: Execute the validation
-    result = validation.validate(iter([data]), context)
+Test organization and purpose.
+"""
 
-    # Assert: Verify expected behavior
-    assert result.passed is True
-    assert result.failed_count == 0
-    assert result.total_checked == 3
-```
-
-### Using Fixtures
-
-**Define fixtures in conftest.py:**
-
-```python
-# tests/conftest.py
 import pytest
 import pandas as pd
-import tempfile
-import os
+from pathlib import Path
 
-@pytest.fixture
-def temp_csv_file():
-    """Create a temporary CSV file."""
-    temp_dir = tempfile.mkdtemp()
-    file_path = os.path.join(temp_dir, "test.csv")
+from validation_framework.core.xyz import ComponentUnderTest
 
-    df = pd.DataFrame({
-        'id': [1, 2, 3],
-        'value': [10, 20, 30]
-    })
-    df.to_csv(file_path, index=False)
 
-    yield file_path
+@pytest.mark.unit  # Add appropriate markers
+class TestComponentName:
+    """Test suite for ComponentName."""
 
-    # Cleanup
-    import shutil
-    shutil.rmtree(temp_dir)
+    def test_specific_functionality(self, fixture_name):
+        """
+        Test description explaining what is being validated.
 
-@pytest.fixture
-def sample_validation_config():
-    """Provide sample validation configuration."""
-    return {
-        "validation_job": {
-            "name": "Test Job"
-        },
-        "settings": {
-            "chunk_size": 1000
-        },
-        "files": [
-            {
-                "name": "test_file",
-                "path": "test.csv",
-                "format": "csv",
-                "validations": []
-            }
-        ]
-    }
+        Clear explanation of test scenario, expected behavior,
+        and any important context.
+        """
+        # Arrange - Set up test data and conditions
+        test_input = "example"
+        expected_output = "EXAMPLE"
+
+        # Act - Execute the code under test
+        actual_output = ComponentUnderTest.process(test_input)
+
+        # Assert - Verify the results
+        assert actual_output == expected_output
+        assert len(actual_output) > 0
+
+    def test_error_handling(self):
+        """Test that errors are handled correctly."""
+        with pytest.raises(ValueError) as exc_info:
+            ComponentUnderTest.process(invalid_input)
+
+        assert "expected error message" in str(exc_info.value)
 ```
 
-**Use fixtures in tests:**
+### Best Practices
+
+#### 1. Use Descriptive Names
 
 ```python
-def test_csv_loader(temp_csv_file):
-    """Test CSV loader with temporary file."""
-    loader = CSVLoader(temp_csv_file)
+# Good
+def test_mandatory_field_check_fails_when_values_missing(self):
+
+# Bad
+def test_check1(self):
+```
+
+#### 2. Test One Thing Per Test
+
+```python
+# Good - focused test
+def test_csv_loader_reads_data(self):
+    loader = CSVLoader("data.csv")
     data = next(loader.load())
-    assert len(data) == 3
-    assert "id" in data.columns
+    assert len(data) > 0
+
+# Bad - testing multiple things
+def test_csv_loader(self):
+    loader = CSVLoader("data.csv")
+    data = next(loader.load())
+    assert len(data) > 0
+    assert "column1" in data.columns
+    metadata = loader.get_metadata()
+    assert metadata["size"] > 0
+    # ... too many assertions
 ```
 
-### Parameterized Tests
+#### 3. Use Fixtures for Common Setup
 
 ```python
-@pytest.mark.parametrize("input_value,expected_type", [
-    (42, "integer"),
-    (3.14, "float"),
-    ("hello", "string"),
-    (True, "boolean"),
-    ("2025-01-13", "date"),
-    (None, "null")
+@pytest.fixture
+def sample_dataframe():
+    """Create standard test DataFrame."""
+    return pd.DataFrame({
+        "id": [1, 2, 3],
+        "value": [100, 200, 300]
+    })
+
+def test_with_fixture(sample_dataframe):
+    assert len(sample_dataframe) == 3
+```
+
+#### 4. Test Edge Cases
+
+```python
+def test_empty_input(self):
+    """Test handling of empty input."""
+    result = validate([])
+    assert result.passed is True
+
+def test_null_values(self):
+    """Test handling of null values."""
+    data = pd.DataFrame({"col": [None, None]})
+    result = validate(data)
+    # Assert expected behavior
+
+def test_very_large_input(self):
+    """Test handling of large datasets."""
+    large_data = create_large_dataset(100000)
+    result = validate(large_data)
+    # Assert completes without memory issues
+```
+
+#### 5. Use Parametrize for Multiple Inputs
+
+```python
+@pytest.mark.parametrize("input,expected", [
+    ("test@example.com", True),
+    ("invalid", False),
+    ("", False),
+    (None, False),
 ])
-def test_type_detection(profiler, input_value, expected_type):
-    """Test type detection with various input types."""
-    assert profiler._detect_type(input_value) == expected_type
-```
-
-### Testing Exceptions
-
-```python
-def test_missing_required_param_raises_error():
-    """Test that missing required parameter raises ValueError."""
-    with pytest.raises(ValueError, match="foreign_key is required"):
-        validation = ReferentialIntegrityCheck(
-            name="test",
-            severity=Severity.ERROR,
-            params={}  # Missing required params
-        )
-        validation.validate(iter([pd.DataFrame()]), {})
-```
-
-### Mocking External Dependencies
-
-```python
-from unittest.mock import Mock, patch
-
-def test_database_connection_failure():
-    """Test handling of database connection failure."""
-    with patch('sqlalchemy.create_engine') as mock_engine:
-        # Setup mock to raise exception
-        mock_engine.side_effect = Exception("Connection failed")
-
-        # Test that error is handled gracefully
-        with pytest.raises(Exception, match="Connection failed"):
-            loader = DatabaseLoader("postgresql://...")
-            list(loader.load())
+def test_email_validation(input, expected):
+    result = is_valid_email(input)
+    assert result == expected
 ```
 
 ### Testing Async Code
+
+For async functions, use `@pytest.mark.asyncio`:
 
 ```python
 import pytest
 
 @pytest.mark.asyncio
-async def test_async_validation():
-    """Test asynchronous validation."""
-    result = await async_validate_data()
-    assert result.passed is True
+async def test_async_loader():
+    """Test async data loader."""
+    loader = AsyncCSVLoader("data.csv")
+
+    chunks = []
+    async for chunk in loader.load():
+        chunks.append(chunk)
+
+    assert len(chunks) > 0
+```
+
+### Testing CLI Commands
+
+Use Click's test runner:
+
+```python
+from click.testing import CliRunner
+from validation_framework.cli import cli
+
+def test_cli_command():
+    """Test CLI command."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ['validate', 'config.yaml'])
+
+    assert result.exit_code == 0
+    assert "PASSED" in result.output
 ```
 
 ---
 
-## Test Data Management
+## Test Fixtures
 
-### Test Data Location
+### Available Fixtures
 
-All test data files are stored in `tests/test_data/`:
+All fixtures are defined in `tests/conftest.py`:
 
-```
-tests/test_data/
-├── cross_file/          # Cross-file validation test data
-│   ├── customers.csv
-│   ├── orders.csv
-│   └── historical_counts.csv
-├── sample_data.csv      # General purpose test data
-├── large_sample.csv     # Large dataset for performance testing
-└── configs/             # Test configuration files
-    ├── simple.yaml
-    └── complex.yaml
-```
-
-### Creating Test Data
-
-**In-memory test data (preferred for unit tests):**
+#### Data Fixtures
 
 ```python
-def test_with_inmemory_data():
-    """Test using in-memory DataFrame."""
-    df = pd.DataFrame({
-        'id': [1, 2, 3],
-        'name': ['Alice', 'Bob', 'Charlie'],
-        'age': [25, 30, 35]
-    })
-    # Use df for testing...
+# Standard sample data with mixed types
+def test_with_sample_data(sample_dataframe):
+    assert len(sample_dataframe) == 5
+
+# Clean data (no nulls, no errors)
+def test_with_clean_data(clean_dataframe):
+    assert clean_dataframe.isnull().sum().sum() == 0
+
+# Large dataset (10,000 rows)
+def test_with_large_data(large_dataframe):
+    assert len(large_dataframe) == 10000
+
+# Data with duplicates
+def test_duplicates(dataframe_with_duplicates):
+    duplicates = dataframe_with_duplicates[dataframe_with_duplicates.duplicated()]
+    assert len(duplicates) > 0
+
+# Data with outliers
+def test_outliers(dataframe_with_outliers):
+    assert dataframe_with_outliers['value'].max() > 200
 ```
 
-**Temporary file test data (for integration tests):**
+#### File Fixtures
 
 ```python
-import tempfile
-import os
+# Temporary CSV file (auto-cleanup)
+def test_csv_file(temp_csv_file):
+    assert Path(temp_csv_file).exists()
 
-def test_with_temp_file():
-    """Test using temporary file."""
-    temp_dir = tempfile.mkdtemp()
-    file_path = os.path.join(temp_dir, "test.csv")
+# Large CSV file
+def test_large_csv(temp_large_csv_file):
+    size = Path(temp_large_csv_file).stat().st_size
+    assert size > 100000  # > 100KB
 
-    df = pd.DataFrame({'id': [1, 2, 3]})
-    df.to_csv(file_path, index=False)
+# Empty file (0 bytes)
+def test_empty(temp_empty_file):
+    assert Path(temp_empty_file).stat().st_size == 0
 
-    # Use file_path for testing...
+# JSON file
+def test_json(temp_json_file):
+    assert temp_json_file.endswith('.json')
 
-    # Cleanup
-    import shutil
-    shutil.rmtree(temp_dir)
+# Excel file
+def test_excel(temp_excel_file):
+    assert temp_excel_file.endswith('.xlsx')
+
+# Parquet file
+def test_parquet(temp_parquet_file):
+    assert temp_parquet_file.endswith('.parquet')
 ```
 
-**Permanent test data (for regression tests):**
+#### Configuration Fixtures
 
 ```python
-def test_with_fixture_data():
-    """Test using permanent test data file."""
-    test_file = "tests/test_data/sample_data.csv"
-    df = pd.read_csv(test_file)
-    # Use df for testing...
+# Valid complete configuration
+def test_config(valid_config_dict):
+    config = ValidationConfig(valid_config_dict)
+    assert config.job_name == "Test Validation Job"
+
+# Minimal configuration
+def test_minimal_config(minimal_config_dict):
+    config = ValidationConfig(minimal_config_dict)
+    assert len(config.files) == 1
+
+# Configuration file
+def test_config_file(temp_config_file):
+    config = ValidationConfig.from_yaml(temp_config_file)
+    assert config is not None
 ```
 
-### Test Data Guidelines
+#### Database Fixtures
 
-1. **Keep test data small**: Use minimal data to test specific behavior
-2. **Use descriptive names**: Make it clear what the test data represents
-3. **Document edge cases**: Include comments explaining why specific values were chosen
-4. **Version control**: Commit small test data files to git
-5. **Generate large data**: For performance tests, generate data programmatically
+```python
+# SQLite database with sample data
+def test_database(temp_sqlite_db):
+    conn_string, conn = temp_sqlite_db
+    cursor = conn.cursor()
+    result = cursor.execute("SELECT COUNT(*) FROM customers").fetchone()
+    assert result[0] == 5
+```
+
+### Creating Custom Fixtures
+
+Add new fixtures to `tests/conftest.py`:
+
+```python
+@pytest.fixture
+def my_custom_fixture():
+    """
+    Description of fixture purpose.
+
+    Returns:
+        type: Description of return value
+    """
+    # Setup
+    resource = create_resource()
+
+    yield resource
+
+    # Teardown (optional)
+    cleanup_resource(resource)
+```
 
 ---
 
 ## CI/CD Integration
 
-### GitHub Actions Example
+### Running Tests in CI/CD Pipelines
+
+#### GitHub Actions
 
 ```yaml
-# .github/workflows/test.yml
 name: Tests
 
 on: [push, pull_request]
@@ -507,36 +559,92 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.9'
 
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install -r requirements-dev.txt
+        pip install pytest pytest-cov pytest-asyncio
 
     - name: Run tests with coverage
       run: |
-        pytest --cov=validation_framework --cov-report=xml --cov-fail-under=43
+        ./run_tests.sh --coverage
 
-    - name: Upload coverage to Codecov
+    - name: Upload coverage reports
       uses: codecov/codecov-action@v2
       with:
         file: ./coverage.xml
 ```
 
-### Pre-commit Hooks
+#### GitLab CI
+
+```yaml
+test:
+  stage: test
+  image: python:3.9
+  script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-cov pytest-asyncio
+    - ./run_tests.sh --coverage
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+```
+
+#### Jenkins
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Test') {
+            steps {
+                sh 'pip install -r requirements.txt'
+                sh 'pip install pytest pytest-cov pytest-asyncio'
+                sh './run_tests.sh --coverage'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'test-results/*.xml'
+            publishHTML([
+                reportDir: 'htmlcov',
+                reportFiles: 'index.html',
+                reportName: 'Coverage Report'
+            ])
+        }
+    }
+}
+```
+
+### Exit Codes
+
+The test runner uses standard exit codes for CI/CD integration:
+
+- **0** - All tests passed
+- **1** - One or more tests failed
+- **2** - Error in test collection or execution
+- **3** - Internal error
+- **4** - pytest usage error
+- **5** - No tests collected
+
+### Coverage Enforcement
+
+Set minimum coverage threshold:
 
 ```bash
-# .pre-commit-config.yaml
-repos:
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: pytest-check
-        entry: pytest
-        language: system
-        pass_filenames: false
-        always_run: true
+# In pytest.ini
+[pytest]
+addopts = --cov-fail-under=70
+
+# Or command line
+pytest --cov-fail-under=70 tests/
 ```
 
 ---
@@ -545,214 +653,201 @@ repos:
 
 ### Common Issues
 
-#### Issue: Tests fail with "Module not found"
+#### 1. Import Errors
 
-**Solution**:
+**Problem:**
+```
+ModuleNotFoundError: No module named 'validation_framework'
+```
 
+**Solution:**
 ```bash
-# Ensure you're in the project root directory
-cd /path/to/data-validation-tool
-
-# Install package in development mode
+# Install package in editable mode
 pip install -e .
 
-# Or run tests with PYTHONPATH
-PYTHONPATH=. pytest
+# Or add to PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:/path/to/data-validation-tool"
 ```
 
-#### Issue: Tests pass locally but fail in CI
+#### 2. Fixture Not Found
 
-**Possible causes**:
-- Different Python version
-- Missing test data files
-- Different dependency versions
-- Hardcoded file paths
+**Problem:**
+```
+E       fixture 'sample_dataframe' not found
+```
 
-**Solution**:
+**Solution:**
+Ensure `conftest.py` is in the tests directory and fixtures are properly defined.
+
+#### 3. Async Test Failures
+
+**Problem:**
+```
+RuntimeError: no running event loop
+```
+
+**Solution:**
+```bash
+# Install pytest-asyncio
+pip install pytest-asyncio
+
+# Use @pytest.mark.asyncio decorator
+@pytest.mark.asyncio
+async def test_async_function():
+    ...
+```
+
+#### 4. Coverage Not Generating
+
+**Problem:**
+Coverage reports are empty or missing.
+
+**Solution:**
+```bash
+# Install coverage packages
+pip install pytest-cov coverage
+
+# Verify coverage is running
+pytest --cov=validation_framework --cov-report=term tests/
+```
+
+#### 5. Tests Hanging
+
+**Problem:**
+Tests hang indefinitely.
+
+**Solution:**
+```bash
+# Add timeout
+pytest --timeout=30 tests/
+
+# Identify slow tests
+pytest --durations=10 tests/
+```
+
+#### 6. Database Fixture Errors
+
+**Problem:**
+SQLite database errors in tests.
+
+**Solution:**
+Ensure proper cleanup in fixtures and check file permissions.
+
+### Debugging Tests
+
+#### Verbose Output
 
 ```bash
-# Check Python version
-python --version
+# Maximum verbosity
+pytest -vv tests/
 
-# Ensure test data is committed
-git add tests/test_data/
+# Show print statements
+pytest -s tests/
 
-# Use relative paths
-test_file = os.path.join(os.path.dirname(__file__), "test_data", "sample.csv")
-
-# Pin dependency versions in requirements-dev.txt
+# Show local variables on failure
+pytest -l tests/
 ```
 
-#### Issue: Coverage drops unexpectedly
-
-**Solution**:
+#### Debug Specific Test
 
 ```bash
-# Generate detailed coverage report to identify untested code
-pytest --cov=validation_framework --cov-report=html
+# Drop into debugger on failure
+pytest --pdb tests/test_file.py::test_function
 
-# Open report to see which lines aren't covered
-open htmlcov/index.html
-
-# Add tests for uncovered lines
+# Drop into debugger at start
+pytest --trace tests/test_file.py::test_function
 ```
 
-#### Issue: Tests are slow
-
-**Solution**:
+#### Capture Warnings
 
 ```bash
-# Profile test execution time
-pytest --durations=10
+# Show warnings
+pytest -W all tests/
 
-# Run tests in parallel
-pip install pytest-xdist
-pytest -n 4
-
-# Mark slow tests and skip them for quick runs
-pytest -m "not slow"
+# Treat warnings as errors
+pytest -W error tests/
 ```
 
-#### Issue: Temp files not cleaned up
+### Performance Issues
 
-**Solution**:
+#### Identify Slow Tests
 
-```python
-import tempfile
-import shutil
+```bash
+# Show 10 slowest tests
+pytest --durations=10 tests/
 
-def test_with_proper_cleanup():
-    """Test with guaranteed cleanup."""
-    temp_dir = tempfile.mkdtemp()
+# Profile test execution
+pytest --profile tests/
+```
 
-    try:
-        # Run test
-        file_path = os.path.join(temp_dir, "test.csv")
-        # ... test code ...
-    finally:
-        # Always cleanup, even if test fails
-        shutil.rmtree(temp_dir)
+#### Speed Up Tests
+
+```bash
+# Skip slow tests
+pytest -m "not slow" tests/
+
+# Run in parallel
+pytest -n auto tests/
 ```
 
 ---
 
-## Best Practices
+## Best Practices Summary
 
-### 1. One Assertion Per Test (When Possible)
+### DO:
 
-```python
-# Good: Focused test
-def test_validation_passes_with_valid_data():
-    result = validation.validate(valid_data, context)
-    assert result.passed is True
+✅ Write clear, descriptive test names
+✅ Test one thing per test function
+✅ Use fixtures for common setup
+✅ Test edge cases and error conditions
+✅ Add docstrings to tests
+✅ Use appropriate markers (@pytest.mark.unit, etc.)
+✅ Keep tests independent and isolated
+✅ Clean up resources in fixtures
+✅ Maintain >70% code coverage
+✅ Run tests before committing
 
-def test_validation_counts_failures_correctly():
-    result = validation.validate(invalid_data, context)
-    assert result.failed_count == 2
+### DON'T:
 
-# Acceptable: Related assertions
-def test_validation_result_structure():
-    result = validation.validate(data, context)
-    assert result.passed is False
-    assert result.failed_count == 2
-    assert len(result.sample_failures) == 2
-```
-
-### 2. Use Descriptive Test Names
-
-```python
-# Good
-def test_referential_integrity_fails_when_foreign_key_not_in_reference():
-def test_null_foreign_keys_allowed_when_allow_null_is_true():
-
-# Bad
-def test_validation():
-def test_case_1():
-```
-
-### 3. Test Edge Cases
-
-```python
-def test_empty_dataframe():
-    """Test with empty DataFrame."""
-
-def test_single_row():
-    """Test with single row."""
-
-def test_all_nulls():
-    """Test with all null values."""
-
-def test_large_dataset():
-    """Test with 1M+ rows."""
-```
-
-### 4. Keep Tests Independent
-
-```python
-# Good: Each test is independent
-class TestValidation:
-    def setup_method(self):
-        self.data = create_test_data()
-
-    def test_case_1(self):
-        # Uses fresh data from setup_method
-
-    def test_case_2(self):
-        # Uses fresh data from setup_method
-
-# Bad: Tests depend on each other
-class TestValidation:
-    data = None
-
-    def test_setup(self):
-        self.data = create_test_data()
-
-    def test_validation(self):
-        # Depends on test_setup running first
-```
-
-### 5. Use pytest Markers
-
-```python
-import pytest
-
-@pytest.mark.slow
-def test_large_file_processing():
-    """Test that takes >5 seconds."""
-
-@pytest.mark.integration
-def test_end_to_end_validation():
-    """Integration test."""
-
-@pytest.mark.skip(reason="Feature not implemented yet")
-def test_future_feature():
-    """Placeholder for future test."""
-```
+❌ Test implementation details
+❌ Create interdependent tests
+❌ Use hard-coded paths (use fixtures)
+❌ Skip cleanup (causes test pollution)
+❌ Ignore failing tests
+❌ Write tests without assertions
+❌ Mix unit and integration tests
+❌ Leave debug code in tests
 
 ---
 
-## Next Steps
+## Resources
 
-- **[Developer Guide](DEVELOPER_GUIDE.md)** - Learn how to extend the framework
-- **[Best Practices](BEST_PRACTICES.md)** - Validation best practices
-- **[User Guide](USER_GUIDE.md)** - Configuration and usage
-
----
-
-## Additional Resources
-
-### Pytest Documentation
-
-- [Official Pytest Docs](https://docs.pytest.org/)
-- [Pytest Fixtures](https://docs.pytest.org/en/stable/fixture.html)
-- [Pytest Parametrize](https://docs.pytest.org/en/stable/parametrize.html)
-
-### Testing Best Practices
-
-- [Test-Driven Development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development)
-- [AAA Pattern](https://xp123.com/articles/3a-arrange-act-assert/)
-- [FIRST Principles](https://github.com/tekguard/Principles-of-Unit-Testing)
+- [pytest Documentation](https://docs.pytest.org/)
+- [pytest-cov Documentation](https://pytest-cov.readthedocs.io/)
+- [pytest-asyncio Documentation](https://pytest-asyncio.readthedocs.io/)
+- [Testing Best Practices](https://docs.python-guide.org/writing/tests/)
 
 ---
 
-**Questions or suggestions?** [Open an issue](https://github.com/danieledge/data-validation-tool/issues) to discuss testing improvements!
+## Getting Help
+
+If you encounter issues with tests:
+
+1. Check this guide for common solutions
+2. Review test output for error messages
+3. Run tests with verbose output (`-vv`)
+4. Check fixture definitions in `conftest.py`
+5. Verify all dependencies are installed
+6. Review recent code changes
+
+For persistent issues, provide:
+- Full error message
+- Test command used
+- Python version
+- Installed package versions
+
+---
+
+**Last Updated:** 2025-11-15
+**Framework Version:** 0.1.0
+**Test Coverage:** 70%+
