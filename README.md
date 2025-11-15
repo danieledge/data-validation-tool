@@ -101,7 +101,8 @@ open validation_report.html
 **Key Features:**
 - 🎯 **IDE-Style Interface** - Professional three-panel layout like VS Code
 - 🧙 **Validation Wizard** - Choose from 35+ validation types organized in 10 color-coded categories
-- 💻 **Monaco Editor** - VS Code's YAML editor with syntax highlighting
+- 💻 **Monaco Editor** - VS Code's YAML editor with syntax highlighting (self-hosted for corporate environments)
+- 🏢 **Offline Ready** - Works without internet, firewall-friendly, no external CDN dependencies
 - 📱 **Mobile-First Design** - Responsive with drawer panels and optimized touch controls
 - 🎨 **Modern UI** - DataK9-branded dark theme (K9 Blue & Guard Orange)
 - 🗂️ **Multiple Files** - Configure complex multi-file validations
@@ -110,6 +111,8 @@ open validation_report.html
 - 🔍 **Smart Parameters** - Type-specific inputs with validation and hints
 - 📊 **Real-time Preview** - Live YAML generation with two-way sync
 - 🎯 **Context Help** - Right panel auto-updates with relevant documentation
+
+**For Corporate Environments:** Self-hosted Monaco Editor means no external dependencies - perfect for air-gapped networks and strict firewall policies. See [MONACO_SELF_HOSTED.md](MONACO_SELF_HOSTED.md) for details.
 
 ---
 

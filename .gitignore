@@ -63,6 +63,10 @@ examples/sample_data/*.parquet
 !docs/**/*.html
 !examples/sample_config.yaml
 
+# Track DataK9 Studio application
+!datak9-studio.html
+!config-builder/index.html
+
 # Generated reports
 examples/validation_report.html
 examples/validation_summary.json
