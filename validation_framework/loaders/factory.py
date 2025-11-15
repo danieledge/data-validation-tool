@@ -5,27 +5,32 @@ The factory pattern allows easy extension with new file formats without
 modifying existing code.
 """
 
-from typing import Dict, Type
+from typing import Dict, Type, Optional, List, Any
 from pathlib import Path
 from validation_framework.loaders.base import DataLoader
 from validation_framework.loaders.csv_loader import CSVLoader
 from validation_framework.loaders.excel_loader import ExcelLoader
 from validation_framework.loaders.parquet_loader import ParquetLoader
 from validation_framework.loaders.json_loader import JSONLoader
+from validation_framework.loaders.database_loader import DatabaseLoader
 
 
 class LoaderFactory:
     """
-    Factory for creating data loaders based on file format.
+    Factory for creating data loaders based on file format or data source.
 
     This factory automatically selects the appropriate loader implementation
     based on the specified file format or file extension.
 
-    Supported formats:
+    Supported file formats:
         - CSV and delimited text files (csv, tsv, txt)
         - Excel files (xls, xlsx)
         - Parquet files (parquet)
         - JSON files (json, jsonl)
+
+    Supported data sources:
+        - Database connections (PostgreSQL, MySQL, SQL Server, Oracle, SQLite)
+          Use create_database_loader() for database sources
     """
 
     # Mapping of format names to loader classes
@@ -40,9 +45,9 @@ class LoaderFactory:
     def create_loader(
         cls,
         file_path: str,
-        file_format: str = None,
+        file_format: Optional[str] = None,
         chunk_size: int = 50000,
-        **kwargs
+        **kwargs: Any
     ) -> DataLoader:
         """
         Create an appropriate data loader for the given file.
@@ -158,7 +163,7 @@ class LoaderFactory:
         return inferred_format
 
     @classmethod
-    def register_loader(cls, format_name: str, loader_class: Type[DataLoader]):
+    def register_loader(cls, format_name: str, loader_class: Type[DataLoader]) -> None:
         """
         Register a custom data loader for a new format.
 
@@ -189,11 +194,81 @@ class LoaderFactory:
         cls._loaders[format_name.lower()] = loader_class
 
     @classmethod
-    def list_supported_formats(cls) -> list:
+    def create_database_loader(
+        cls,
+        connection_string: str,
+        query: Optional[str] = None,
+        table: Optional[str] = None,
+        chunk_size: int = 10000,
+        db_type: str = "postgresql"
+    ) -> DatabaseLoader:
+        """
+        Create a database loader for validating data directly from databases.
+
+        This method provides a convenient way to create database loaders through
+        the factory, maintaining consistency with file-based loaders.
+
+        Args:
+            connection_string (str): Database connection string
+                Examples:
+                - PostgreSQL: "postgresql://user:password@host:port/database"
+                - MySQL: "mysql+pymysql://user:password@host:port/database"
+                - SQL Server: "mssql+pyodbc://user:password@host:port/database?driver=ODBC+Driver+17+for+SQL+Server"
+                - Oracle: "oracle+cx_oracle://user:password@host:port/?service_name=service"
+                - SQLite: "sqlite:///path/to/database.db"
+            query (str, optional): SQL query to execute. Mutually exclusive with table.
+            table (str, optional): Table name to read. Mutually exclusive with query.
+            chunk_size (int): Number of rows to read per chunk (default: 10,000)
+            db_type (str): Database type (postgresql, mysql, mssql, oracle, sqlite)
+                         Default: postgresql
+
+        Returns:
+            DatabaseLoader: An instance of DatabaseLoader configured for the database
+
+        Raises:
+            ValueError: If neither query nor table is provided, or if both are provided
+
+        Examples:
+            >>> # Load from PostgreSQL table
+            >>> loader = LoaderFactory.create_database_loader(
+            ...     connection_string="postgresql://user:pass@localhost/mydb",
+            ...     table="customers",
+            ...     chunk_size=50000
+            ... )
+            >>>
+            >>> # Load from MySQL with custom query
+            >>> loader = LoaderFactory.create_database_loader(
+            ...     connection_string="mysql+pymysql://user:pass@localhost/mydb",
+            ...     query="SELECT * FROM orders WHERE order_date >= '2024-01-01'",
+            ...     db_type="mysql"
+            ... )
+            >>>
+            >>> # Load from SQLite
+            >>> loader = LoaderFactory.create_database_loader(
+            ...     connection_string="sqlite:///data/sales.db",
+            ...     table="transactions",
+            ...     db_type="sqlite"
+            ... )
+        """
+        try:
+            return DatabaseLoader(
+                connection_string=connection_string,
+                query=query,
+                table=table,
+                chunk_size=chunk_size,
+                db_type=db_type
+            )
+        except Exception as e:
+            raise RuntimeError(
+                f"Error creating database loader: {str(e)}"
+            )
+
+    @classmethod
+    def list_supported_formats(cls) -> List[str]:
         """
         Get list of all supported file formats.
 
         Returns:
-            list: List of supported format names
+            List of supported format names
         """
         return list(cls._loaders.keys())

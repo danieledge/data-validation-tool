@@ -12,11 +12,11 @@ The engine:
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import logging
 
 from validation_framework.core.config import ValidationConfig
-from validation_framework.core.registry import get_registry
+from validation_framework.core.registry import get_registry, ValidationRegistry
 from validation_framework.core.results import (
     ValidationReport,
     FileValidationReport,
@@ -65,15 +65,15 @@ class ValidationEngine:
         engine.generate_json_report(report, 'report.json')
     """
 
-    def __init__(self, config: ValidationConfig):
+    def __init__(self, config: ValidationConfig) -> None:
         """
         Initialize the validation engine.
 
         Args:
             config: Validation configuration object
         """
-        self.config = config
-        self.registry = get_registry()
+        self.config: ValidationConfig = config
+        self.registry: ValidationRegistry = get_registry()
 
     @classmethod
     def from_config(cls, config_path: str) -> "ValidationEngine":
@@ -317,7 +317,7 @@ class ValidationEngine:
 
         return file_report
 
-    def _print_summary(self, report: ValidationReport):
+    def _print_summary(self, report: ValidationReport) -> None:
         """
         Print a summary of the validation results.
 
@@ -346,7 +346,7 @@ class ValidationEngine:
 
         print()
 
-    def generate_html_report(self, report: ValidationReport, output_path: str):
+    def generate_html_report(self, report: ValidationReport, output_path: str) -> None:
         """
         Generate HTML report.
 
@@ -358,7 +358,7 @@ class ValidationEngine:
         reporter = HTMLReporter()
         reporter.generate(report, output_path)
 
-    def generate_json_report(self, report: ValidationReport, output_path: str):
+    def generate_json_report(self, report: ValidationReport, output_path: str) -> None:
         """
         Generate JSON report.
 

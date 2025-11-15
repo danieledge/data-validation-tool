@@ -52,6 +52,31 @@ class InlineRegexCheck(DataValidationRule):
             should_match: false
     """
 
+    def __init__(self, name: str, severity, params: Dict[str, Any] = None, condition: str = None):
+        """
+        Initialize InlineRegexCheck with pre-compiled regex pattern for performance.
+
+        Args:
+            name: Validation rule name
+            severity: Severity level (ERROR or WARNING)
+            params: Parameters including 'pattern' to compile
+            condition: Optional conditional expression
+        """
+        super().__init__(name, severity, params, condition)
+
+        # Pre-compile regex pattern for performance (avoids recompilation on each chunk)
+        pattern = self.params.get("pattern")
+        if pattern:
+            try:
+                self.compiled_regex = re.compile(pattern)
+                self.regex_error = None
+            except re.error as e:
+                self.compiled_regex = None
+                self.regex_error = str(e)
+        else:
+            self.compiled_regex = None
+            self.regex_error = "No pattern specified"
+
     def get_description(self) -> str:
         """Get human-readable description."""
         custom_desc = self.params.get("description")
@@ -77,15 +102,15 @@ class InlineRegexCheck(DataValidationRule):
                     failed_count=1,
                 )
 
-            # Compile regex
-            try:
-                regex = re.compile(pattern)
-            except re.error as e:
+            # Use pre-compiled regex pattern (compiled in __init__ for performance)
+            if self.regex_error:
                 return self._create_result(
                     passed=False,
-                    message=f"Invalid regex pattern: {str(e)}",
+                    message=f"Invalid regex pattern: {self.regex_error}",
                     failed_count=1,
                 )
+
+            regex = self.compiled_regex
 
             total_rows = 0
             failed_rows = []

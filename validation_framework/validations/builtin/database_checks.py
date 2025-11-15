@@ -10,6 +10,7 @@ These validations are designed for validating data in databases:
 from typing import Iterator, Dict, Any
 import pandas as pd
 from validation_framework.validations.base import DataValidationRule, ValidationResult
+from validation_framework.core.sql_utils import SQLIdentifierValidator
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,16 @@ class SQLCustomCheck(DataValidationRule):
 
     Allows complex validations using SQL queries. The query should return
     rows that FAIL the validation (i.e., problematic records).
+
+    SECURITY WARNING:
+        This validation executes user-provided SQL queries directly against the database.
+        Only use SQL queries from TRUSTED sources. Malicious SQL queries could:
+        - Expose sensitive data
+        - Modify or delete data
+        - Compromise database security
+
+        Always validate and sanitize SQL queries before use, especially if they
+        include any user input or external data sources.
 
     Configuration:
         params:
@@ -247,14 +258,33 @@ class DatabaseReferentialIntegrityCheck(DataValidationRule):
             # Create engine
             engine = create_engine(connection_string)
 
+            # Validate all SQL identifiers to prevent injection
+            try:
+                SQLIdentifierValidator.validate_identifier(fk_table, "foreign_key_table")
+                SQLIdentifierValidator.validate_identifier(fk_column, "foreign_key_column")
+                SQLIdentifierValidator.validate_identifier(ref_table, "reference_table")
+                SQLIdentifierValidator.validate_identifier(ref_column, "reference_key_column")
+            except ValueError as ve:
+                return self._create_result(
+                    passed=False,
+                    message=f"Invalid identifier: {str(ve)}",
+                    failed_count=1,
+                )
+
+            # Quote identifiers for safe SQL construction
+            quoted_fk_table = SQLIdentifierValidator.quote_identifier(fk_table, db_type)
+            quoted_fk_column = SQLIdentifierValidator.quote_identifier(fk_column, db_type)
+            quoted_ref_table = SQLIdentifierValidator.quote_identifier(ref_table, db_type)
+            quoted_ref_column = SQLIdentifierValidator.quote_identifier(ref_column, db_type)
+
             # Build SQL query to find orphaned foreign keys
-            null_condition = "" if allow_null else f"AND fk.{fk_column} IS NOT NULL"
+            null_condition = "" if allow_null else f"AND fk.{quoted_fk_column} IS NOT NULL"
 
             sql_query = f"""
-                SELECT fk.{fk_column}
-                FROM {fk_table} fk
-                LEFT JOIN {ref_table} ref ON fk.{fk_column} = ref.{ref_column}
-                WHERE ref.{ref_column} IS NULL
+                SELECT fk.{quoted_fk_column}
+                FROM {quoted_fk_table} fk
+                LEFT JOIN {quoted_ref_table} ref ON fk.{quoted_fk_column} = ref.{quoted_ref_column}
+                WHERE ref.{quoted_ref_column} IS NULL
                   {null_condition}
             """
 
@@ -265,7 +295,7 @@ class DatabaseReferentialIntegrityCheck(DataValidationRule):
             violations = pd.read_sql_query(sql_query, engine)
 
             # Get total count for context
-            count_query = f"SELECT COUNT(*) as total FROM {fk_table}"
+            count_query = f"SELECT COUNT(*) as total FROM {quoted_fk_table}"
             total_result = pd.read_sql_query(count_query, engine)
             total_count = total_result['total'].iloc[0]
 
@@ -414,7 +444,18 @@ class DatabaseConstraintCheck(DataValidationRule):
             # Create engine
             engine = create_engine(connection_string)
 
+            # Validate table identifier to prevent injection
+            try:
+                SQLIdentifierValidator.validate_identifier(table, "table")
+            except ValueError as ve:
+                return self._create_result(
+                    passed=False,
+                    message=f"Invalid table identifier: {str(ve)}",
+                    failed_count=1,
+                )
+
             # Execute constraint check query
+            # Note: constraint_query is user-provided SQL and should come from trusted sources
             logger.info(f"Checking database constraint: {constraint_name}")
             logger.debug(f"Query: {constraint_query}")
 

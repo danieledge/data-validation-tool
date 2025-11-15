@@ -12,6 +12,7 @@ Supports:
 from typing import Iterator, Dict, Any, Optional
 import pandas as pd
 from pathlib import Path
+from validation_framework.core.sql_utils import SQLIdentifierValidator, create_safe_select_query, create_safe_count_query
 import logging
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,13 @@ class DatabaseLoader:
         if query and table:
             raise ValueError("Provide either 'query' or 'table', not both")
 
+        # Validate table identifier if provided to prevent SQL injection
+        if table:
+            try:
+                SQLIdentifierValidator.validate_identifier(table, "table")
+            except ValueError as e:
+                raise ValueError(f"Invalid table name: {str(e)}")
+
     def load_chunks(self) -> Iterator[pd.DataFrame]:
         """
         Load data in chunks from database.
@@ -92,10 +100,16 @@ class DatabaseLoader:
             # Build query
             if self.query:
                 sql_query = self.query
+                logger.info(f"Loading data from database using custom query: {self.db_type}")
             else:
-                sql_query = f"SELECT * FROM {self.table}"
+                # Use safe query builder to prevent SQL injection
+                sql_query = create_safe_select_query(
+                    table=self.table,
+                    columns=None,  # SELECT *
+                    dialect=self.db_type
+                )
+                logger.info(f"Loading data from database table: {self.db_type}")
 
-            logger.info(f"Loading data from database: {self.db_type}")
             logger.debug(f"Query: {sql_query}")
 
             # Read in chunks using pandas
@@ -151,10 +165,14 @@ class DatabaseLoader:
 
             # Build count query
             if self.query:
-                # Wrap query in count
+                # Wrap query in count (user-provided query, assume trusted)
                 count_query = f"SELECT COUNT(*) as count FROM ({self.query}) AS subquery"
             else:
-                count_query = f"SELECT COUNT(*) FROM {self.table}"
+                # Use safe query builder to prevent SQL injection
+                count_query = create_safe_count_query(
+                    table=self.table,
+                    dialect=self.db_type
+                )
 
             with engine.connect() as conn:
                 result = conn.execute(text(count_query))
@@ -183,7 +201,12 @@ class DatabaseLoader:
             if self.query:
                 sql_query = self.query
             else:
-                sql_query = f"SELECT * FROM {self.table}"
+                # Use safe query builder to prevent SQL injection
+                sql_query = create_safe_select_query(
+                    table=self.table,
+                    columns=None,  # SELECT *
+                    dialect=self.db_type
+                )
 
             df = pd.read_sql_query(sql_query, engine, chunksize=1)
             first_chunk = next(df)

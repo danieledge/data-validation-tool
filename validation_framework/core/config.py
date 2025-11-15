@@ -1,7 +1,8 @@
 """Configuration parsing and validation."""
 
 import yaml
-from typing import Dict, Any, List
+import os
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 from validation_framework.core.results import Severity
 
@@ -11,8 +12,23 @@ class ConfigError(Exception):
     pass
 
 
+class YAMLSizeError(ConfigError):
+    """YAML file size exceeds limit."""
+    pass
+
+
+class YAMLStructureError(ConfigError):
+    """YAML structure is invalid or too complex."""
+    pass
+
+
 class ValidationConfig:
     """Configuration for a validation job."""
+
+    # Security limits for YAML files
+    MAX_YAML_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+    MAX_YAML_NESTING_DEPTH = 20  # Maximum depth of nested structures
+    MAX_YAML_KEYS = 10000  # Maximum number of keys/items in entire YAML
 
     def __init__(self, config_dict: Dict[str, Any]):
         """
@@ -27,24 +43,120 @@ class ValidationConfig:
     @classmethod
     def from_yaml(cls, config_path: str) -> "ValidationConfig":
         """
-        Load configuration from YAML file.
+        Load configuration from YAML file with security validations.
+
+        Security protections:
+        - File size limit: 10 MB
+        - Nesting depth limit: 20 levels
+        - Total keys limit: 10,000 keys
 
         Args:
             config_path: Path to YAML configuration file
 
         Returns:
             ValidationConfig instance
+
+        Raises:
+            ConfigError: If file not found or invalid
+            YAMLSizeError: If file exceeds size limit
+            YAMLStructureError: If YAML structure is too complex
         """
         config_file = Path(config_path)
         if not config_file.exists():
             raise ConfigError(f"Configuration file not found: {config_path}")
 
-        with open(config_file, "r") as f:
-            config_dict = yaml.safe_load(f)
+        # Check file size to prevent DoS attacks
+        file_size = os.path.getsize(config_file)
+        if file_size > cls.MAX_YAML_FILE_SIZE:
+            raise YAMLSizeError(
+                f"Configuration file too large: {file_size:,} bytes. "
+                f"Maximum allowed: {cls.MAX_YAML_FILE_SIZE:,} bytes ({cls.MAX_YAML_FILE_SIZE // (1024*1024)} MB)"
+            )
+
+        # Read and parse YAML file
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                # Use safe_load to prevent code execution
+                config_dict = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise ConfigError(f"Failed to parse YAML file: {str(e)}")
+        except UnicodeDecodeError as e:
+            raise ConfigError(f"Invalid file encoding (expected UTF-8): {str(e)}")
+
+        # Validate YAML structure to prevent resource exhaustion
+        if config_dict is not None:
+            cls._validate_yaml_structure(config_dict)
 
         return cls(config_dict)
 
-    def _parse_config(self):
+    @classmethod
+    def _validate_yaml_structure(cls, obj: Any, current_depth: int = 0, total_keys: List[int] = None) -> None:
+        """
+        Validate YAML structure to prevent DoS attacks.
+
+        Checks for:
+        - Excessive nesting depth (prevents stack overflow)
+        - Too many keys/items (prevents memory exhaustion)
+
+        Args:
+            obj: Object to validate (dict, list, or primitive)
+            current_depth: Current nesting depth
+            total_keys: Mutable list with single element tracking total key count
+
+        Raises:
+            YAMLStructureError: If structure is too complex
+        """
+        if total_keys is None:
+            total_keys = [0]
+
+        # Check nesting depth
+        if current_depth > cls.MAX_YAML_NESTING_DEPTH:
+            raise YAMLStructureError(
+                f"YAML nesting depth exceeds maximum of {cls.MAX_YAML_NESTING_DEPTH} levels. "
+                f"This may indicate a malformed or malicious configuration file."
+            )
+
+        # Check total number of keys/items
+        if total_keys[0] > cls.MAX_YAML_KEYS:
+            raise YAMLStructureError(
+                f"YAML structure contains more than {cls.MAX_YAML_KEYS:,} keys/items. "
+                f"This may indicate a malformed or malicious configuration file."
+            )
+
+        # Recursively validate structure
+        if isinstance(obj, dict):
+            total_keys[0] += len(obj)
+            if total_keys[0] > cls.MAX_YAML_KEYS:
+                raise YAMLStructureError(
+                    f"YAML structure contains more than {cls.MAX_YAML_KEYS:,} keys/items."
+                )
+
+            for key, value in obj.items():
+                # Validate key is reasonable length
+                if isinstance(key, str) and len(key) > 1000:
+                    raise YAMLStructureError(
+                        f"YAML key exceeds maximum length of 1000 characters: '{key[:50]}...'"
+                    )
+                cls._validate_yaml_structure(value, current_depth + 1, total_keys)
+
+        elif isinstance(obj, list):
+            total_keys[0] += len(obj)
+            if total_keys[0] > cls.MAX_YAML_KEYS:
+                raise YAMLStructureError(
+                    f"YAML structure contains more than {cls.MAX_YAML_KEYS:,} keys/items."
+                )
+
+            for item in obj:
+                cls._validate_yaml_structure(item, current_depth + 1, total_keys)
+
+        elif isinstance(obj, str):
+            # Check for unreasonably long strings (potential DoS)
+            if len(obj) > 1_000_000:  # 1 MB
+                raise YAMLStructureError(
+                    f"YAML contains string exceeding 1MB: '{obj[:50]}...'"
+                )
+
+    def _parse_config(self) -> None:
         """Parse and validate configuration."""
         if "validation_job" not in self.raw_config:
             raise ConfigError("Configuration must have 'validation_job' key")
@@ -52,9 +164,9 @@ class ValidationConfig:
         job_config = self.raw_config["validation_job"]
 
         # Job metadata
-        self.job_name = job_config.get("name", "Unnamed Validation Job")
-        self.version = job_config.get("version", "1.0")
-        self.description = job_config.get("description", None)
+        self.job_name: str = job_config.get("name", "Unnamed Validation Job")
+        self.version: str = job_config.get("version", "1.0")
+        self.description: Optional[str] = job_config.get("description", None)
 
         # Files to validate
         if "files" not in job_config or not job_config["files"]:

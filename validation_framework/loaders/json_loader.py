@@ -10,7 +10,7 @@ Supports:
 Author: daniel edge
 """
 
-from typing import Iterator, Dict, Any
+from typing import Iterator, Dict, Any, List
 import pandas as pd
 import json
 from pathlib import Path
@@ -104,7 +104,7 @@ class JSONLoader(DataLoader):
         Yields:
             DataFrames containing chunks of records
         """
-        records = []
+        records: List[Dict[str, Any]] = []
 
         with open(self.file_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -178,7 +178,7 @@ class JSONLoader(DataLoader):
         except json.JSONDecodeError as e:
             raise RuntimeError(f"Invalid JSON array format: {str(e)}")
 
-    def _records_to_dataframe(self, records: list, flatten: bool) -> pd.DataFrame:
+    def _records_to_dataframe(self, records: List[Dict[str, Any]], flatten: bool) -> pd.DataFrame:
         """
         Convert list of records to DataFrame, optionally flattening nested structures.
 

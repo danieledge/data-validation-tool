@@ -9,7 +9,7 @@ import pandas as pd
 class DataLoader(ABC):
     """Base class for data loaders."""
 
-    def __init__(self, file_path: str, chunk_size: int = 50000, **kwargs):
+    def __init__(self, file_path: str, chunk_size: int = 50000, **kwargs: Any) -> None:
         """
         Initialize data loader.
 
@@ -18,9 +18,9 @@ class DataLoader(ABC):
             chunk_size: Number of rows per chunk for memory-efficient processing
             **kwargs: Additional loader-specific parameters
         """
-        self.file_path = Path(file_path)
-        self.chunk_size = chunk_size
-        self.kwargs = kwargs
+        self.file_path: Path = Path(file_path)
+        self.chunk_size: int = chunk_size
+        self.kwargs: Dict[str, Any] = kwargs
 
         if not self.file_path.exists():
             raise FileNotFoundError(f"File not found: {file_path}")

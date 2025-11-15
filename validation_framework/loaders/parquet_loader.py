@@ -5,7 +5,7 @@ Parquet is a columnar storage format ideal for large datasets (200GB+).
 It provides excellent compression and allows for efficient column-based reading.
 """
 
-from typing import Iterator, Dict, Any
+from typing import Iterator, Dict, Any, List
 import pandas as pd
 from validation_framework.loaders.base import DataLoader
 
@@ -145,14 +145,14 @@ class ParquetLoader(DataLoader):
 
         return metadata
 
-    def get_columns(self) -> list:
+    def get_columns(self) -> List[str]:
         """
         Get list of column names efficiently from Parquet metadata.
 
         This is a convenience method that doesn't require loading any data.
 
         Returns:
-            list: List of column names
+            List of column names
 
         Raises:
             RuntimeError: If columns cannot be read from metadata

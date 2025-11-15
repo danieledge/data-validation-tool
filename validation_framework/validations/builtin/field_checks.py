@@ -183,6 +183,31 @@ class RegexCheck(DataValidationRule):
             message: "Account number must be exactly 8 digits"
     """
 
+    def __init__(self, name: str, severity, params: Dict[str, Any] = None, condition: str = None):
+        """
+        Initialize RegexCheck with pre-compiled regex pattern for performance.
+
+        Args:
+            name: Validation rule name
+            severity: Severity level (ERROR or WARNING)
+            params: Parameters including 'pattern' to compile
+            condition: Optional conditional expression
+        """
+        super().__init__(name, severity, params, condition)
+
+        # Pre-compile regex pattern for performance (avoids recompilation on each chunk)
+        pattern = self.params.get("pattern")
+        if pattern:
+            try:
+                self.compiled_regex = re.compile(pattern)
+                self.regex_error = None
+            except re.error as e:
+                self.compiled_regex = None
+                self.regex_error = str(e)
+        else:
+            self.compiled_regex = None
+            self.regex_error = "No pattern specified"
+
     def get_description(self) -> str:
         """Get human-readable description."""
         field = self.params.get("field", "unknown")
@@ -220,15 +245,15 @@ class RegexCheck(DataValidationRule):
             custom_message = self.params.get("message", f"Value does not match pattern: {pattern}")
             invert = self.params.get("invert", False)
 
-            # Compile regex pattern once for efficiency
-            try:
-                regex = re.compile(pattern)
-            except re.error as e:
+            # Use pre-compiled regex pattern (compiled in __init__ for performance)
+            if self.regex_error:
                 return self._create_result(
                     passed=False,
-                    message=f"Invalid regex pattern: {str(e)}",
+                    message=f"Invalid regex pattern: {self.regex_error}",
                     failed_count=1,
                 )
+
+            regex = self.compiled_regex
 
             total_rows = 0
             failed_rows = []
@@ -323,6 +348,29 @@ class ValidValuesCheck(DataValidationRule):
             case_sensitive: true
     """
 
+    def __init__(self, name: str, severity, params: Dict[str, Any] = None, condition: str = None):
+        """
+        Initialize ValidValuesCheck with pre-computed valid set for performance.
+
+        Args:
+            name: Validation rule name
+            severity: Severity level (ERROR or WARNING)
+            params: Parameters including 'valid_values' and 'case_sensitive'
+            condition: Optional conditional expression
+        """
+        super().__init__(name, severity, params, condition)
+
+        # Pre-compute valid set for efficient lookup (avoids recreation on each chunk)
+        valid_values = self.params.get("valid_values", [])
+        case_sensitive = self.params.get("case_sensitive", True)
+
+        if case_sensitive:
+            self.valid_set = set(valid_values)
+        else:
+            self.valid_set = {str(v).lower() for v in valid_values}
+
+        self.case_sensitive = case_sensitive
+
     def get_description(self) -> str:
         """Get human-readable description."""
         field = self.params.get("field", "unknown")
@@ -357,13 +405,9 @@ class ValidValuesCheck(DataValidationRule):
                     failed_count=1,
                 )
 
-            case_sensitive = self.params.get("case_sensitive", True)
-
-            # Convert to set for efficient lookup
-            if case_sensitive:
-                valid_set = set(valid_values)
-            else:
-                valid_set = {str(v).lower() for v in valid_values}
+            # Use pre-computed valid set (computed in __init__ for performance)
+            valid_set = self.valid_set
+            case_sensitive = self.case_sensitive
 
             total_rows = 0
             failed_rows = []

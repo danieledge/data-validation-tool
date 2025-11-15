@@ -7,11 +7,11 @@ from validation_framework.validations.base import ValidationRule
 class ValidationRegistry:
     """Registry for validation rules."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the registry."""
         self._rules: Dict[str, Type[ValidationRule]] = {}
 
-    def register(self, name: str, rule_class: Type[ValidationRule]):
+    def register(self, name: str, rule_class: Type[ValidationRule]) -> None:
         """
         Register a validation rule.
 
@@ -72,7 +72,7 @@ def get_registry() -> ValidationRegistry:
     return _global_registry
 
 
-def register_validation(name: str, rule_class: Type[ValidationRule]):
+def register_validation(name: str, rule_class: Type[ValidationRule]) -> None:
     """
     Register a validation rule in the global registry.
 

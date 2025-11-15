@@ -18,3 +18,15 @@ python-dateutil>=2.8.0
 
 # For colored terminal output
 colorama>=0.4.6
+
+# Optional async dependencies (for concurrent file validation)
+# Install with: pip install aiofiles
+# aiofiles>=23.0.0
+
+# Optional database dependencies (for database validations)
+# Install with: pip install sqlalchemy psycopg2-binary pymysql
+# SQLAlchemy>=2.0.0
+# psycopg2-binary>=2.9.0  # PostgreSQL
+# PyMySQL>=1.0.0          # MySQL
+# cx_Oracle>=8.3.0        # Oracle
+# pyodbc>=4.0.0           # SQL Server

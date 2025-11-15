@@ -33,7 +33,7 @@ class ValidationResult:
     sample_failures: List[Dict[str, Any]] = field(default_factory=list)
     execution_time: float = 0.0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
             "rule_name": self.rule_name,
@@ -69,7 +69,7 @@ class FileValidationReport:
     total_validations: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def add_result(self, result: ValidationResult):
+    def add_result(self, result: ValidationResult) -> None:
         """Add a validation result and update counts."""
         self.validation_results.append(result)
         self.total_validations += 1
@@ -80,7 +80,7 @@ class FileValidationReport:
             else:
                 self.warning_count += 1
 
-    def update_status(self):
+    def update_status(self) -> None:
         """Update overall status based on results."""
         if self.error_count > 0:
             self.status = Status.FAILED
@@ -89,7 +89,7 @@ class FileValidationReport:
         else:
             self.status = Status.PASSED
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
             "file_name": self.file_name,
@@ -118,16 +118,16 @@ class ValidationReport:
     total_warnings: int = 0
     total_validations: int = 0
     config: Dict[str, Any] = field(default_factory=dict)
-    description: str = None
+    description: Optional[str] = None
 
-    def add_file_report(self, report: FileValidationReport):
+    def add_file_report(self, report: FileValidationReport) -> None:
         """Add a file validation report."""
         self.file_reports.append(report)
         self.total_errors += report.error_count
         self.total_warnings += report.warning_count
         self.total_validations += report.total_validations
 
-    def update_overall_status(self):
+    def update_overall_status(self) -> None:
         """Update overall status based on all file reports."""
         if self.total_errors > 0:
             self.overall_status = Status.FAILED
@@ -144,7 +144,7 @@ class ValidationReport:
         """Check if there are any warnings."""
         return self.total_warnings > 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
             "job_name": self.job_name,
